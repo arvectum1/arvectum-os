@@ -1,126 +1,22 @@
 import { useEffect, useState } from "react";
 import { loadGovernedExperience, runGovernedPreflight, WorkspaceApiError } from "./api";
+import { useWorkspaceLanguage } from "./i18n";
 import type { GovernedExperienceProjection, GovernedPreflightResult } from "./types";
 
-type ViewState =
-  | { kind: "loading" }
-  | { kind: "ready"; projection: GovernedExperienceProjection; result: GovernedPreflightResult | null; running: boolean }
-  | { kind: "error"; code: string };
+type ViewState = { kind: "loading" } | { kind: "ready"; projection: GovernedExperienceProjection; result: GovernedPreflightResult | null; running: boolean } | { kind: "error"; code: string };
 
 export function Governed({ csrfToken }: { csrfToken: string }) {
-  const [state, setState] = useState<ViewState>({ kind: "loading" });
-
-  useEffect(() => {
-    let cancelled = false;
-    void loadGovernedExperience()
-      .then((projection) => {
-        if (!cancelled) setState({ kind: "ready", projection, result: null, running: false });
-      })
-      .catch((error) => {
-        if (cancelled) return;
-        const code = error instanceof WorkspaceApiError ? error.code : "GOVERNED_EXPERIENCE_UNAVAILABLE";
-        setState({ kind: "error", code });
-      });
-    return () => { cancelled = true; };
-  }, []);
-
-  if (state.kind === "loading") {
-    return <section className="governed" aria-live="polite"><p>Loading current governed execution…</p></section>;
-  }
-  if (state.kind === "error") {
-    return (
-      <section className="governed governed-unavailable" role="alert">
-        <p className="eyebrow">Governed actions</p>
-        <h1>Current governed evidence is unavailable.</h1>
-        <p>Protected execution and decision details are withheld until current access and retained evidence can be revalidated.</p>
-        <code>{state.code}</code>
-      </section>
-    );
-  }
-
+  const { text } = useWorkspaceLanguage(); const [state, setState] = useState<ViewState>({ kind: "loading" });
+  useEffect(() => { let cancelled = false; void loadGovernedExperience().then((projection) => { if (!cancelled) setState({ kind: "ready", projection, result: null, running: false }); }).catch((error) => { if (!cancelled) setState({ kind: "error", code: error instanceof WorkspaceApiError ? error.code : "GOVERNED_EXPERIENCE_UNAVAILABLE" }); }); return () => { cancelled = true; }; }, []);
+  if (state.kind === "loading") return <section className="governed" aria-live="polite"><p>{text("Загружаем текущее управляемое выполнение…", "Loading current governed execution…")}</p></section>;
+  if (state.kind === "error") return <section className="governed governed-unavailable" role="alert"><p className="eyebrow">{text("Управляемые действия", "Governed actions")}</p><h1>{text("Текущие управляемые свидетельства недоступны.", "Current governed evidence is unavailable.")}</h1><p>{text("Детали выполнения и решений скрыты, пока текущий доступ и сохранённые свидетельства нельзя безопасно перепроверить.", "Protected execution and decision details are withheld until current access and retained evidence can be revalidated.")}</p><code>{state.code}</code></section>;
   const { projection, result, running } = state;
-  const run = async () => {
-    setState({ kind: "ready", projection, result, running: true });
-    try {
-      const next = await runGovernedPreflight(csrfToken);
-      setState({ kind: "ready", projection, result: next, running: false });
-    } catch (error) {
-      const code = error instanceof WorkspaceApiError ? error.code : "GOVERNED_PREFLIGHT_UNAVAILABLE";
-      setState({ kind: "error", code });
-    }
-  };
-
-  return (
-    <section className="governed" aria-labelledby="governed-title">
-      <header className="governed-heading">
-        <p className="eyebrow">Executions · Decisions · Governed actions</p>
-        <h1 id="governed-title">{projection.presentation.title}</h1>
-        <p>{projection.presentation.summary}</p>
-      </header>
-
-      <div className="governed-summary" aria-label="Current governed execution status">
-        <div><span>Current status</span><strong>{projection.execution.status}</strong></div>
-        <div><span>Authoritative source</span><strong>{projection.presentation.source}</strong></div>
-        <div><span>Authority mode</span><strong>{projection.presentation.authority_mode}</strong></div>
-      </div>
-
-      <section className="context-panel" aria-labelledby="execution-meaning-title">
-        <h2 id="execution-meaning-title">What happened</h2>
-        <p>{projection.execution.meaning}</p>
-        <dl>
-          <div><dt>Source scope</dt><dd>{projection.presentation.authority_scope}</dd></div>
-          <div><dt>Validation</dt><dd>{projection.presentation.validation_status}</dd></div>
-        </dl>
-        <p className="boundary-note">
-          This page, technical Workspace access and the action button do not grant Authorization, Organizational Authority, Data Governance approval or Consequential Approval.
-        </p>
-      </section>
-
-      <section className="decision-panel" aria-labelledby="decisions-title">
-        <p className="eyebrow">Independent governance decisions</p>
-        <h2 id="decisions-title">What is still required</h2>
-        <div className="decision-list">
-          {projection.decisions.map((decision) => (
-            <article key={decision.name} className="decision-card">
-              <div><span>{decision.name}</span><strong>{decision.state}</strong></div>
-              <p>{decision.basis}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="governed-action-panel" aria-labelledby="governed-action-title">
-        <p className="eyebrow">Bounded governed interaction</p>
-        <h2 id="governed-action-title">Re-check the real execution now</h2>
-        <p>{projection.action.explanation}</p>
-        <button type="button" disabled={running || !projection.action.available} onClick={() => void run()}>
-          {running ? "Running preflight…" : projection.action.label}
-        </button>
-        <p className="action-safety-note">No canonical mutation or external effect is requested by this preflight.</p>
-        {result ? (
-          <div className="preflight-result" role="status">
-            <strong>{result.status_text}</strong>
-            <p>Evidence: {result.evidence.classification}. SHA-256 <code>{result.evidence.sha256}</code>.</p>
-          </div>
-        ) : null}
-      </section>
-
-      <details className="technical-details">
-        <summary>Exact technical identity and provenance</summary>
-        <p>These identifiers are evidence for audit/reconstruction; they are not required for the ordinary action path.</p>
-        <dl>
-          <div><dt>Source Subject</dt><dd><code>{projection.technical.source_subject}</code></dd></div>
-          <div><dt>Source Version</dt><dd><code>{projection.technical.source_version}</code></dd></div>
-          <div><dt>Execution Subject</dt><dd><code>{projection.technical.execution_subject}</code></dd></div>
-          <div><dt>Execution Version</dt><dd><code>{projection.technical.execution_version}</code></dd></div>
-          <div><dt>Event Version</dt><dd><code>{projection.technical.event_version}</code></dd></div>
-          <div><dt>Recovery checkpoint</dt><dd><code>{projection.technical.checkpoint_id}</code></dd></div>
-          <div><dt>Runtime release</dt><dd><code>{projection.technical.release_sha}</code></dd></div>
-        </dl>
-        <ul className="provenance-list">
-          {projection.technical.provenance_refs.map((value) => <li key={value}><code>{value}</code></li>)}
-        </ul>
-      </details>
-    </section>
-  );
+  const run = async () => { setState({ kind: "ready", projection, result, running: true }); try { setState({ kind: "ready", projection, result: await runGovernedPreflight(csrfToken), running: false }); } catch (error) { setState({ kind: "error", code: error instanceof WorkspaceApiError ? error.code : "GOVERNED_PREFLIGHT_UNAVAILABLE" }); } };
+  return <section className="governed" aria-labelledby="governed-title"><header className="governed-heading"><p className="eyebrow">{text("Выполнения · Решения · Управляемые действия", "Executions · Decisions · Governed actions")}</p><h1 id="governed-title">{projection.presentation.title}</h1><p>{projection.presentation.summary}</p></header>
+    <div className="governed-summary" aria-label={text("Текущее состояние выполнения", "Current governed execution status")}><div><span>{text("Текущий статус", "Current status")}</span><strong>{projection.execution.status}</strong></div><div><span>{text("Авторитетный источник", "Authoritative source")}</span><strong>{projection.presentation.source}</strong></div><div><span>{text("Режим авторитета", "Authority mode")}</span><strong>{projection.presentation.authority_mode}</strong></div></div>
+    <section className="context-panel" aria-labelledby="execution-meaning-title"><h2 id="execution-meaning-title">{text("Что произошло", "What happened")}</h2><p>{projection.execution.meaning}</p><dl><div><dt>{text("Область источника", "Source scope")}</dt><dd>{projection.presentation.authority_scope}</dd></div><div><dt>{text("Валидация", "Validation")}</dt><dd>{projection.presentation.validation_status}</dd></div></dl><p className="boundary-note">{text("Эта страница, технический доступ к Workspace и кнопка действия не предоставляют авторизацию, Organizational Authority, Data Governance approval или Consequential Approval.", "This page, technical Workspace access and the action button do not grant Authorization, Organizational Authority, Data Governance approval or Consequential Approval.")}</p></section>
+    <section className="decision-panel" aria-labelledby="decisions-title"><p className="eyebrow">{text("Независимые governance-решения", "Independent governance decisions")}</p><h2 id="decisions-title">{text("Что ещё требуется", "What is still required")}</h2><div className="decision-list">{projection.decisions.map((decision) => <article key={decision.name} className="decision-card"><div><span>{decision.name}</span><strong>{decision.state}</strong></div><p>{decision.basis}</p></article>)}</div></section>
+    <section className="governed-action-panel" aria-labelledby="governed-action-title"><p className="eyebrow">{text("Ограниченное управляемое взаимодействие", "Bounded governed interaction")}</p><h2 id="governed-action-title">{text("Перепроверить реальное выполнение сейчас", "Re-check the real execution now")}</h2><p>{projection.action.explanation}</p><button type="button" disabled={running || !projection.action.available} onClick={() => void run()}>{running ? text("Выполняем проверку…", "Running preflight…") : projection.action.label}</button><p className="action-safety-note">{text("Эта проверка не запрашивает каноническое изменение или внешний эффект.", "No canonical mutation or external effect is requested by this preflight.")}</p>{result ? <div className="preflight-result" role="status"><strong>{result.status_text}</strong><p>{text("Свидетельство", "Evidence")}: {result.evidence.classification}. SHA-256 <code>{result.evidence.sha256}</code>.</p></div> : null}</section>
+    <details className="technical-details"><summary>{text("Точная техническая идентичность и происхождение", "Exact technical identity and provenance")}</summary><p>{text("Эти идентификаторы нужны для аудита и реконструкции, но не для обычной работы.", "These identifiers are evidence for audit/reconstruction; they are not required for the ordinary action path.")}</p><dl><div><dt>Source Subject</dt><dd><code>{projection.technical.source_subject}</code></dd></div><div><dt>Source Version</dt><dd><code>{projection.technical.source_version}</code></dd></div><div><dt>Execution Subject</dt><dd><code>{projection.technical.execution_subject}</code></dd></div><div><dt>Execution Version</dt><dd><code>{projection.technical.execution_version}</code></dd></div><div><dt>Event Version</dt><dd><code>{projection.technical.event_version}</code></dd></div><div><dt>{text("Контрольная точка восстановления", "Recovery checkpoint")}</dt><dd><code>{projection.technical.checkpoint_id}</code></dd></div><div><dt>{text("Версия runtime", "Runtime release")}</dt><dd><code>{projection.technical.release_sha}</code></dd></div></dl><ul className="provenance-list">{projection.technical.provenance_refs.map((value) => <li key={value}><code>{value}</code></li>)}</ul></details>
+  </section>;
 }

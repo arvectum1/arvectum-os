@@ -1,179 +1,28 @@
 import { FormEvent, useEffect, useState } from "react";
 import { loadDiscovery, WorkspaceApiError } from "./api";
+import { useWorkspaceLanguage } from "./i18n";
 import type { DiscoveryKind, DiscoveryProjection, DiscoveryResult } from "./types";
 
-const surfaceCopy: Record<string, { eyebrow: string; title: string; intro: string }> = {
-  search: {
-    eyebrow: "Global discovery",
-    title: "Find organizational context",
-    intro: "Search current governed Records, Documents, Knowledge and Executions by human context. Search is a non-authoritative projection; opening a result revalidates the current source before context is shown.",
-  },
-  record: {
-    eyebrow: "Records",
-    title: "Governed records",
-    intro: "Browse current governed records without learning Subject or Version identifiers. Technical identity remains available only inside an opened object.",
-  },
-  document: {
-    eyebrow: "Documents",
-    title: "Documents and artifacts",
-    intro: "Find governed Document context while preserving the declared authority source and exact-version evidence behind the human view.",
-  },
-  knowledge: {
-    eyebrow: "Knowledge",
-    title: "Knowledge and organizational memory",
-    intro: "Browse knowledge-related governed records without treating Observations, Memory or candidates as validated Knowledge.",
-  },
-};
-
-function navigate(href: string) {
-  window.history.pushState({}, "", href);
-  window.dispatchEvent(new PopStateEvent("popstate"));
-}
-
-function parseKind(value: string | null): DiscoveryKind | undefined {
-  return value === "record" || value === "document" || value === "knowledge" || value === "execution" ? value : undefined;
-}
-
-function ResultCard({ item }: { item: DiscoveryResult }) {
-  return (
-    <article className="discovery-card">
-      <div className="discovery-card-topline">
-        <span>{item.kind}</span>
-        <span>{item.semantic_role}</span>
-        <span>{item.authority_mode}</span>
-      </div>
-      <h2>{item.title}</h2>
-      {item.knowledge_role ? <p className="semantic-warning">{item.knowledge_role}</p> : null}
-      <p>{item.summary}</p>
-      <dl>
-        <div><dt>Source</dt><dd>{item.source}</dd></div>
-        <div><dt>State</dt><dd>{item.state}</dd></div>
-      </dl>
-      <div className="discovery-card-footer">
-        <small>Search result · non-authoritative · inspect only</small>
-        <a
-          href={item.open_href}
-          onClick={(event) => {
-            event.preventDefault();
-            navigate(item.open_href);
-          }}
-        >
-          Open context
-        </a>
-      </div>
-    </article>
-  );
-}
+function navigate(href: string) { window.history.pushState({}, "", href); window.dispatchEvent(new PopStateEvent("popstate")); }
+function parseKind(value: string | null): DiscoveryKind | undefined { return value === "record" || value === "document" || value === "knowledge" || value === "execution" ? value : undefined; }
 
 export function Discovery({ kind }: { kind?: DiscoveryKind }) {
-  const route = new URLSearchParams(window.location.search);
-  const routeQuery = route.get("q") ?? "";
-  const routeKind = parseKind(route.get("kind"));
-  const effectiveKind = kind ?? routeKind;
-  const [query, setQuery] = useState(routeQuery);
-  const [selectedKind, setSelectedKind] = useState<DiscoveryKind | "all">(routeKind ?? "all");
-  const [projection, setProjection] = useState<DiscoveryProjection | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const copy = surfaceCopy[kind ?? "search"];
-
-  useEffect(() => {
-    setQuery(routeQuery);
-    if (!kind) setSelectedKind(routeKind ?? "all");
-  }, [routeQuery, routeKind, kind]);
-
-  useEffect(() => {
-    let cancelled = false;
-    setError(null);
-    setProjection(null);
-    void loadDiscovery(routeQuery, effectiveKind)
-      .then((value) => { if (!cancelled) setProjection(value); })
-      .catch((reason) => {
-        if (cancelled) return;
-        setError(reason instanceof WorkspaceApiError ? reason.code : "DISCOVERY_UNAVAILABLE");
-      });
-    return () => { cancelled = true; };
-  }, [routeQuery, effectiveKind]);
-
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const trimmed = query.trim();
-    const base = kind === "record" ? "/records" : kind === "document" ? "/documents" : kind === "knowledge" ? "/knowledge" : "/search";
-    const params = new URLSearchParams();
-    if (trimmed) params.set("q", trimmed);
-    if (!kind && selectedKind !== "all") params.set("kind", selectedKind);
-    navigate(params.size ? `${base}?${params.toString()}` : base);
+  const { text } = useWorkspaceLanguage();
+  const surfaceCopy: Record<string, { eyebrow: string; title: string; intro: string }> = {
+    search: { eyebrow: text("Глобальный поиск", "Global discovery"), title: text("Найти организационный контекст", "Find organizational context"), intro: text("Ищите актуальные управляемые записи, документы, знания и выполнения по понятному контексту. Поиск является неавторитетной проекцией; при открытии результата источник перепроверяется.", "Search current governed Records, Documents, Knowledge and Executions by human context. Search is a non-authoritative projection; opening a result revalidates the current source before context is shown.") },
+    record: { eyebrow: text("Записи", "Records"), title: text("Управляемые записи", "Governed records"), intro: text("Просматривайте актуальные записи без необходимости знать внутренние идентификаторы Subject или Version. Техническая идентичность доступна внутри открытого объекта.", "Browse current governed records without learning Subject or Version identifiers. Technical identity remains available only inside an opened object.") },
+    document: { eyebrow: text("Документы", "Documents"), title: text("Документы и артефакты", "Documents and artifacts"), intro: text("Находите контекст документов с сохранением авторитетного источника и свидетельств точной версии.", "Find governed Document context while preserving the declared authority source and exact-version evidence behind the human view.") },
+    knowledge: { eyebrow: text("Знания", "Knowledge"), title: text("Знания и организационная память", "Knowledge and organizational memory"), intro: text("Просматривайте связанные со знаниями записи, не смешивая наблюдения, память и кандидатов с подтверждённым Знанием.", "Browse knowledge-related governed records without treating Observations, Memory or candidates as validated Knowledge.") },
   };
+  const route = new URLSearchParams(window.location.search); const routeQuery = route.get("q") ?? ""; const routeKind = parseKind(route.get("kind")); const effectiveKind = kind ?? routeKind;
+  const [query, setQuery] = useState(routeQuery); const [selectedKind, setSelectedKind] = useState<DiscoveryKind | "all">(routeKind ?? "all"); const [projection, setProjection] = useState<DiscoveryProjection | null>(null); const [error, setError] = useState<string | null>(null); const copy = surfaceCopy[kind ?? "search"];
+  useEffect(() => { setQuery(routeQuery); if (!kind) setSelectedKind(routeKind ?? "all"); }, [routeQuery, routeKind, kind]);
+  useEffect(() => { let cancelled = false; setError(null); setProjection(null); void loadDiscovery(routeQuery, effectiveKind).then((value) => { if (!cancelled) setProjection(value); }).catch((reason) => { if (!cancelled) setError(reason instanceof WorkspaceApiError ? reason.code : "DISCOVERY_UNAVAILABLE"); }); return () => { cancelled = true; }; }, [routeQuery, effectiveKind]);
+  const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); const trimmed = query.trim(); const base = kind === "record" ? "/records" : kind === "document" ? "/documents" : kind === "knowledge" ? "/knowledge" : "/search"; const params = new URLSearchParams(); if (trimmed) params.set("q", trimmed); if (!kind && selectedKind !== "all") params.set("kind", selectedKind); navigate(params.size ? `${base}?${params.toString()}` : base); };
+  const resultCard = (item: DiscoveryResult) => <article className="discovery-card" key={item.id}><div className="discovery-card-topline"><span>{item.kind}</span><span>{item.semantic_role}</span><span>{item.authority_mode}</span></div><h2>{item.title}</h2>{item.knowledge_role ? <p className="semantic-warning">{item.knowledge_role}</p> : null}<p>{item.summary}</p><dl><div><dt>{text("Источник", "Source")}</dt><dd>{item.source}</dd></div><div><dt>{text("Состояние", "State")}</dt><dd>{item.state}</dd></div></dl><div className="discovery-card-footer"><small>{text("Результат поиска · неавторитетный · только просмотр", "Search result · non-authoritative · inspect only")}</small><a href={item.open_href} onClick={(event) => { event.preventDefault(); navigate(item.open_href); }}>{text("Открыть контекст", "Open context")}</a></div></article>;
 
-  return (
-    <section className="discovery" aria-labelledby="discovery-title">
-      <div className="discovery-heading">
-        <p className="eyebrow">{copy.eyebrow}</p>
-        <h1 id="discovery-title">{copy.title}</h1>
-        <p>{copy.intro}</p>
-      </div>
-
-      <form className="discovery-search" role="search" onSubmit={submit}>
-        <label htmlFor="discovery-query">Search by name, source, external reference or meaningful context</label>
-        <div>
-          <input
-            id="discovery-query"
-            type="search"
-            value={query}
-            maxLength={160}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="e.g. notice number, source or document context"
-          />
-          <button type="submit">Search</button>
-        </div>
-        {!kind ? (
-          <label className="discovery-kind-filter">
-            Result type
-            <select value={selectedKind} onChange={(event) => setSelectedKind(event.target.value as DiscoveryKind | "all")}>
-              <option value="all">All result types</option>
-              <option value="record">Records</option>
-              <option value="document">Documents</option>
-              <option value="knowledge">Knowledge</option>
-              <option value="execution">Executions</option>
-            </select>
-          </label>
-        ) : null}
-      </form>
-
-      {error ? (
-        <div className="discovery-unavailable" role="alert">
-          <h2>Discovery unavailable</h2>
-          <p>Current protected discovery state could not be read safely. No protected result details are shown.</p>
-          <code>{error}</code>
-        </div>
-      ) : projection ? (
-        <>
-          <div className={`discovery-health discovery-health-${projection.health.state}`} role="status">
-            <strong>{projection.health.state}</strong>
-            <span>{projection.health.message}</span>
-            <small>Derived search · never canonical authority</small>
-          </div>
-          {projection.health.state === "degraded" ? (
-            <div className="discovery-unavailable">
-              <h2>Results withheld</h2>
-              <p>The current governed source could not be revalidated. Refresh after source health/access is restored.</p>
-            </div>
-          ) : projection.results.length === 0 ? (
-            <div className="empty-discovery">
-              <h2>No accessible matches</h2>
-              <p>No current authorized result matches this view. This message does not reveal whether denied objects exist.</p>
-            </div>
-          ) : (
-            <>
-              <p className="discovery-summary">{projection.results.length} accessible result{projection.results.length === 1 ? "" : "s"}</p>
-              <div className="discovery-list">
-                {projection.results.map((item) => <ResultCard key={item.id} item={item} />)}
-              </div>
-            </>
-          )}
-        </>
-      ) : (
-        <p aria-live="polite">Reading current authorized governed sources…</p>
-      )}
-    </section>
-  );
+  return <section className="discovery" aria-labelledby="discovery-title"><div className="discovery-heading"><p className="eyebrow">{copy.eyebrow}</p><h1 id="discovery-title">{copy.title}</h1><p>{copy.intro}</p></div>
+    <form className="discovery-search" role="search" onSubmit={submit}><label htmlFor="discovery-query">{text("Поиск по названию, источнику, внешней ссылке или смысловому контексту", "Search by name, source, external reference or meaningful context")}</label><div><input id="discovery-query" type="search" value={query} maxLength={160} onChange={(event) => setQuery(event.target.value)} placeholder={text("например: номер извещения, источник или контекст документа", "e.g. notice number, source or document context")} /><button type="submit">{text("Найти", "Search")}</button></div>{!kind ? <label className="discovery-kind-filter">{text("Тип результата", "Result type")}<select value={selectedKind} onChange={(event) => setSelectedKind(event.target.value as DiscoveryKind | "all")}><option value="all">{text("Все типы", "All result types")}</option><option value="record">{text("Записи", "Records")}</option><option value="document">{text("Документы", "Documents")}</option><option value="knowledge">{text("Знания", "Knowledge")}</option><option value="execution">{text("Выполнения", "Executions")}</option></select></label> : null}</form>
+    {error ? <div className="discovery-unavailable" role="alert"><h2>{text("Поиск недоступен", "Discovery unavailable")}</h2><p>{text("Не удалось безопасно прочитать текущую защищённую проекцию. Детали защищённых результатов не показываются.", "Current protected discovery state could not be read safely. No protected result details are shown.")}</p><code>{error}</code></div> : projection ? <><div className={`discovery-health discovery-health-${projection.health.state}`} role="status"><strong>{projection.health.state}</strong><span>{projection.health.message}</span><small>{text("Производный поиск · никогда не является каноническим источником", "Derived search · never canonical authority")}</small></div>{projection.health.state === "degraded" ? <div className="discovery-unavailable"><h2>{text("Результаты скрыты", "Results withheld")}</h2><p>{text("Текущий управляемый источник не удалось перепроверить. Обновите после восстановления источника или доступа.", "The current governed source could not be revalidated. Refresh after source health/access is restored.")}</p></div> : projection.results.length === 0 ? <div className="empty-discovery"><h2>{text("Доступных совпадений нет", "No accessible matches")}</h2><p>{text("В текущей авторизованной области ничего не найдено. Это сообщение не раскрывает существование недоступных объектов.", "No current authorized result matches this view. This message does not reveal whether denied objects exist.")}</p></div> : <><p className="discovery-summary">{text(`Доступных результатов: ${projection.results.length}`, `${projection.results.length} accessible result${projection.results.length === 1 ? "" : "s"}`)}</p><div className="discovery-list">{projection.results.map(resultCard)}</div></>}</> : <p aria-live="polite">{text("Читаем текущие авторизованные источники…", "Reading current authorized governed sources…")}</p>}
+  </section>;
 }

@@ -57,8 +57,10 @@ class P312Phase3M3ClosureTests(unittest.TestCase):
         self.assertIn("🟩 Complete", phase_3)
         self.assertIn("`M3` Validated shared capability baseline", phase_3)
         self.assertNotIn("Active", phase_3)
+        # Preserve the exact M3 capability disposition without freezing a global
+        # claim that no later, separately governed Platform Capability can ever
+        # become Active. The catalog test below independently guards CAP-001..004.
         self.assertIn("CAP-001 through CAP-004 remain `Incubating / Provisional`", roadmap)
-        self.assertIn("no Platform Capability is `Active`", roadmap)
         self.assertIn(
             "Roadmap status does not itself change Platform Capability lifecycle, Product Contract lifecycle, operational environment/readiness, conformance maturity, SLA/support or commercial commitments.",
             roadmap,

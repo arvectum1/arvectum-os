@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { loadWorkspaceContext, logoutWorkspace, WorkspaceApiError } from "./api";
+import { useWorkspaceLanguage } from "./i18n";
 import { Shell } from "./Shell";
 import type { WorkspaceContext } from "./types";
 
@@ -12,6 +13,7 @@ type State =
 export function App() {
   const [state, setState] = useState<State>({ kind: "loading" });
   const [, rerenderForRoute] = useState(0);
+  const { text } = useWorkspaceLanguage();
 
   const refresh = useCallback(async () => {
     setState({ kind: "loading" });
@@ -37,24 +39,26 @@ export function App() {
     return () => window.removeEventListener("popstate", listener);
   }, []);
 
-  if (state.kind === "loading") return <main className="center-state" aria-live="polite">Opening secure workspace…</main>;
+  if (state.kind === "loading") return <main className="center-state" aria-live="polite">{text("Открываем защищённое рабочее пространство…", "Opening secure workspace…")}</main>;
   if (state.kind === "signedOut") {
     return (
       <main className="center-state">
-        <h1>Signed out</h1>
-        <p>The server-side Workspace session has been revoked.</p>
-        <button type="button" onClick={() => void refresh()}>Re-open local workspace</button>
+        <h1>{text("Сеанс завершён", "Signed out")}</h1>
+        <p>{text("Серверный сеанс Arvectum OS отозван.", "The server-side Workspace session has been revoked.")}</p>
+        <button type="button" onClick={() => void refresh()}>{text("Открыть локальное пространство снова", "Re-open local workspace")}</button>
       </main>
     );
   }
   if (state.kind === "error") {
     return (
       <main className="center-state error-state" role="alert">
-        <h1>Workspace unavailable</h1>
-        <p>{state.reloadRequired ? "The application release changed. Reload before continuing." : "Access or security context could not be established."}</p>
+        <h1>{text("Рабочее пространство недоступно", "Workspace unavailable")}</h1>
+        <p>{state.reloadRequired
+          ? text("Версия приложения изменилась. Перезагрузите страницу перед продолжением.", "The application release changed. Reload before continuing.")
+          : text("Не удалось безопасно установить контекст доступа.", "Access or security context could not be established.")}</p>
         <code>{state.code}</code>
         <button type="button" onClick={() => state.reloadRequired ? window.location.reload() : void refresh()}>
-          {state.reloadRequired ? "Reload application" : "Try again"}
+          {state.reloadRequired ? text("Перезагрузить приложение", "Reload application") : text("Повторить", "Try again")}
         </button>
       </main>
     );

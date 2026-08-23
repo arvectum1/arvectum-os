@@ -1,273 +1,40 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import {
-  dispositionDogfoodingObservation,
-  loadDogfoodingBacklog,
-  recordDogfoodingObservation,
-  WorkspaceApiError,
-} from "./api";
-import type {
-  DogfoodingBacklog,
-  DogfoodingClassification,
-  DogfoodingDisposition,
-  DogfoodingJourney,
-  DogfoodingObservation,
-  DogfoodingObservationInput,
-  DogfoodingSeverity,
-  DogfoodingSurface,
-} from "./dogfoodingTypes";
+import { dispositionDogfoodingObservation, loadDogfoodingBacklog, recordDogfoodingObservation, WorkspaceApiError } from "./api";
+import { useWorkspaceLanguage } from "./i18n";
+import type { DogfoodingBacklog, DogfoodingClassification, DogfoodingDisposition, DogfoodingJourney, DogfoodingObservation, DogfoodingObservationInput, DogfoodingSeverity, DogfoodingSurface } from "./dogfoodingTypes";
 import "./Dogfooding.css";
-
-const journeyLabels: Record<DogfoodingJourney, string> = {
-  J1: "J1 · answer what needs attention now",
-  J2: "J2 · understand one object in context",
-  J3: "J3 · discover records, documents and knowledge",
-  J4: "J4 · ask Arvectum with inspectable evidence",
-  J5: "J5 · inspect or continue governed work",
-  J6: "J6 · inspect product context without hidden coupling",
-  other: "Other ordinary Workspace journey",
-};
-
-const surfaceLabels: Record<DogfoodingSurface, string> = {
-  home: "Home",
-  organization: "Organization",
-  "my-work": "My Work",
-  activity: "Activity",
-  search: "Search",
-  "records-documents-knowledge": "Records / Documents / Knowledge",
-  "ask-arvectum": "Ask Arvectum",
-  "governed-actions": "Governed actions",
-  products: "Products",
-  other: "Other",
-};
-
-const classificationLabels: Record<DogfoodingClassification, string> = {
-  "workspace-usability": "Workspace usability defect",
-  "product-specific": "Product-specific gap",
-  governance: "Governance / contract gap",
-  "security-authority": "Security / authority concern",
-};
-
-const dispositionLabels: Record<DogfoodingDisposition, string> = {
-  resolved: "Resolved and rechecked",
-  "routed-product": "Routed to product-owned backlog",
-  "routed-governance": "Routed to governance work",
-  "not-reproducible": "Not reproducible after recheck",
-  deferred: "Deferred with explicit rationale",
-};
 
 function allowedDispositions(item: DogfoodingObservation): DogfoodingDisposition[] {
   const allowed: DogfoodingDisposition[] = ["resolved", "not-reproducible"];
   if (item.severity !== "blocker" && item.classification === "product-specific") allowed.push("routed-product");
-  if (
-    item.severity !== "blocker"
-    && (item.classification === "governance" || item.classification === "security-authority")
-  ) allowed.push("routed-governance");
+  if (item.severity !== "blocker" && (item.classification === "governance" || item.classification === "security-authority")) allowed.push("routed-governance");
   if (item.severity !== "blocker" && item.classification !== "security-authority") allowed.push("deferred");
   return allowed;
 }
 
-type LoadState =
-  | { kind: "loading" }
-  | { kind: "ready"; backlog: DogfoodingBacklog }
-  | { kind: "error"; code: string };
+type LoadState = { kind: "loading" } | { kind: "ready"; backlog: DogfoodingBacklog } | { kind: "error"; code: string };
 
-function DispositionForm({
-  item,
-  csrfToken,
-  onChanged,
-}: {
-  item: DogfoodingObservation;
-  csrfToken: string;
-  onChanged: () => Promise<void>;
-}) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const allowed = allowedDispositions(item);
-
-  const submit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setBusy(true);
-    setError(null);
-    const form = new FormData(event.currentTarget);
-    try {
-      await dispositionDogfoodingObservation(
-        item.id,
-        String(form.get("disposition")) as DogfoodingDisposition,
-        String(form.get("rationale") ?? ""),
-        csrfToken,
-      );
-      await onChanged();
-    } catch (caught) {
-      setError(caught instanceof WorkspaceApiError ? caught.code : "DOGFOODING_DISPOSITION_FAILED");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <form className="dogfood-disposition" onSubmit={(event) => void submit(event)}>
-      <label>
-        Disposition
-        <select name="disposition" defaultValue={allowed[0]}>
-          {allowed.map((value) => (
-            <option key={value} value={value}>{dispositionLabels[value]}</option>
-          ))}
-        </select>
-      </label>
-      <label>
-        Rationale
-        <input
-          name="rationale"
-          required
-          maxLength={500}
-          placeholder="What changed, where it was routed, or why it is deferred"
-        />
-      </label>
-      <button type="submit" disabled={busy}>{busy ? "Saving…" : "Disposition"}</button>
-      {error ? <p className="dogfood-error" role="alert">{error}</p> : null}
-    </form>
-  );
+function DispositionForm({ item, csrfToken, onChanged }: { item: DogfoodingObservation; csrfToken: string; onChanged: () => Promise<void> }) {
+  const { text } = useWorkspaceLanguage(); const [busy, setBusy] = useState(false); const [error, setError] = useState<string | null>(null);
+  const labels: Record<DogfoodingDisposition, string> = { resolved: text("Исправлено и перепроверено", "Resolved and rechecked"), "routed-product": text("Передано в продуктовый бэклог", "Routed to product-owned backlog"), "routed-governance": text("Передано в governance", "Routed to governance work"), "not-reproducible": text("Не воспроизводится после проверки", "Not reproducible after recheck"), deferred: text("Отложено с обоснованием", "Deferred with explicit rationale") };
+  const submit = async (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); setBusy(true); setError(null); const form = new FormData(event.currentTarget); try { await dispositionDogfoodingObservation(item.id, String(form.get("disposition")) as DogfoodingDisposition, String(form.get("rationale") ?? ""), csrfToken); await onChanged(); } catch (caught) { setError(caught instanceof WorkspaceApiError ? caught.code : "DOGFOODING_DISPOSITION_FAILED"); } finally { setBusy(false); } };
+  return <form className="dogfood-disposition" onSubmit={(event) => void submit(event)}><label>{text("Решение", "Disposition")}<select name="disposition" defaultValue={allowedDispositions(item)[0]}>{allowedDispositions(item).map((value) => <option key={value} value={value}>{labels[value]}</option>)}</select></label><label>{text("Обоснование", "Rationale")}<input name="rationale" required maxLength={500} placeholder={text("Что изменилось, куда передано или почему отложено", "What changed, where it was routed, or why it is deferred")} /></label><button type="submit" disabled={busy}>{busy ? text("Сохраняем…", "Saving…") : text("Сохранить решение", "Disposition")}</button>{error ? <p className="dogfood-error" role="alert">{error}</p> : null}</form>;
 }
 
 export function Dogfooding({ csrfToken }: { csrfToken: string }) {
-  const [state, setState] = useState<LoadState>({ kind: "loading" });
-  const [captureBusy, setCaptureBusy] = useState(false);
-  const [captureError, setCaptureError] = useState<string | null>(null);
-
-  const refresh = useCallback(async () => {
-    try {
-      setState({ kind: "ready", backlog: await loadDogfoodingBacklog() });
-    } catch (caught) {
-      setState({ kind: "error", code: caught instanceof WorkspaceApiError ? caught.code : "DOGFOODING_UNAVAILABLE" });
-    }
-  }, []);
-
+  const { text } = useWorkspaceLanguage();
+  const journeys: Record<DogfoodingJourney, string> = { J1: text("J1 · понять, что требует внимания", "J1 · answer what needs attention now"), J2: text("J2 · понять объект в контексте", "J2 · understand one object in context"), J3: text("J3 · найти записи, документы и знания", "J3 · discover records, documents and knowledge"), J4: text("J4 · спросить Arvectum и проверить источники", "J4 · ask Arvectum with inspectable evidence"), J5: text("J5 · проверить или продолжить управляемую работу", "J5 · inspect or continue governed work"), J6: text("J6 · открыть продуктовый контекст без скрытой связанности", "J6 · inspect product context without hidden coupling"), other: text("Другой обычный сценарий", "Other ordinary Workspace journey") };
+  const surfaces: Record<DogfoodingSurface, string> = { home: text("Главная", "Home"), organization: text("Организация", "Organization"), "my-work": text("Моя работа", "My Work"), activity: text("Активность", "Activity"), search: text("Поиск", "Search"), "records-documents-knowledge": text("Записи / Документы / Знания", "Records / Documents / Knowledge"), "ask-arvectum": text("Спросить Arvectum", "Ask Arvectum"), "governed-actions": text("Управляемые действия", "Governed actions"), products: text("Продукты", "Products"), other: text("Другое", "Other") };
+  const classifications: Record<DogfoodingClassification, string> = { "workspace-usability": text("Недочёт интерфейса Arvectum OS", "Workspace usability defect"), "product-specific": text("Пробел конкретного продукта", "Product-specific gap"), governance: text("Пробел governance / контракта", "Governance / contract gap"), "security-authority": text("Безопасность / полномочия", "Security / authority concern") };
+  const dispositionLabel: Record<DogfoodingDisposition, string> = { resolved: text("Исправлено и перепроверено", "Resolved and rechecked"), "routed-product": text("Передано продукту", "Routed to product-owned backlog"), "routed-governance": text("Передано в governance", "Routed to governance work"), "not-reproducible": text("Не воспроизводится", "Not reproducible after recheck"), deferred: text("Отложено", "Deferred with explicit rationale") };
+  const [state, setState] = useState<LoadState>({ kind: "loading" }); const [captureBusy, setCaptureBusy] = useState(false); const [captureError, setCaptureError] = useState<string | null>(null);
+  const refresh = useCallback(async () => { try { setState({ kind: "ready", backlog: await loadDogfoodingBacklog() }); } catch (caught) { setState({ kind: "error", code: caught instanceof WorkspaceApiError ? caught.code : "DOGFOODING_UNAVAILABLE" }); } }, []);
   useEffect(() => { void refresh(); }, [refresh]);
+  const capture = async (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); const formElement = event.currentTarget; const form = new FormData(formElement); const input: DogfoodingObservationInput = { journey: String(form.get("journey")) as DogfoodingJourney, surface: String(form.get("surface")) as DogfoodingSurface, severity: String(form.get("severity")) as DogfoodingSeverity, classification: String(form.get("classification")) as DogfoodingClassification, summary: String(form.get("summary") ?? ""), details: String(form.get("details") ?? "") }; setCaptureBusy(true); setCaptureError(null); try { await recordDogfoodingObservation(input, csrfToken); formElement.reset(); await refresh(); } catch (caught) { setCaptureError(caught instanceof WorkspaceApiError ? caught.code : "DOGFOODING_CAPTURE_FAILED"); } finally { setCaptureBusy(false); } };
 
-  const capture = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formElement = event.currentTarget;
-    const form = new FormData(formElement);
-    const input: DogfoodingObservationInput = {
-      journey: String(form.get("journey")) as DogfoodingJourney,
-      surface: String(form.get("surface")) as DogfoodingSurface,
-      severity: String(form.get("severity")) as DogfoodingSeverity,
-      classification: String(form.get("classification")) as DogfoodingClassification,
-      summary: String(form.get("summary") ?? ""),
-      details: String(form.get("details") ?? ""),
-    };
-    setCaptureBusy(true);
-    setCaptureError(null);
-    try {
-      await recordDogfoodingObservation(input, csrfToken);
-      formElement.reset();
-      await refresh();
-    } catch (caught) {
-      setCaptureError(caught instanceof WorkspaceApiError ? caught.code : "DOGFOODING_CAPTURE_FAILED");
-    } finally {
-      setCaptureBusy(false);
-    }
-  };
-
-  return (
-    <section className="dogfood-page" aria-labelledby="dogfood-title">
-      <p className="eyebrow">P9.11 · Real daily-use dogfooding</p>
-      <h1 id="dogfood-title">Capture friction where the work actually happens.</h1>
-      <p className="dogfood-boundary">
-        Entries are bounded, owner-operated observations only. They are not canonical Events, validated Knowledge,
-        authorization, Organizational Authority, or approval. Do not paste secrets or unnecessary protected content.
-      </p>
-
-      <form className="dogfood-capture" onSubmit={(event) => void capture(event)}>
-        <div className="dogfood-grid">
-          <label>
-            Journey
-            <select name="journey" defaultValue="J1">
-              {(Object.keys(journeyLabels) as DogfoodingJourney[]).map((value) => (
-                <option key={value} value={value}>{journeyLabels[value]}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Surface
-            <select name="surface" defaultValue="my-work">
-              {(Object.keys(surfaceLabels) as DogfoodingSurface[]).map((value) => (
-                <option key={value} value={value}>{surfaceLabels[value]}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Severity
-            <select name="severity" defaultValue="material">
-              <option value="blocker">Blocker · ordinary work cannot continue</option>
-              <option value="material">Material · recurring or costly friction</option>
-              <option value="minor">Minor · usable but unnecessarily awkward</option>
-            </select>
-          </label>
-          <label>
-            Classification
-            <select name="classification" defaultValue="workspace-usability">
-              {(Object.keys(classificationLabels) as DogfoodingClassification[]).map((value) => (
-                <option key={value} value={value}>{classificationLabels[value]}</option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <label>
-          Short observation
-          <input name="summary" required maxLength={240} placeholder="Describe the friction in one sentence" />
-        </label>
-        <label>
-          Minimal supporting detail
-          <textarea name="details" maxLength={600} rows={3} placeholder="Only what is needed to reproduce or understand it" />
-        </label>
-        <div className="dogfood-actions">
-          <button type="submit" disabled={captureBusy}>{captureBusy ? "Recording…" : "Record observation"}</button>
-          <span>Retention: 90 days · capacity: 200 entries · expired entries pruned on access</span>
-        </div>
-        {captureError ? <p className="dogfood-error" role="alert">{captureError}</p> : null}
-      </form>
-
-      {state.kind === "loading" ? <p aria-live="polite">Loading current friction backlog…</p> : null}
-      {state.kind === "error" ? <p className="dogfood-error" role="alert">{state.code}</p> : null}
-      {state.kind === "ready" ? (
-        <section aria-labelledby="dogfood-backlog-title">
-          <div className="dogfood-summary">
-            <div><span>Total retained</span><strong>{state.backlog.summary.total}</strong></div>
-            <div><span>Open observations</span><strong>{state.backlog.summary.open}</strong></div>
-            <div><span>P9.11 closure-blocking</span><strong>{state.backlog.summary.closure_blocking}</strong></div>
-          </div>
-          <h2 id="dogfood-backlog-title">Friction backlog</h2>
-          {state.backlog.items.length === 0 ? <p>No observations captured yet. Real owner sessions are still required for P9.11 closure.</p> : null}
-          {state.backlog.summary.closure_blocking > 0 ? (
-            <p className="dogfood-boundary">Blocker/material observations that are open or deferred still block P9.11 friction-backlog closure.</p>
-          ) : null}
-          <div className="dogfood-list">
-            {state.backlog.items.map((item) => (
-              <article key={item.id} className="dogfood-item">
-                <div className="dogfood-item-head">
-                  <strong>{item.summary}</strong>
-                  <span>{item.status === "open" ? "Open" : dispositionLabels[item.disposition!]}</span>
-                </div>
-                <p>{item.details || "No additional detail recorded."}</p>
-                <dl>
-                  <div><dt>Journey</dt><dd>{item.journey}</dd></div>
-                  <div><dt>Surface</dt><dd>{surfaceLabels[item.surface]}</dd></div>
-                  <div><dt>Severity</dt><dd>{item.severity}</dd></div>
-                  <div><dt>Classification</dt><dd>{classificationLabels[item.classification]}</dd></div>
-                  <div><dt>Release</dt><dd>{item.release_id}</dd></div>
-                </dl>
-                {item.status === "open" ? (
-                  <DispositionForm item={item} csrfToken={csrfToken} onChanged={refresh} />
-                ) : (
-                  <p className="dogfood-rationale"><strong>Rationale:</strong> {item.disposition_rationale}</p>
-                )}
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : null}
-    </section>
-  );
+  return <section className="dogfood-page" aria-labelledby="dogfood-title"><p className="eyebrow">P9.11 · {text("Реальная эксплуатация", "Real daily-use dogfooding")}</p><h1 id="dogfood-title">{text("Фиксируйте трение прямо там, где оно мешает работе.", "Capture friction where the work actually happens.")}</h1><p className="dogfood-boundary">{text("Записи здесь — только ограниченные наблюдения владельца. Это не канонические Events, не подтверждённое Knowledge, не авторизация, не Organizational Authority и не согласование. Не вставляйте секреты или лишние защищённые данные.", "Entries are bounded, owner-operated observations only. They are not canonical Events, validated Knowledge, authorization, Organizational Authority, or approval. Do not paste secrets or unnecessary protected content.")}</p>
+    <form className="dogfood-capture" onSubmit={(event) => void capture(event)}><div className="dogfood-grid"><label>{text("Сценарий", "Journey")}<select name="journey" defaultValue="J1">{(Object.keys(journeys) as DogfoodingJourney[]).map((value) => <option key={value} value={value}>{journeys[value]}</option>)}</select></label><label>{text("Раздел", "Surface")}<select name="surface" defaultValue="my-work">{(Object.keys(surfaces) as DogfoodingSurface[]).map((value) => <option key={value} value={value}>{surfaces[value]}</option>)}</select></label><label>{text("Критичность", "Severity")}<select name="severity" defaultValue="material"><option value="blocker">{text("Блокер · обычную работу нельзя продолжить", "Blocker · ordinary work cannot continue")}</option><option value="material">{text("Существенно · повторяется или дорого обходится", "Material · recurring or costly friction")}</option><option value="minor">{text("Незначительно · работать можно, но неудобно", "Minor · usable but unnecessarily awkward")}</option></select></label><label>{text("Классификация", "Classification")}<select name="classification" defaultValue="workspace-usability">{(Object.keys(classifications) as DogfoodingClassification[]).map((value) => <option key={value} value={value}>{classifications[value]}</option>)}</select></label></div><label>{text("Короткое замечание", "Short observation")}<input name="summary" required maxLength={240} placeholder={text("Опишите проблему одним предложением", "Describe the friction in one sentence")} /></label><label>{text("Минимальные детали", "Minimal supporting detail")}<textarea name="details" maxLength={600} rows={3} placeholder={text("Только то, что нужно для воспроизведения или понимания", "Only what is needed to reproduce or understand it")} /></label><div className="dogfood-actions"><button type="submit" disabled={captureBusy}>{captureBusy ? text("Записываем…", "Recording…") : text("Записать замечание", "Record observation")}</button><span>{text("Хранение: 90 дней · максимум 200 записей · истёкшие записи удаляются при обращении", "Retention: 90 days · capacity: 200 entries · expired entries pruned on access")}</span></div>{captureError ? <p className="dogfood-error" role="alert">{captureError}</p> : null}</form>
+    {state.kind === "loading" ? <p aria-live="polite">{text("Загружаем текущий список замечаний…", "Loading current friction backlog…")}</p> : null}{state.kind === "error" ? <p className="dogfood-error" role="alert">{state.code}</p> : null}{state.kind === "ready" ? <section aria-labelledby="dogfood-backlog-title"><div className="dogfood-summary"><div><span>{text("Всего хранится", "Total retained")}</span><strong>{state.backlog.summary.total}</strong></div><div><span>{text("Открытых замечаний", "Open observations")}</span><strong>{state.backlog.summary.open}</strong></div><div><span>{text("Блокируют P9.11", "P9.11 closure-blocking")}</span><strong>{state.backlog.summary.closure_blocking}</strong></div></div><h2 id="dogfood-backlog-title">{text("Бэклог замечаний", "Friction backlog")}</h2>{state.backlog.items.length === 0 ? <p>{text("Замечаний пока нет. Для закрытия P9.11 всё равно нужны реальные рабочие сессии владельца.", "No observations captured yet. Real owner sessions are still required for P9.11 closure.")}</p> : null}{state.backlog.summary.closure_blocking > 0 ? <p className="dogfood-boundary">{text("Открытые или отложенные blocker/material замечания продолжают блокировать закрытие P9.11.", "Blocker/material observations that are open or deferred still block P9.11 friction-backlog closure.")}</p> : null}<div className="dogfood-list">{state.backlog.items.map((item) => <article key={item.id} className="dogfood-item"><div className="dogfood-item-head"><strong>{item.summary}</strong><span>{item.status === "open" ? text("Открыто", "Open") : dispositionLabel[item.disposition!]}</span></div><p>{item.details || text("Дополнительные детали не записаны.", "No additional detail recorded.")}</p><dl><div><dt>{text("Сценарий", "Journey")}</dt><dd>{item.journey}</dd></div><div><dt>{text("Раздел", "Surface")}</dt><dd>{surfaces[item.surface]}</dd></div><div><dt>{text("Критичность", "Severity")}</dt><dd>{item.severity}</dd></div><div><dt>{text("Классификация", "Classification")}</dt><dd>{classifications[item.classification]}</dd></div><div><dt>{text("Версия", "Release")}</dt><dd>{item.release_id}</dd></div></dl>{item.status === "open" ? <DispositionForm item={item} csrfToken={csrfToken} onChanged={refresh} /> : <p className="dogfood-rationale"><strong>{text("Обоснование", "Rationale")}:</strong> {item.disposition_rationale}</p>}</article>)}</div></section> : null}
+  </section>;
 }
