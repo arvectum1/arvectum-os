@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.2`
+Version: `2.95.3`
 Created: `2026-08-07`
 Updated: `2026-08-24`
 Owner: `ООО «Арвектум»`
@@ -17,7 +17,7 @@ Detailed completed-phase history remains in the corresponding phase roadmaps, re
 
 ## 2. Version note
 
-Version `2.95.2` preserves `P9.11 — Real daily-use dogfooding + friction/backlog closure` as the current **critical-path** action. It records the deployed `p9.11.1` RU-first/brand repair, `P9.11-F03` owner-first IA repair `p9.11.2`, and real finding `P9.11-F04`: the P7.06 canonical-repository guard blocked the p9.11.2 deployment because it still admitted only the obsolete repository identity. The bounded repository-identity migration bridge repairs deployment tooling only; p9.11.2 deployment and owner recheck remain pending.
+Version `2.95.3` preserves `P9.11 — Real daily-use dogfooding + friction/backlog closure` as the current **critical-path** action. It records `P9.11-F05`, the bounded exact-release Workspace listener reconciliation: P7.06 and the Desktop launcher now require process, installed-release and live-asset identity rather than treating HTTP 200 as readiness. It creates no new service, does not signal unknown listeners, and has not deployed p9.11.2 or replaced required owner recheck evidence.
 
 `INT-B7 — First real connector pilot admission package` is now canonically prepared and cross-reviewed, but the pilot is **NOT ADMITTED** because no exact real 1С/CRM/СЭД/ЭДО endpoint/deployment/account has been supplied. The integration block is therefore `Internally complete / operational continuation externally blocked`.
 

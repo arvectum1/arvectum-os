@@ -91,7 +91,7 @@ class ShellTests(unittest.TestCase):
 
     def test_update_requires_runtime_lock_quiescence_before_target_install(self):
         text = DEPLOY.read_text()
-        stop = text.index('sh "$P702" stop\n  wait_runtime_quiescent')
+        stop = text.index('if ! sh "$P702" stop; then rollback_and_record_failure "source runtime did not stop"; fi')
         quiescent = text.index('wait_runtime_quiescent || rollback_and_record_failure')
         install = text.index('if ! sh "$P702" install')
         self.assertLess(stop, quiescent)
