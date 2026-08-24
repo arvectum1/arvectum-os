@@ -24,6 +24,8 @@ TX_SCHEMA = "arvectum.p7_06.deployment-transaction/1"
 MIGRATION_SCHEMA = "arvectum.p7_06.migration-plan/1"
 OPERATING_MODE = "Persistent Internal / owner-operated"
 ORGANIZATION_SCOPE = "ООО «Арвектум»"
+CURRENT_CANONICAL_REPOSITORY = "arvectum1/arvectum-os"
+LEGACY_CANONICAL_REPOSITORIES = frozenset({"arvectum/arvectum-os"})
 REQUIRED_RELEASE_FILES = (
     "source/reference/python/p7_02_persistent_runtime.py",
     "source/reference/python/p7_02_macos_service.sh",
@@ -115,7 +117,12 @@ def _literal_store_schema(module_path: Path) -> str:
     raise IntegrityError("target P7.03 module has no literal STORE_SCHEMA")
 
 
-def verify_release(root: Path, release_sha: str) -> dict[str, Any]:
+def verify_release(
+    root: Path,
+    release_sha: str,
+    *,
+    allow_legacy_repository: bool = False,
+) -> dict[str, Any]:
     release_sha = _validate_sha(release_sha)
     release = root / "releases" / release_sha
     if not release.is_dir() or release.is_symlink():
@@ -123,7 +130,10 @@ def verify_release(root: Path, release_sha: str) -> dict[str, Any]:
     manifest_path = release / "release-manifest.json"
     archive_path = release / "reference-python.tar"
     manifest = _load_json(manifest_path)
-    if manifest.get("canonical_repository") != "arvectum/arvectum-os":
+    admitted_repositories = {CURRENT_CANONICAL_REPOSITORY}
+    if allow_legacy_repository:
+        admitted_repositories.update(LEGACY_CANONICAL_REPOSITORIES)
+    if manifest.get("canonical_repository") not in admitted_repositories:
         raise IntegrityError("release manifest canonical repository mismatch")
     if manifest.get("release_sha") != release_sha:
         raise IntegrityError("release manifest SHA mismatch")
@@ -192,7 +202,7 @@ def build_plan(root: Path, target_release: str, decision_ref: str, migration_pla
     target = _validate_sha(target_release)
     if source == target:
         raise BoundaryError("target release is already current")
-    source_info = verify_release(root, source)
+    source_info = verify_release(root, source, allow_legacy_repository=True)
     target_info = verify_release(root, target)
     migration = _migration_disposition(root, source, target, target_info["store_schema"], migration_plan)
     body = {
@@ -278,7 +288,7 @@ def record_transaction(root: Path, payload_path: Path) -> dict[str, Any]:
 def status(root: Path) -> dict[str, Any]:
     root = root.expanduser().resolve()
     current = current_release(root)
-    info = verify_release(root, current)
+    info = verify_release(root, current, allow_legacy_repository=True)
     pointer = root / "run" / "p7-06-last-transaction.json"
     last = _load_json(pointer) if pointer.exists() else None
     return {"current_release": current, "store_schema": info["store_schema"], "last_transaction": last}

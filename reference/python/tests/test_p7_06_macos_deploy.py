@@ -10,6 +10,23 @@ class ShellTests(unittest.TestCase):
     def test_deploy_shell_syntax(self):
         subprocess.run(["sh", "-n", str(DEPLOY)], check=True)
 
+    def test_current_canonical_repository_guard_and_target_manifest(self):
+        text = DEPLOY.read_text()
+        self.assertIn('CANONICAL_REPOSITORY="arvectum1/arvectum-os"', text)
+        self.assertIn('"https://github.com/$CANONICAL_REPOSITORY"', text)
+        self.assertIn('https://*@github.com/"$CANONICAL_REPOSITORY"', text)
+        self.assertNotIn('*github.com/', text)
+        self.assertNotIn('github.com/arvectum/arvectum-os', text)
+        self.assertIn('"canonical_repository":"$CANONICAL_REPOSITORY"', text)
+
+    def test_p702_activation_uses_the_same_current_repository_identity(self):
+        text = (HERE / "p7_02_macos_service.sh").read_text()
+        self.assertIn('CANONICAL_REPOSITORY="arvectum1/arvectum-os"', text)
+        self.assertIn('https://*@github.com/"$CANONICAL_REPOSITORY"', text)
+        self.assertNotIn('*github.com/', text)
+        self.assertNotIn('github.com/arvectum/arvectum-os', text)
+        self.assertIn('"canonical_repository":"$CANONICAL_REPOSITORY"', text)
+
     def test_proof_shell_syntax(self):
         subprocess.run(["sh", "-n", str(PROOF)], check=True)
 
