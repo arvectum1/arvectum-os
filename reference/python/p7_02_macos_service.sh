@@ -11,6 +11,7 @@ DOMAIN="gui/$(id -u)"
 SERVICE_TARGET="$DOMAIN/$LABEL"
 SERVICE_WAIT_ATTEMPTS=${ARVECTUM_P7_02_SERVICE_WAIT_ATTEMPTS:-20}
 SERVICE_WAIT_INTERVAL=${ARVECTUM_P7_02_SERVICE_WAIT_INTERVAL:-0.5}
+CANONICAL_REPOSITORY="arvectum1/arvectum-os"
 
 fail() { printf '%s\n' "P7.02 FAIL: $*" >&2; exit 1; }
 info() { printf '%s\n' "P7.02: $*"; }
@@ -40,8 +41,8 @@ assert_canonical_checkout() {
   git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1 || fail "not a Git worktree"
   origin=$(git -C "$REPO_ROOT" remote get-url origin 2>/dev/null || true)
   case "$origin" in
-    https://github.com/arvectum/arvectum-os|https://github.com/arvectum/arvectum-os.git|git@github.com:arvectum/arvectum-os|git@github.com:arvectum/arvectum-os.git|ssh://git@github.com/arvectum/arvectum-os|ssh://git@github.com/arvectum/arvectum-os.git) ;;
-    *) fail "origin is not canonical arvectum/arvectum-os: ${origin:-missing}" ;;
+    "https://github.com/$CANONICAL_REPOSITORY"|"https://github.com/$CANONICAL_REPOSITORY.git"|https://*@github.com/"$CANONICAL_REPOSITORY"|https://*@github.com/"$CANONICAL_REPOSITORY".git|"git@github.com:$CANONICAL_REPOSITORY"|"git@github.com:$CANONICAL_REPOSITORY.git"|"ssh://git@github.com/$CANONICAL_REPOSITORY"|"ssh://git@github.com/$CANONICAL_REPOSITORY.git") ;;
+    *) fail "origin is not canonical $CANONICAL_REPOSITORY: ${origin:-missing}" ;;
   esac
   branch=$(git -C "$REPO_ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || true)
   [ "$branch" = "main" ] || fail "checkout must be canonical main (found ${branch:-detached})"
@@ -144,7 +145,7 @@ prepare_release() {
   archive_sha=$(shasum -a 256 "$tmp/reference-python.tar" | awk '{print $1}')
   tar -xf "$tmp/reference-python.tar" -C "$tmp"
   cat > "$tmp/release-manifest.json" <<EOF
-{"canonical_repository":"arvectum/arvectum-os","release_sha":"$HEAD_SHA","reference_python_archive_sha256":"$archive_sha","runtime_classification":"Persistent Internal / owner-operated","network_listener_mode":"none"}
+{"canonical_repository":"$CANONICAL_REPOSITORY","release_sha":"$HEAD_SHA","reference_python_archive_sha256":"$archive_sha","runtime_classification":"Persistent Internal / owner-operated","network_listener_mode":"none"}
 EOF
 
   if [ -e "$release" ]; then
@@ -382,7 +383,7 @@ prove_runtime() {
   cat > "$summary" <<EOF
 p7_02_local_proof=PASS
 operating_mode=Persistent Internal / owner-operated
-canonical_repository=arvectum/arvectum-os
+canonical_repository=$CANONICAL_REPOSITORY
 release_sha=$rel
 service_manager=launchd LaunchAgent; reversible environment-specific adapter
 service_label=$LABEL

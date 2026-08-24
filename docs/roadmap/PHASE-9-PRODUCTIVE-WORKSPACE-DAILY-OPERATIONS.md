@@ -1,9 +1,9 @@
 # Arvectum OS Phase 9 — Productive Workspace & Daily Operations
 
 Status: `Active`
-Version: `1.13.1`
+Version: `1.13.2`
 Created: `2026-08-21`
-Updated: `2026-08-22`
+Updated: `2026-08-24`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `product_contract` and `governance`
 Parent roadmap: [`ROADMAP.md`](ROADMAP.md)
@@ -361,6 +361,8 @@ R31 is complete within the exact private internal scope. M9 remains open; P9.11,
 ### P9.11 current repair record
 
 The real owner launch repaired by `p9.11.1` established RU-first/brand presentation but then found `P9.11-F03 — Owner-first information architecture / obvious daily workflow`: the owner could not immediately identify where ordinary work starts, where actionable work and product work live, which section fits each job or why Workspace is useful. The `p9.11.2` repair changes only the internal Workspace navigation/presentation to Today, Work, Information, Arvectum AI and System, preserving legacy deep routes and all existing protected projections. It does not invent product operations or change authority, security, Product Contract or lifecycle semantics. Owner recheck is pending; P9.11 remains Current, R32 remains locked, P9.12 has not started and M9 is not closed.
+
+`P9.11-F04 — Canonical repository migration blocked governed deployment` was observed during the real p9.11.2 deployment attempt. P7.06 correctly failed closed before mutation because its checkout guard admitted only obsolete `arvectum/arvectum-os`, while canonical main is `arvectum1/arvectum-os`. The bounded repair admits the obsolete identity only as immutable installed-source provenance and requires `arvectum1/arvectum-os` for the current checkout and every new target. It does not rewrite the p9.11.1 manifest, deploy p9.11.2, change Workspace behavior, or close P9.11; owner recheck remains pending and R32 remains locked.
 
 ## 18. P9.07 closure result
 

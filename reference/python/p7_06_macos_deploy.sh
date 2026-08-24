@@ -17,6 +17,7 @@ OBSERVER_PLIST="$HOME/Library/LaunchAgents/$OBSERVER_LABEL.plist"
 LOCK_DIR="$RUNTIME_ROOT/run/p7-06-deploy.lock"
 R22_SHA="950a5a8e0258dd555db4a97e5622d64951bcf6fe"
 P705_LEGACY_PROVEN_SHA="cf60e52c93bf0ef4158cf2c3e26792850a126c70"
+CANONICAL_REPOSITORY="arvectum1/arvectum-os"
 QUIESCE_WAIT_ATTEMPTS=${ARVECTUM_P7_06_QUIESCE_WAIT_ATTEMPTS:-30}
 QUIESCE_WAIT_INTERVAL=${ARVECTUM_P7_06_QUIESCE_WAIT_INTERVAL:-0.5}
 
@@ -29,8 +30,8 @@ assert_canonical_checkout() {
   [ "$(git -C "$REPO_ROOT" branch --show-current)" = "main" ] || fail "canonical checkout must be on main"
   origin=$(git -C "$REPO_ROOT" remote get-url origin 2>/dev/null || true)
   case "$origin" in
-    *github.com/arvectum/arvectum-os.git|*github.com/arvectum/arvectum-os) ;;
-    *) fail "origin is not canonical arvectum/arvectum-os: $origin" ;;
+    "https://github.com/$CANONICAL_REPOSITORY"|"https://github.com/$CANONICAL_REPOSITORY.git"|https://*@github.com/"$CANONICAL_REPOSITORY"|https://*@github.com/"$CANONICAL_REPOSITORY".git|"git@github.com:$CANONICAL_REPOSITORY"|"git@github.com:$CANONICAL_REPOSITORY.git"|"ssh://git@github.com/$CANONICAL_REPOSITORY"|"ssh://git@github.com/$CANONICAL_REPOSITORY.git") ;;
+    *) fail "origin is not canonical $CANONICAL_REPOSITORY: $origin" ;;
   esac
   [ -z "$(git -C "$REPO_ROOT" status --porcelain)" ] || fail "canonical checkout must be clean"
   git -C "$REPO_ROOT" fetch --quiet origin main
@@ -86,7 +87,7 @@ prepare_target() {
   archive_sha=$(shasum -a 256 "$tmp/reference-python.tar" | awk '{print $1}')
   tar -xf "$tmp/reference-python.tar" -C "$tmp"
   cat > "$tmp/release-manifest.json" <<EOF
-{"canonical_repository":"arvectum/arvectum-os","release_sha":"$target","reference_python_archive_sha256":"$archive_sha","runtime_classification":"Persistent Internal / owner-operated","network_listener_mode":"none"}
+{"canonical_repository":"$CANONICAL_REPOSITORY","release_sha":"$target","reference_python_archive_sha256":"$archive_sha","runtime_classification":"Persistent Internal / owner-operated","network_listener_mode":"none"}
 EOF
   if [ -e "$release" ]; then
     [ -d "$release/source/reference/python" ] || fail "existing target release is incomplete"

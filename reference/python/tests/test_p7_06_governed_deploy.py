@@ -28,7 +28,7 @@ class P706Tests(unittest.TestCase):
         (self.root / "config/p7-03-recovery.json").write_text(json.dumps({"store_schema":"arvectum.p7_03.durable-store/1"}))
     def tearDown(self): self.tmp.cleanup()
 
-    def _release(self, sha, schema):
+    def _release(self, sha, schema, repository=m.CURRENT_CANONICAL_REPOSITORY):
         r = self.root / "releases" / sha
         src = r / "source/reference/python"
         src.mkdir(parents=True, exist_ok=True)
@@ -41,7 +41,7 @@ class P706Tests(unittest.TestCase):
                 p.write_text("# fixture\n")
         archive = r / "reference-python.tar"
         archive.write_bytes(f"archive-{sha}".encode())
-        manifest = {"canonical_repository":"arvectum/arvectum-os","release_sha":sha,"reference_python_archive_sha256":hashlib.sha256(archive.read_bytes()).hexdigest()}
+        manifest = {"canonical_repository":repository,"release_sha":sha,"reference_python_archive_sha256":hashlib.sha256(archive.read_bytes()).hexdigest()}
         (r / "release-manifest.json").write_text(json.dumps(manifest))
         py = self.root / "venvs" / sha / "bin/python"
         py.parent.mkdir(parents=True, exist_ok=True); py.write_text("")
@@ -58,6 +58,37 @@ class P706Tests(unittest.TestCase):
     def test_same_release_rejected(self):
         with self.assertRaises(m.BoundaryError):
             m.build_plan(self.root, SHA1, "owner:test")
+
+    def test_legacy_source_and_current_target_are_admitted(self):
+        self._release(SHA1, "arvectum.p7_03.durable-store/1", "arvectum/arvectum-os")
+        plan = m.build_plan(self.root, SHA2, "owner:test")
+        self.assertEqual(plan["source_release"], SHA1)
+        self.assertEqual(plan["target_release"], SHA2)
+
+    def test_current_source_and_legacy_target_are_rejected(self):
+        self._release(SHA2, "arvectum.p7_03.durable-store/1", "arvectum/arvectum-os")
+        with self.assertRaises(m.IntegrityError):
+            m.build_plan(self.root, SHA2, "owner:test")
+
+    def test_legacy_source_and_legacy_target_are_rejected(self):
+        self._release(SHA1, "arvectum.p7_03.durable-store/1", "arvectum/arvectum-os")
+        self._release(SHA2, "arvectum.p7_03.durable-store/1", "arvectum/arvectum-os")
+        with self.assertRaises(m.IntegrityError):
+            m.build_plan(self.root, SHA2, "owner:test")
+
+    def test_arbitrary_source_repository_is_rejected(self):
+        self._release(SHA1, "arvectum.p7_03.durable-store/1", "someone/example")
+        with self.assertRaises(m.IntegrityError):
+            m.build_plan(self.root, SHA2, "owner:test")
+
+    def test_arbitrary_target_repository_is_rejected(self):
+        self._release(SHA2, "arvectum.p7_03.durable-store/1", "someone/example")
+        with self.assertRaises(m.IntegrityError):
+            m.build_plan(self.root, SHA2, "owner:test")
+
+    def test_status_admits_a_legacy_active_source_for_inspection(self):
+        self._release(SHA1, "arvectum.p7_03.durable-store/1", "arvectum/arvectum-os")
+        self.assertEqual(m.status(self.root)["current_release"], SHA1)
 
     def test_schema_change_without_plan_rejected(self):
         self._release(SHA2, "arvectum.p7_03.durable-store/2")
