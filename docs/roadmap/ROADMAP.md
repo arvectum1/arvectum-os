@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.0`
+Version: `2.95.1`
 Created: `2026-08-07`
 Updated: `2026-08-22`
 Owner: `ООО «Арвектум»`
@@ -17,7 +17,7 @@ Detailed completed-phase history remains in the corresponding phase roadmaps, re
 
 ## 2. Version note
 
-Version `2.95.0` preserves `P9.11 — Real daily-use dogfooding + friction/backlog closure` as the current **critical-path** action and closes all internally executable work in the current Lane-B integration block through the `INT-B7` admission boundary.
+Version `2.95.1` preserves `P9.11 — Real daily-use dogfooding + friction/backlog closure` as the current **critical-path** action. It records the deployed `p9.11.1` RU-first/brand repair and the new real owner finding `P9.11-F03`: the first-level taxonomy did not make a daily workflow obvious. The bounded owner-first IA implementation repair is `p9.11.2`; owner recheck remains pending.
 
 `INT-B7 — First real connector pilot admission package` is now canonically prepared and cross-reviewed, but the pilot is **NOT ADMITTED** because no exact real 1С/CRM/СЭД/ЭДО endpoint/deployment/account has been supplied. The integration block is therefore `Internally complete / operational continuation externally blocked`.
 
@@ -81,7 +81,7 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 | `R32` | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ gate |
 | `P9.12` | Phase 9 / M9 closure review | ⬜ |
 
-P9.11 remains the critical path to M9. The `p9.11.0` internal Workspace release contains the bounded real-session Observation/backlog mechanism; synthetic owner-session evidence is not accepted.
+P9.11 remains the critical path to M9. The `p9.11.0` internal Workspace release contains the bounded real-session Observation/backlog mechanism; `p9.11.1` repaired RU-first/brand presentation and `p9.11.2` repairs owner-first information architecture. Synthetic owner-session evidence is not accepted; none of these implementation repairs closes P9.11 before owner recheck.
 
 ## 6. Parallel development lanes
 

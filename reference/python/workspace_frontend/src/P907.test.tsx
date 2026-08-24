@@ -86,10 +86,12 @@ describe("P9.07 J5 product composition", () => {
 
     fireEvent.click(screen.getByRole("link", { name: "Open Tender Operator" }));
     expect(await screen.findByRole("heading", { name: "Tender Operator" })).toBeTruthy();
+    expect(screen.getByText("Verified Tender Operator context")).toBeTruthy();
+    expect(screen.queryByText("governed-item:abc")).toBeNull();
+    fireEvent.click(screen.getByText("Technical details"));
     expect(screen.getByText(/P6\.02 · Provisional 0\.1\.0/)).toBeTruthy();
     expect(screen.getByText("CAP-001")).toBeTruthy();
     expect(screen.getByText(/ЕИС \/ zakupki\.gov\.ru/)).toBeTruthy();
-    expect(screen.queryByText("governed-item:abc")).toBeNull();
 
     fireEvent.click(screen.getByRole("link", { name: "Home" }));
     await waitFor(() => expect(document.activeElement?.id).toBe("workspace-main"));
@@ -100,10 +102,12 @@ describe("P9.07 J5 product composition", () => {
     await screen.findByRole("heading", { name: "Products" });
     fireEvent.click(screen.getByRole("link", { name: "Open Discount Parser" }));
     expect(await screen.findByRole("heading", { name: "Discount Parser" })).toBeTruthy();
+    expect(screen.getByText("Verified Discount Parser context")).toBeTruthy();
+    expect(screen.queryByText("execution:dp-real")).toBeNull();
+    fireEvent.click(screen.getByText("Technical details"));
     expect(screen.getByText(/P6\.06 · Provisional 0\.1\.0/)).toBeTruthy();
     expect(screen.getByText("CAP-004")).toBeTruthy();
-    expect(screen.getByText("No effect replay")).toBeTruthy();
-    expect(screen.queryByText("execution:dp-real")).toBeNull();
+    expect(screen.getByText(/never replays an external effect/)).toBeTruthy();
 
     expect(paths.every((path) => ["/api/app/v1/context", "/api/app/v1/my-work", "/api/app/v1/products"].includes(path))).toBe(true);
   });

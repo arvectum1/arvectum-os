@@ -124,7 +124,7 @@ describe("P9.08 J6 Ask Arvectum", () => {
     window.history.replaceState({}, "", "/copilot");
     render(<App />);
 
-    expect(await screen.findByRole("heading", { name: /Ask the organization/i })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: /Ask Arvectum about the current work context/i })).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Question"), {
       target: { value: "What is the current status of EIS notice 0344100006426000005 and which source is authoritative?" },
     });
