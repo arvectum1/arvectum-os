@@ -27,14 +27,17 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
             (source / "p9_03_workspace.py").touch()
             (source / "workspace_frontend/dist").mkdir(parents=True)
             (source / "workspace_frontend/dist/index.html").touch()
+            (source / "workspace_app").mkdir()
+            (source / "workspace_app/release.json").write_text(json.dumps({"release_id": "p9.11.2", "app_api_contract": 11}))
         return root.resolve()
 
     def _status(self, root: pathlib.Path, listener_release: str):
         source = root / "releases" / listener_release / "source/reference/python"
+        python = root / "venvs" / listener_release / "bin/python"
         with (
             mock.patch.object(process, "_current_release", return_value="current"),
             mock.patch.object(process, "_listener", return_value=(30686, "Python")),
-            mock.patch.object(process, "_process_command", return_value="Python p9_03_workspace.py serve"),
+            mock.patch.object(process, "_process_command", return_value=f"{python} p9_03_workspace.py serve"),
             mock.patch.object(process, "_process_cwd", return_value=source),
             mock.patch.object(process, "_live_assets_match", return_value=True),
             mock.patch.object(process.p706, "verify_release"),
@@ -61,6 +64,83 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
         ):
             self.assertEqual(process.status(root)["state"], process.UNKNOWN)
 
+    def test_no_listener_is_not_running(self):
+        root = self._root("current", "current")
+        with mock.patch.object(process, "_current_release", return_value="current"), mock.patch.object(process, "_listener", return_value=None):
+            self.assertEqual(process.status(root)["state"], process.NOT_RUNNING)
+
+    def test_wrong_interpreter_is_unknown(self):
+        root = self._root("current", "current")
+        source = root / "releases/current/source/reference/python"
+        wrong = root / "other-python"
+        wrong.touch()
+        with (
+            mock.patch.object(process, "_current_release", return_value="current"),
+            mock.patch.object(process, "_listener", return_value=(30686, "Python")),
+            mock.patch.object(process, "_process_command", return_value=f"{wrong} p9_03_workspace.py serve"),
+            mock.patch.object(process, "_process_cwd", return_value=source),
+            mock.patch.object(process, "_live_assets_match", return_value=True),
+            mock.patch.object(process.p706, "verify_release"),
+        ):
+            self.assertEqual(process.status(root)["reason"], "exact invocation provenance is unavailable")
+
+    def test_wrong_entrypoint_is_unknown(self):
+        root = self._root("current", "current")
+        source = root / "releases/current/source/reference/python"
+        python = root / "venvs/current/bin/python"
+        with (
+            mock.patch.object(process, "_current_release", return_value="current"),
+            mock.patch.object(process, "_listener", return_value=(30686, "Python")),
+            mock.patch.object(process, "_process_command", return_value=f"{python} other.py serve"),
+            mock.patch.object(process, "_process_cwd", return_value=source),
+            mock.patch.object(process.p706, "verify_release"),
+        ):
+            self.assertEqual(process.status(root)["reason"], "wrong entrypoint")
+
+    def test_ambiguous_listener_is_unknown(self):
+        root = self._root("current", "current")
+        with mock.patch.object(process, "_current_release", return_value="current"), mock.patch.object(process, "_listener", side_effect=process.WorkspaceProcessError("ambiguous/non-loopback listener")):
+            observed = process.status(root)
+        self.assertEqual(observed["state"], process.UNKNOWN)
+        self.assertEqual(observed["reason"], "ambiguous/non-loopback listener")
+
+    def test_framework_interpreter_requires_managed_provenance(self):
+        root = self._root("current", "current")
+        source = root / "releases/current/source/reference/python"
+        framework = root / "framework-python"
+        framework.touch()
+        with (
+            mock.patch.object(process, "_current_release", return_value="current"),
+            mock.patch.object(process, "_listener", return_value=(30686, "Python")),
+            mock.patch.object(process, "_process_command", return_value=f"{framework} p9_03_workspace.py serve"),
+            mock.patch.object(process, "_process_cwd", return_value=source),
+            mock.patch.object(process, "_process_start_identity", return_value="start"),
+            mock.patch.object(process, "_live_assets_match", return_value=True),
+            mock.patch.object(process.p706, "verify_release"),
+        ):
+            self.assertEqual(process.status(root)["state"], process.UNKNOWN)
+            process._write_process_metadata(root, "current", 30686, "start")
+            observed = process.status(root)
+        self.assertEqual(observed["state"], process.CURRENT_EXACT)
+        self.assertEqual(observed["proof_mode"], "MANAGED_SPAWN_PROOF")
+
+    def test_pid_reuse_rejects_managed_metadata(self):
+        root = self._root("current", "current")
+        process._write_process_metadata(root, "current", 30686, "old-start")
+        source = root / "releases/current/source/reference/python"
+        framework = root / "framework-python"
+        framework.touch()
+        with (
+            mock.patch.object(process, "_current_release", return_value="current"),
+            mock.patch.object(process, "_listener", return_value=(30686, "Python")),
+            mock.patch.object(process, "_process_command", return_value=f"{framework} p9_03_workspace.py serve"),
+            mock.patch.object(process, "_process_cwd", return_value=source),
+            mock.patch.object(process, "_process_start_identity", return_value="new-start"),
+            mock.patch.object(process, "_live_assets_match", return_value=True),
+            mock.patch.object(process.p706, "verify_release"),
+        ):
+            self.assertEqual(process.status(root)["state"], process.UNKNOWN)
+
     def test_stop_refuses_unknown_without_signalling(self):
         with (
             mock.patch.object(process, "status", return_value={"state": process.UNKNOWN}),
@@ -70,14 +150,37 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
             process.stop_for_update(pathlib.Path("/tmp/runtime"))
         kill.assert_not_called()
 
+    def test_stop_revalidates_stale_process_before_signalling(self):
+        stale = {"state": process.STALE_KNOWN_EXACT, "pid": 7, "release_sha": "a" * 40}
+        with (
+            mock.patch.object(process, "status", side_effect=[stale, stale, {"state": process.NOT_RUNNING}]),
+            mock.patch.object(process.os, "kill") as kill,
+            mock.patch.object(process, "_atomic_json"),
+        ):
+            observed = process.stop_for_update(pathlib.Path("/tmp/runtime"))
+        kill.assert_called_once_with(7, process.signal.SIGTERM)
+        self.assertEqual(observed["state"], process.NOT_RUNNING)
+
+    def test_stop_does_not_signal_when_identity_changes(self):
+        before = {"state": process.STALE_KNOWN_EXACT, "pid": 7, "release_sha": "a" * 40}
+        after = {"state": process.STALE_KNOWN_EXACT, "pid": 8, "release_sha": "a" * 40}
+        with (
+            mock.patch.object(process, "status", side_effect=[before, after]),
+            mock.patch.object(process.os, "kill") as kill,
+            self.assertRaises(process.WorkspaceProcessError),
+        ):
+            process.stop_for_update(pathlib.Path("/tmp/runtime"))
+        kill.assert_not_called()
+
     def test_process_metadata_uses_release_payload_beside_workspace_source(self):
         root = self._root("current", "current")
         release = root / "releases/current/source/reference/python"
-        (release / "workspace_app").mkdir()
-        (release / "workspace_app/release.json").write_text(json.dumps({"release_id": "p9.11.2"}))
-        process._write_process_metadata(root, "current", 123)
+        (release / "workspace_app/release.json").write_text(json.dumps({"release_id": "p9.11.2", "app_api_contract": 11}))
+        process._write_process_metadata(root, "current", 123, "start")
         payload = json.loads((root / "run/workspace-process.json").read_text())
         self.assertEqual(payload["workspace_release"], "p9.11.2")
+        self.assertEqual(payload["requested_python"], str(root / "venvs/current/bin/python"))
+        self.assertEqual(payload["observed_process_start_identity"], "start")
 
 
 class LifecycleShellTests(unittest.TestCase):

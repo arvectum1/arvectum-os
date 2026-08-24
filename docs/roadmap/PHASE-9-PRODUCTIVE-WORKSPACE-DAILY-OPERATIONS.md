@@ -1,12 +1,14 @@
 # Arvectum OS Phase 9 — Productive Workspace & Daily Operations
 
 Status: `Active`
-Version: `1.13.3`
+Version: `1.13.4`
 Created: `2026-08-21`
 Updated: `2026-08-24`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `product_contract` and `governance`
 Parent roadmap: [`ROADMAP.md`](ROADMAP.md)
+
+F05 Case-C disposition: historical PID `30686` remains `UNKNOWN`, is not retroactively attributed or signalled, and future helper-created Workspace processes use managed spawn provenance with PID-reuse protection. P9.11 remains Current, R32 locked, P9.12 not started and M9 open.
 Milestone: `M9 — Daily-use organizational workbench`
 Intermediate milestone: `M9-alpha — Usable Internal Workspace — Achieved / PASS`
 Architecture baseline: Constitution `1.2.0`; RFC-0001 through RFC-0008 `Accepted 1.0.0`; ADR-0001 `Accepted`

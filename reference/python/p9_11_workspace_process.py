@@ -11,6 +11,7 @@ import argparse
 import json
 import os
 import re
+import shlex
 import signal
 import subprocess
 import sys
@@ -26,7 +27,7 @@ import p7_06_governed_deploy as p706
 
 PORT = 8769
 HOST = "127.0.0.1"
-PROCESS_SCHEMA = "arvectum.p9_11.workspace-process/1"
+PROCESS_SCHEMA = "arvectum.p9_11.workspace-process/2"
 STOP_SCHEMA = "arvectum.p9_11.workspace-stop/1"
 MAX_WAIT_SECONDS = 30.0
 POLL_SECONDS = 0.25
@@ -49,6 +50,8 @@ def _utc_now() -> str:
 def _atomic_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     os.chmod(path.parent, 0o700)
+    if path.is_symlink():
+        raise WorkspaceProcessError("operational metadata target must not be a symlink")
     descriptor, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
     try:
         with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
@@ -131,6 +134,53 @@ def _process_command(pid: int) -> str:
     return _command(["ps", "-ww", "-p", str(pid), "-o", "command="]).strip()
 
 
+def _process_start_identity(pid: int) -> str | None:
+    value = _command(["ps", "-ww", "-p", str(pid), "-o", "lstart="]).strip()
+    return value or None
+
+
+def _process_identity(command: str, cwd: Path | None, python: Path, entrypoint: Path) -> tuple[bool, str | None]:
+    if cwd is None:
+        return False, "wrong cwd"
+    try:
+        arguments = shlex.split(command)
+    except ValueError:
+        return False, "not Workspace command"
+    if len(arguments) != 3 or arguments[2] != "serve":
+        return False, "not Workspace command"
+    candidate = Path(arguments[1])
+    actual_entrypoint = (candidate if candidate.is_absolute() else cwd / candidate).resolve()
+    if actual_entrypoint != entrypoint.resolve():
+        return False, "wrong entrypoint"
+    try:
+        return Path(arguments[0]).resolve(strict=True) == python.resolve(), None
+    except OSError:
+        return False, "wrong interpreter"
+
+
+def _managed_proof(root: Path, pid: int, release: str, python: Path, entrypoint: Path, source: Path) -> bool:
+    path = root / "run/workspace-process.json"
+    if path.is_symlink() or not path.is_file():
+        return False
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    identity = _process_start_identity(pid)
+    return (
+        payload.get("schema") == PROCESS_SCHEMA
+        and payload.get("classification") == "non-canonical operational telemetry"
+        and payload.get("managed_by") == "p9_11_workspace_process"
+        and payload.get("pid") == pid
+        and payload.get("release_sha") == release
+        and payload.get("requested_python") == str(python)
+        and payload.get("requested_entrypoint") == str(entrypoint)
+        and payload.get("requested_cwd") == str(source)
+        and payload.get("bind") == f"{HOST}:{PORT}"
+        and payload.get("observed_process_start_identity") == identity
+    )
+
+
 def _fetch(path: str) -> bytes:
     try:
         with urlopen(f"http://{HOST}:{PORT}{path}", timeout=3) as response:
@@ -159,25 +209,38 @@ def _live_assets_match(index: Path) -> bool:
 def status(root: Path) -> dict[str, Any]:
     root = root.expanduser().resolve()
     current = _current_release(root)
-    listener = _listener()
+    try:
+        listener = _listener()
+    except WorkspaceProcessError as exc:
+        return {"state": UNKNOWN, "current_release": current, "reason": str(exc)}
     if listener is None:
         return {"state": NOT_RUNNING, "current_release": current}
     pid, listener_command = listener
     command = _process_command(pid)
     cwd = _process_cwd(pid)
-    if "p9_03_workspace.py serve" not in command or cwd is None:
-        return {"state": UNKNOWN, "current_release": current, "pid": pid, "reason": "listener is not a Workspace serve process"}
+    if cwd is None:
+        return {"state": UNKNOWN, "current_release": current, "pid": pid, "reason": "wrong cwd"}
     releases = root / "releases"
     try:
         release = cwd.relative_to(releases).parts[0]
         python, entrypoint, source, index = _release_paths(root, release)
         p706.verify_release(root, release, allow_legacy_repository=True)
     except (ValueError, IndexError, OSError, p706.P706Error):
-        return {"state": UNKNOWN, "current_release": current, "pid": pid, "reason": "Workspace source is not an admitted exact release"}
-    if cwd != source.resolve() or not python.is_file() or not entrypoint.is_file() or not _live_assets_match(index):
-        return {"state": UNKNOWN, "current_release": current, "pid": pid, "reason": "Workspace listener does not match its exact release"}
+        return {"state": UNKNOWN, "current_release": current, "pid": pid, "reason": "invalid release provenance"}
+    if cwd != source.resolve():
+        return {"state": UNKNOWN, "current_release": current, "pid": pid, "reason": "wrong cwd"}
+    if not python.is_file() or not entrypoint.is_file():
+        return {"state": UNKNOWN, "current_release": current, "pid": pid, "reason": "invalid release provenance"}
+    direct_proof, identity_error = _process_identity(command, cwd, python, entrypoint)
+    if identity_error:
+        return {"state": UNKNOWN, "current_release": current, "pid": pid, "reason": identity_error}
+    if not _live_assets_match(index):
+        return {"state": UNKNOWN, "current_release": current, "pid": pid, "reason": "asset mismatch"}
+    proof_mode = "DIRECT_OS_PROOF" if direct_proof else "MANAGED_SPAWN_PROOF" if _managed_proof(root, pid, release, python, entrypoint, source) else "NONE"
+    if proof_mode == "NONE":
+        return {"state": UNKNOWN, "current_release": current, "pid": pid, "release_sha": release, "proof_mode": proof_mode, "reason": "exact invocation provenance is unavailable"}
     state = CURRENT_EXACT if release == current else STALE_KNOWN_EXACT
-    return {"state": state, "current_release": current, "release_sha": release, "pid": pid, "listener_command": listener_command}
+    return {"state": state, "current_release": current, "release_sha": release, "pid": pid, "listener_command": listener_command, "proof_mode": proof_mode}
 
 
 def _require_p702_health(root: Path, release: str) -> None:
@@ -194,16 +257,22 @@ def _require_p702_health(root: Path, release: str) -> None:
         raise WorkspaceProcessError("P7.02 exact-current runtime health verification failed")
 
 
-def _write_process_metadata(root: Path, release: str, pid: int) -> None:
-    _, _, _, index = _release_paths(root, release)
+def _write_process_metadata(root: Path, release: str, pid: int, start_identity: str) -> None:
+    python, entrypoint, source, index = _release_paths(root, release)
     release_payload = json.loads((index.parent.parent.parent / "workspace_app/release.json").read_text(encoding="utf-8"))
     _atomic_json(root / "run/workspace-process.json", {
         "schema": PROCESS_SCHEMA,
         "classification": "non-canonical operational telemetry",
+        "managed_by": "p9_11_workspace_process",
         "pid": pid,
         "release_sha": release,
         "workspace_release": release_payload["release_id"],
-        "started_at": _utc_now(),
+        "app_api_contract": release_payload["app_api_contract"],
+        "requested_python": str(python),
+        "requested_entrypoint": str(entrypoint),
+        "requested_cwd": str(source),
+        "spawned_at": _utc_now(),
+        "observed_process_start_identity": start_identity,
         "bind": f"{HOST}:{PORT}",
     })
 
@@ -233,17 +302,25 @@ def start(root: Path) -> dict[str, Any]:
     process = subprocess.Popen([str(python), str(entrypoint), "serve"], cwd=source, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr, start_new_session=True)
     stdout.close()
     stderr.close()
+    start_identity = _process_start_identity(process.pid)
+    if start_identity is None:
+        raise WorkspaceProcessError("new Workspace process has no observable start identity")
+    try:
+        _write_process_metadata(root, release, process.pid, start_identity)
+    except Exception:
+        if _process_start_identity(process.pid) == start_identity:
+            os.kill(process.pid, signal.SIGTERM)
+        raise
     deadline = time.monotonic() + MAX_WAIT_SECONDS
     while time.monotonic() < deadline:
         observed = status(root)
         if observed["state"] == CURRENT_EXACT and observed.get("pid") == process.pid:
-            _write_process_metadata(root, release, process.pid)
             return observed
         if process.poll() is not None:
             break
         time.sleep(POLL_SECONDS)
-    if process.poll() is None:
-        process.terminate()
+    if process.poll() is None and _process_start_identity(process.pid) == start_identity:
+        os.kill(process.pid, signal.SIGTERM)
         try:
             process.wait(timeout=5)
         except subprocess.TimeoutExpired:
@@ -260,12 +337,15 @@ def stop_for_update(root: Path) -> dict[str, Any]:
         raise WorkspaceProcessError("Workspace stop refused: listener is UNKNOWN")
     pid = int(before["pid"])
     revalidated = status(root)
-    if revalidated.get("state") != before["state"] or revalidated.get("pid") != pid or revalidated.get("release_sha") != before.get("release_sha"):
+    if revalidated.get("state") != before["state"] or revalidated.get("pid") != pid or revalidated.get("release_sha") != before.get("release_sha") or revalidated.get("proof_mode") != before.get("proof_mode"):
         raise WorkspaceProcessError("Workspace stop refused: process identity changed")
     os.kill(pid, signal.SIGTERM)
     deadline = time.monotonic() + MAX_WAIT_SECONDS
     while time.monotonic() < deadline:
         if status(root)["state"] == NOT_RUNNING:
+            metadata = root / "run/workspace-process.json"
+            if metadata.is_file() and not metadata.is_symlink():
+                metadata.unlink()
             _atomic_json(root / "run/workspace-last-stop.json", {
                 "schema": STOP_SCHEMA,
                 "classification": "non-canonical operational telemetry",

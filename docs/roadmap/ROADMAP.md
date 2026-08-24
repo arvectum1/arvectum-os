@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.3`
+Version: `2.95.4`
 Created: `2026-08-07`
 Updated: `2026-08-24`
 Owner: `ООО «Арвектум»`
@@ -15,7 +15,7 @@ Roadmap progress does not itself change Platform Capability lifecycle, Product C
 
 ## 2. Version note
 
-Version `2.95.3` synchronizes the roadmap to the latest real P9.11 operating state and current parallel-lane state.
+Version `2.95.4` preserves the `2.95.3` real operating-state record and adds the F05 Case-C disposition: PID `30686` remains `UNKNOWN` because original venv invocation provenance cannot be reconstructed. No retrospective provenance or automatic signal is permitted; future helper-created Workspace processes carry managed spawn provenance bound to OS process-start identity. PR #3, selected-Mac reconciliation and owner recheck remain pending.
 
 The canonical repository for current checkouts and new deployments is `arvectum1/arvectum-os`. Historical `arvectum/arvectum-os` identity is retained only where immutable provenance of already-installed historical releases requires it.
 
