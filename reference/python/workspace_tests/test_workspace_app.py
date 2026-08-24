@@ -93,6 +93,20 @@ class WorkspaceBffTests(unittest.TestCase):
         self.assertNotIn("Domain=", cookie)
         self.assertNotIn("Secure", cookie)
 
+    def test_shell_navigation_is_owner_oriented_and_release_scoped(self) -> None:
+        payload = self.bootstrap().json()
+        self.assertEqual(payload["release"]["app_api_contract"], "11")
+        self.assertEqual(
+            [(item["id"], item["href"]) for item in payload["navigation"]],
+            [
+                ("today", "/"),
+                ("work", "/work"),
+                ("information", "/information"),
+                ("copilot", "/copilot"),
+                ("system", "/system"),
+            ],
+        )
+
     def test_browser_cannot_override_organization_or_actor(self) -> None:
         self.bootstrap()
         response = self.client.get(

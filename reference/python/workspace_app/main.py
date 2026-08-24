@@ -61,18 +61,11 @@ def _security_event(code: str, request: Request, store: SessionStore, detail: st
 
 def _navigation() -> list[dict[str, Any]]:
     return [
-        {"id": "home", "label": "Home", "href": "/", "availability": "available"},
-        {"id": "organization", "label": "Organization", "href": "/organization", "availability": "available"},
-        {"id": "my-work", "label": "My Work", "href": "/my-work", "availability": "available"},
-        {"id": "activity", "label": "Activity", "href": "/activity", "availability": "available"},
-        {"id": "search", "label": "Search", "href": "/search", "availability": "available"},
-        {"id": "records", "label": "Records", "href": "/records", "availability": "available"},
-        {"id": "documents", "label": "Documents", "href": "/documents", "availability": "available"},
-        {"id": "knowledge", "label": "Knowledge", "href": "/knowledge", "availability": "available"},
-        {"id": "copilot", "label": "Ask Arvectum", "href": "/copilot", "availability": "available"},
-        {"id": "governed", "label": "Governed actions", "href": "/governed", "availability": "available"},
-        {"id": "products", "label": "Products", "href": "/products", "availability": "available"},
-        {"id": "dogfooding", "label": "Dogfooding", "href": "/dogfooding", "availability": "available"},
+        {"id": "today", "label": "Today", "href": "/", "availability": "available"},
+        {"id": "work", "label": "Work", "href": "/work", "availability": "available"},
+        {"id": "information", "label": "Information", "href": "/information", "availability": "available"},
+        {"id": "copilot", "label": "Arvectum AI", "href": "/copilot", "availability": "available"},
+        {"id": "system", "label": "System", "href": "/system", "availability": "available"},
     ]
 
 

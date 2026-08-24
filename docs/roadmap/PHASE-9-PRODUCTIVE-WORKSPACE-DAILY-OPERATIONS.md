@@ -1,7 +1,7 @@
 # Arvectum OS Phase 9 — Productive Workspace & Daily Operations
 
 Status: `Active`
-Version: `1.13.0`
+Version: `1.13.1`
 Created: `2026-08-21`
 Updated: `2026-08-22`
 Owner: `ООО «Арвектум»`
@@ -357,6 +357,10 @@ Phase 9 does not by itself establish:
 Use the private Productive Workspace as the primary interface for real owner working sessions. Capture recurring friction and incomplete journeys, distinguish Workspace usability defects from product-specific or governance gaps, repair material blockers without weakening security/authority boundaries, and disposition the resulting backlog before R32.
 
 R31 is complete within the exact private internal scope. M9 remains open; P9.11, R32 and P9.12 still govern real daily-use evidence, hardening and final closure.
+
+### P9.11 current repair record
+
+The real owner launch repaired by `p9.11.1` established RU-first/brand presentation but then found `P9.11-F03 — Owner-first information architecture / obvious daily workflow`: the owner could not immediately identify where ordinary work starts, where actionable work and product work live, which section fits each job or why Workspace is useful. The `p9.11.2` repair changes only the internal Workspace navigation/presentation to Today, Work, Information, Arvectum AI and System, preserving legacy deep routes and all existing protected projections. It does not invent product operations or change authority, security, Product Contract or lifecycle semantics. Owner recheck is pending; P9.11 remains Current, R32 remains locked, P9.12 has not started and M9 is not closed.
 
 ## 18. P9.07 closure result
 

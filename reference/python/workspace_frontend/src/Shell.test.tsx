@@ -74,7 +74,6 @@ describe("P9.04 shell", () => {
     expect(screen.getByLabelText("Authenticated actor: Owner operator")).toBeTruthy();
     expect(screen.getByRole("navigation", { name: "Workspace navigation" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "My Work" })).toBeTruthy();
-    expect(screen.getByText("Not implied")).toBeTruthy();
     expect(await screen.findByRole("heading", { name: "Needs attention" })).toBeTruthy();
     expect(screen.getByText("Governed preflight is waiting")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Open My Work" })).toBeTruthy();

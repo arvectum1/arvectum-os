@@ -38,16 +38,9 @@ export function useWorkspaceLanguage(): LanguageContextValue {
 }
 
 export const navigationLabels: Record<string, { ru: string; en: string }> = {
-  home: { ru: "Главная", en: "Home" },
-  organization: { ru: "Организация", en: "Organization" },
-  "my-work": { ru: "Моя работа", en: "My Work" },
-  activity: { ru: "Активность", en: "Activity" },
-  search: { ru: "Поиск", en: "Search" },
-  records: { ru: "Записи", en: "Records" },
-  documents: { ru: "Документы", en: "Documents" },
-  knowledge: { ru: "Знания", en: "Knowledge" },
-  copilot: { ru: "Спросить Arvectum", en: "Ask Arvectum" },
-  governed: { ru: "Управляемые действия", en: "Governed actions" },
-  products: { ru: "Продукты", en: "Products" },
-  dogfooding: { ru: "Обратная связь", en: "Dogfooding" },
+  today: { ru: "Сегодня", en: "Today" },
+  work: { ru: "Работа", en: "Work" },
+  information: { ru: "Информация", en: "Information" },
+  copilot: { ru: "Arvectum AI", en: "Arvectum AI" },
+  system: { ru: "Система", en: "System" },
 };

@@ -264,7 +264,7 @@ describe("R30 M9-alpha integrated J1-J4 ordinary path", () => {
     const globalSearch = screen.getByLabelText("Global search");
     fireEvent.change(globalSearch, { target: { value: "0344100006426000005" } });
     fireEvent.click(screen.getAllByRole("button", { name: "Search" })[0]);
-    expect(await screen.findByRole("heading", { name: "Find organizational context" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Information" })).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Result type"), { target: { value: "document" } });
     fireEvent.click(screen.getAllByRole("button", { name: "Search" }).at(-1)!);
     expect(await screen.findByRole("heading", { name: "Document — EIS exact notice attachment evidence" })).toBeTruthy();
