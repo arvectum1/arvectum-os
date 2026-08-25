@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.12`
+Version: `2.95.13`
 Created: `2026-08-07`
 Updated: `2026-08-25`
 Owner: `ООО «Арвектум»`
@@ -15,22 +15,24 @@ Roadmap status does not itself change Platform Capability lifecycle, Product Con
 
 ## 2. Version note
 
-Version `2.95.12` records the `p9.11.4` F08 repair candidate under review. The live `p9.11.3` Workspace was reviewed by the owner: the Home page is now understandable and visually acceptable, the top-level navigation is clear, and the owner-provided Arvectum Block logo is accepted in this bounded presentation scope. F07 is therefore closed only for Home/navigation/branding.
+Version `2.95.13` records F08 remediation PR `#7` as merged canonical implementation through `2f1bf8f341c1a779805586e9f239c4442a65d96b`. Workspace source/release identity is now `p9.11.4` / app contract `11`. The merged repair makes the focused task a dedicated Russian-first owner view, keeps raw evidence on demand, preserves the task navigation context on `/governed`, makes the desktop sidebar persistent on long pages, and exposes the safe `Перепроверить состояние` operation only inside the exact waiting/non-consequential boundary. Merge is not deployment or owner-acceptance evidence.
 
-The same real session exposed **P9.11-F08 — Task-to-Governed Action Comprehension and Actionability**. After entering the urgent task, the owner could not understand the task-detail/governed-action flow: raw English and internal governance terminology dominate the screens; `Открыть` versus `Открыть выполнение` is ambiguous and visually crowded; the focused task remains duplicated in the queue so the list-level `Открыть` can appear non-functional; and the visually primary `Run governed preflight` control does not explain in plain Russian what it does or whether it is safe.
+The live `p9.11.3` Workspace was reviewed by the owner before this merge: the Home page is understandable and visually acceptable, the top-level navigation is clear, and the owner-provided Arvectum Block logo is accepted in that bounded presentation scope. F07 is therefore closed only for Home/navigation/branding.
 
-Repository review confirms a deeper truthfulness issue. The current P7.06-UI4 bridge intentionally supplies none of the four RFC-0005 action-specific decisions and exposes no consequential action request. Its preflight only re-evaluates retained evidence and records minimized owner-local non-canonical proof evidence; it requests no canonical mutation or external effect and grants no authority or approval. The current Workspace therefore has no admitted in-Workspace path to satisfy those four decisions. F08 must improve the owner-facing presentation without manufacturing approval/authority controls that do not exist.
+The same real session exposed **P9.11-F08 — Task-to-Governed Action Comprehension and Actionability**. After entering the urgent task, the owner could not understand the task-detail/governed-action flow: raw English and internal governance terminology dominated the screens; `Открыть` versus `Открыть выполнение` was ambiguous and visually crowded; the focused task was duplicated in the queue so the list-level `Открыть` could appear non-functional; and the visually primary `Run governed preflight` control did not explain in plain Russian what it did or whether it was safe.
+
+Repository review confirms the binding truthfulness boundary. The current P7.06-UI4 bridge intentionally supplies none of the four RFC-0005 action-specific decisions and exposes no consequential action request. Its preflight only re-evaluates retained evidence and records minimized owner-local non-canonical proof evidence; it requests no canonical mutation or external effect and grants no authority or approval. The current Workspace therefore has no admitted in-Workspace path to satisfy those four decisions. F08 improves owner-facing comprehension without manufacturing approval/authority controls that do not exist.
 
 Canonical evidence:
 
 - [`P9.11-F07 — Owner-first Workspace UX repair`](../reviews/P9-11-F07-owner-first-workspace-ux-repair.md) — `Owner recheck PASS in bounded Home/navigation/branding scope`;
-- [`P9.11-F08 — Task-to-Governed Action Comprehension and Actionability`](../reviews/P9-11-F08-task-to-governed-action-comprehension.md) — `Repair under review` (`p9.11.4` candidate; no deployment or owner recheck).
+- [`P9.11-F08 — Task-to-Governed Action Comprehension and Actionability`](../reviews/P9-11-F08-task-to-governed-action-comprehension.md) — `Repair merged / deployment + owner recheck pending`.
 
 F06 remains **operationally verified** in its bounded process-identity scope. F08 does not reopen F05/F06 and does not authorize any new effect, authority grant or decision path.
 
 The earlier F05 one-time owner decision for historical PID `30686` remains consumed and non-reusable. Normal `UNKNOWN` Workspace listeners remain fail-closed and unsignallable without a separate exact owner decision.
 
-`P9.11` remains Current and `R32` remains locked. The next canonical action is the bounded F08 task-detail/governed-action UX repair followed by another real owner recheck. No repository test or synthetic click can substitute for that owner evidence.
+`P9.11` remains Current and `R32` remains locked. The next canonical action is governed deployment of the exact current canonical runtime carrying Workspace `p9.11.4`, exact readiness/assets/launcher verification, and then a real owner recheck of the urgent-task journey. No repository test or synthetic click can substitute for that owner evidence.
 
 Lane B is internally complete through prepared `INT-B7`; no additional internal integration-planning task is admitted until an exact real 1С/CRM/СЭД/ЭДО endpoint/deployment/account is available.
 
@@ -65,7 +67,7 @@ This update creates no public/stable API/connector/browser contract, no customer
 
 ## 5. Active Phase 9
 
-Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.11`.
+Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.12`.
 
 | ID | Work item | Status |
 |---|---|---:|
@@ -84,7 +86,7 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F07 bounded PASS; F08 task/governed flow blocker** |
+| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F07 bounded PASS; F08 repair merged, deployment + owner recheck pending** |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked |
 | P9.12 | Phase 9 / M9 closure review | ⬜ |
 
@@ -97,20 +99,20 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 - F07 implementation repair PR `#6` merged at `3e0b472a015bde7a44ac8202f364fbf5ea568ebb`, advancing Workspace to `p9.11.3` / app contract `11`;
 - **F07 bounded owner recheck:** PASS for Home first-glance orientation, primary actions, top-level navigation and Arvectum branding;
 - **F08 real owner finding:** FAIL for the urgent-task detail and governed-action path — raw English/internal terminology, ambiguous/crowded actions, apparent same-route `Открыть` behavior, and unclear safety/purpose of `Run governed preflight`;
-- **F08 repair candidate:** `p9.11.4` is under repository review with Russian-first focused-task/governed inspection, evidence on demand, task-context navigation, and a fail-closed safe re-check that requires the exact action, execution, and gate-state boundary; it is not deployed or owner-rechecked;
+- **F08 implementation repair:** PR `#7` merged at `2f1bf8f341c1a779805586e9f239c4442a65d96b`; canonical Workspace source/release is now `p9.11.4` / contract `11`, but the selected Mac has not yet been updated to this merged repair;
 - repository inspection confirms the current preflight is non-consequential (`canonical_mutation_requested=false`, `external_effect_requested=false`, authority/approval not provided) and only records minimized local non-canonical proof evidence;
 - repository inspection also confirms no admitted in-Workspace path currently exists to satisfy the four missing RFC-0005 decisions; UI must not imply otherwise or manufacture approval controls;
-- next owner recheck: pending after F08 repair and exact deployment/readiness verification;
+- next owner recheck: pending after governed deployment, exact readiness verification and launcher refresh/open;
 - synthetic owner-session evidence: prohibited.
 
 Current critical sequence:
 
 ```text
-repair F08 task detail + governed-action comprehension/actionability
+governed P7.06 update selected Mac to exact current canonical main carrying Workspace p9.11.4 / contract 11
         ↓
-review + merge exact repair
+verify P7.02/P7.05, CURRENT_EXACT, admissible proof, and exact live assets
         ↓
-govern-deploy exact release and verify runtime/readiness/assets/launcher
+refresh/open exact-release Desktop launcher
         ↓
 real owner recheck of urgent-task journey
         ↓
@@ -155,7 +157,9 @@ Preferred first prepared candidate remains a bounded read-only `1С:ERP 2.5` pro
 - F06 selected-Mac operational verification: P7.02/P7.05 healthy, `CURRENT_EXACT`, `MANAGED_SPAWN_PROOF`, exact live assets PASS, Desktop launcher refreshed/opened on runtime `470d4e310973ed873eb71d1bec3cf0985288be6b`;
 - merged F07 PR `#6`: reviewed head `5e5db4b0dbf84774cc5915baccce5a21e109d267`; frontend `27 passed`; typecheck, no-Web-Storage guard, build and diff check PASS; Productive Workspace CI `32850241215` PASS; Reference Python CI `32850241199` PASS;
 - local F07 targeted backend/reference run reported `41 passed` plus one macOS `/var` symlink-policy baseline failure reproduced on canonical `main`; it is not treated as a waiver or post-deploy readiness proof;
-- real `p9.11.3` owner recheck now proves F07 Home/navigation/branding improvement but also proves F08 downstream usability failure;
+- real `p9.11.3` owner recheck proves F07 Home/navigation/branding improvement but also proves F08 downstream usability failure;
+- merged F08 PR `#7`: reviewed head `d2949821347fc3078757303d5858a67dfdd7e23b`; frontend `32 passed`; typecheck/build/diff check PASS; Productive Workspace CI `32856696161` PASS including SPA and BFF security/context jobs; Reference Python CI `32856696061` full reference suite PASS;
+- F08 post-merge selected-Mac deployment and owner recheck have not yet occurred;
 - R32 remains locked and therefore no M9 code-health PASS is claimed.
 
 ## 8. M9 definition
@@ -168,7 +172,7 @@ Parallel integration progress cannot substitute for P9.11 operational evidence.
 
 **Critical path:**
 
-> **P9.11-F08 — repair the urgent-task detail and governed-action journey so that the owner can understand what is blocked, why it is blocked, whether any external effect is occurring, what the available re-check does and does not do, and whether the task is actually resolvable inside Workspace. Remove ambiguous/same-route task actions, make the current non-consequential preflight explicitly safe and Russian-first, preserve exact source/provenance on demand, and do not manufacture missing Authorization, Organizational Authority, Data Governance or Consequential Approval controls. Then review, merge, govern-deploy and stop at a real owner recheck.**
+> **P9.11-F08 — govern-deploy the exact current canonical `main` carrying Workspace `p9.11.4` / app contract `11` to the selected Mac; verify P7.02/P7.05, `CURRENT_EXACT`, admissible process proof and exact live assets; refresh/open the exact-release Desktop launcher; then stop at a real owner recheck of the urgent-task → governed-inspection journey. F07 remains bounded PASS; F08 repair is merged but not yet owner-accepted; P9.11 remains Current and R32 remains locked.**
 
 **Lane B:**
 
