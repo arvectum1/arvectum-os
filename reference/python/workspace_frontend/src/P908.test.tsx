@@ -10,15 +10,11 @@ const context: WorkspaceContext = {
   actor: { label: "Owner operator", attributable: true, scope_resolved_server_side: true, authentication_source: "P7.04 owner-local credential" },
   session: { csrf_token: "csrf-p908", bounded: true, revocable: true, authority_provided: false },
   navigation: [
-    { id: "home", label: "Home", href: "/", availability: "available" },
-    { id: "my-work", label: "My Work", href: "/my-work", availability: "available" },
-    { id: "search", label: "Search", href: "/search", availability: "available" },
-    { id: "records", label: "Records", href: "/records", availability: "available" },
-    { id: "documents", label: "Documents", href: "/documents", availability: "available" },
-    { id: "knowledge", label: "Knowledge", href: "/knowledge", availability: "available" },
-    { id: "copilot", label: "Ask Arvectum", href: "/copilot", availability: "available" },
-    { id: "governed", label: "Governed actions", href: "/governed", availability: "available" },
-    { id: "products", label: "Products", href: "/products", availability: "available" },
+    { id: "today", label: "Home", href: "/", availability: "available" },
+    { id: "work", label: "Work", href: "/work", availability: "available" },
+    { id: "information", label: "Sources", href: "/information", availability: "available" },
+    { id: "copilot", label: "Arvectum AI", href: "/copilot", availability: "available" },
+    { id: "system", label: "System", href: "/system", availability: "available" },
   ],
   data_governance: { protected_read_revalidated: true, response_minimized: "shell-context-only", canonical_state_in_browser: false },
 };
@@ -124,7 +120,7 @@ describe("P9.08 J6 Ask Arvectum", () => {
     window.history.replaceState({}, "", "/copilot");
     render(<App />);
 
-    expect(await screen.findByRole("heading", { name: /Ask Arvectum about the current work context/i })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: /Ask Arvectum a question/i })).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Question"), {
       target: { value: "What is the current status of EIS notice 0344100006426000005 and which source is authoritative?" },
     });

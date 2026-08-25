@@ -17,14 +17,11 @@ const context: WorkspaceContext = {
   actor: { label: "Owner operator", attributable: true, scope_resolved_server_side: true, authentication_source: "P7.04 owner-local credential" },
   session: { csrf_token: "r30-csrf", bounded: true, revocable: true, authority_provided: false },
   navigation: [
-    { id: "home", label: "Home", href: "/", availability: "available" },
-    { id: "my-work", label: "My Work", href: "/my-work", availability: "available" },
-    { id: "search", label: "Search", href: "/search", availability: "available" },
-    { id: "records", label: "Records", href: "/records", availability: "available" },
-    { id: "documents", label: "Documents", href: "/documents", availability: "available" },
-    { id: "knowledge", label: "Knowledge", href: "/knowledge", availability: "available" },
-    { id: "governed", label: "Governed actions", href: "/governed", availability: "available" },
-    { id: "products", label: "Products", href: "/products", availability: "planned-p9.07" },
+    { id: "today", label: "Home", href: "/", availability: "available" },
+    { id: "work", label: "Work", href: "/work", availability: "available" },
+    { id: "information", label: "Sources", href: "/information", availability: "available" },
+    { id: "copilot", label: "Arvectum AI", href: "/copilot", availability: "available" },
+    { id: "system", label: "System", href: "/system", availability: "available" },
   ],
   data_governance: { protected_read_revalidated: true, response_minimized: "shell-context-only", canonical_state_in_browser: false },
 };
@@ -251,11 +248,14 @@ describe("R30 M9-alpha integrated J1-J4 ordinary path", () => {
     window.history.replaceState({}, "", "/");
     render(<App />);
 
-    // J1: useful Home + My Work, human reason/source/next step and a real context continuation.
+    // J1: Home is action-first; raw evidence is available only after the owner opens the task.
     expect(await screen.findByRole("heading", { name: "Needs attention" })).toBeTruthy();
-    expect(screen.getByText("Governed preflight is waiting for decision evidence")).toBeTruthy();
-    expect(screen.getByText("ЕИС / zakupki.gov.ru")).toBeTruthy();
-    const executionContext = screen.getByRole("link", { name: "Open execution context" });
+    expect(screen.getByText("Decision needed")).toBeTruthy();
+    expect(screen.queryByText("ЕИС / zakupki.gov.ru")).toBeNull();
+    fireEvent.click(screen.getByRole("link", { name: "Open" }));
+    expect(await screen.findAllByText("Governed preflight is waiting for decision evidence")).not.toHaveLength(0);
+    expect(screen.getAllByText("ЕИС / zakupki.gov.ru")).not.toHaveLength(0);
+    const executionContext = screen.getAllByRole("link", { name: "Open execution context" })[0];
     fireEvent.click(executionContext);
     expect(await screen.findByRole("heading", { name: "EIS document governed execution" })).toBeTruthy();
     await waitFor(() => expect(document.activeElement?.id).toBe("workspace-main"));
@@ -264,7 +264,7 @@ describe("R30 M9-alpha integrated J1-J4 ordinary path", () => {
     const globalSearch = screen.getByLabelText("Global search");
     fireEvent.change(globalSearch, { target: { value: "0344100006426000005" } });
     fireEvent.click(screen.getAllByRole("button", { name: "Search" })[0]);
-    expect(await screen.findByRole("heading", { name: "Information" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Search information" })).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Result type"), { target: { value: "document" } });
     fireEvent.click(screen.getAllByRole("button", { name: "Search" }).at(-1)!);
     expect(await screen.findByRole("heading", { name: "Document — EIS exact notice attachment evidence" })).toBeTruthy();

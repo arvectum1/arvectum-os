@@ -10,14 +10,11 @@ const context: WorkspaceContext = {
   actor: { label: "Owner operator", attributable: true, scope_resolved_server_side: true, authentication_source: "P7.04 owner-local credential" },
   session: { csrf_token: "csrf", bounded: true, revocable: true, authority_provided: false },
   navigation: [
-    { id: "home", label: "Home", href: "/", availability: "available" },
-    { id: "my-work", label: "My Work", href: "/my-work", availability: "available" },
-    { id: "search", label: "Search", href: "/search", availability: "available" },
-    { id: "records", label: "Records", href: "/records", availability: "available" },
-    { id: "documents", label: "Documents", href: "/documents", availability: "available" },
-    { id: "knowledge", label: "Knowledge", href: "/knowledge", availability: "available" },
-    { id: "governed", label: "Governed actions", href: "/governed", availability: "available" },
-    { id: "products", label: "Products", href: "/products", availability: "available" },
+    { id: "today", label: "Home", href: "/", availability: "available" },
+    { id: "work", label: "Work", href: "/work", availability: "available" },
+    { id: "information", label: "Sources", href: "/information", availability: "available" },
+    { id: "copilot", label: "Arvectum AI", href: "/copilot", availability: "available" },
+    { id: "system", label: "System", href: "/system", availability: "available" },
   ],
   data_governance: { protected_read_revalidated: true, response_minimized: "shell-context-only", canonical_state_in_browser: false },
 };
@@ -80,8 +77,11 @@ describe("P9.07 J5 product composition", () => {
     render(<App />);
     expect(await screen.findByText("ООО «Арвектум»")).toBeTruthy();
 
-    fireEvent.click(screen.getByRole("link", { name: /^Products/ }));
-    expect(await screen.findByRole("heading", { name: "Products" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("link", { name: "Tasks" }));
+    await waitFor(() => expect(document.activeElement?.id).toBe("workspace-main"));
+    window.history.replaceState({}, "", "/products");
+    window.dispatchEvent(new PopStateEvent("popstate"));
+    expect(await screen.findByRole("heading", { name: "Product contexts" })).toBeTruthy();
     expect(screen.getByText(/composed, not merged/i)).toBeTruthy();
 
     fireEvent.click(screen.getByRole("link", { name: "Open Tender Operator" }));
@@ -98,8 +98,9 @@ describe("P9.07 J5 product composition", () => {
     expect(screen.getByText("ООО «Арвектум»")).toBeTruthy();
     expect(screen.getByText("Owner operator")).toBeTruthy();
 
-    fireEvent.click(screen.getByRole("link", { name: /^Products/ }));
-    await screen.findByRole("heading", { name: "Products" });
+    window.history.replaceState({}, "", "/products");
+    window.dispatchEvent(new PopStateEvent("popstate"));
+    await screen.findByRole("heading", { name: "Product contexts" });
     fireEvent.click(screen.getByRole("link", { name: "Open Discount Parser" }));
     expect(await screen.findByRole("heading", { name: "Discount Parser" })).toBeTruthy();
     expect(screen.getByText("Verified Discount Parser context")).toBeTruthy();

@@ -9,6 +9,7 @@ import { Organization } from "./Organization";
 import { Products } from "./Products";
 import { System } from "./System";
 import { Work } from "./Work";
+import arvectumLogo from "./assets/arvectum-logo.svg";
 import { navigationLabels, useWorkspaceLanguage } from "./i18n";
 import type { NavigationItem, WorkspaceContext } from "./types";
 
@@ -28,20 +29,16 @@ function navigateTo(href: string) {
 function Today() {
   const { text } = useWorkspaceLanguage();
   return <>
-    <section className="hero home-hero" aria-labelledby="today-title">
-      <p className="eyebrow">{text("Рабочий день", "Working day")}</p>
-      <h1 id="today-title">{text("Вот что сейчас требует внимания", "Here is what needs attention now")}</h1>
-      <p>{text("Начните с текущей работы, найдите нужный контекст или спросите Arvectum.", "Start with current work, find context, or ask Arvectum.")}</p>
+    <section className="home-intro" aria-labelledby="today-title">
+      <p className="eyebrow">{text("Arvectum OS · Рабочее пространство", "Arvectum OS · Workspace")}</p>
+      <h1 id="today-title">{text("Что делать сейчас", "What to do now")}</h1>
+    </section>
+    <section className="home-actions" aria-label={text("Основные действия", "Primary actions")}>
+      <a href="/work" onClick={(event) => { event.preventDefault(); navigateTo("/work"); }}>{text("Открыть задачи", "Open tasks")}</a>
+      <a href="/information" onClick={(event) => { event.preventDefault(); navigateTo("/information"); }}>{text("Найти документ", "Find a document")}</a>
+      <a href="/copilot" onClick={(event) => { event.preventDefault(); navigateTo("/copilot"); }}>{text("Спросить Arvectum", "Ask Arvectum")}</a>
     </section>
     <MyWork embedded />
-    <section className="quick-actions" aria-labelledby="quick-actions-title">
-      <h2 id="quick-actions-title">{text("Быстрые действия", "Quick actions")}</h2>
-      <div className="status-grid">
-        <article><strong>{text("Открыть всю работу", "Open all work")}</strong><p>{text("Посмотреть очередь и продуктовые контексты.", "Review the queue and product contexts.")}</p><a href="/work" onClick={(event) => { event.preventDefault(); navigateTo("/work"); }}>{text("Открыть работу", "Open work")}</a></article>
-        <article><strong>{text("Найти информацию", "Find information")}</strong><p>{text("Найти документ, запись или знание.", "Find a document, record, or knowledge context.")}</p><a href="/information" onClick={(event) => { event.preventDefault(); navigateTo("/information"); }}>{text("Найти информацию", "Find information")}</a></article>
-        <article><strong>{text("Спросить Arvectum", "Ask Arvectum")}</strong><p>{text("Получить ответ с проверяемыми источниками.", "Get an answer with inspectable sources.")}</p><a href="/copilot" onClick={(event) => { event.preventDefault(); navigateTo("/copilot"); }}>{text("Спросить Arvectum", "Ask Arvectum")}</a></article>
-      </div>
-    </section>
   </>;
 }
 
@@ -76,14 +73,14 @@ export function Shell({ context, onLogout }: { context: WorkspaceContext; onLogo
   return <div className="app-shell">
     <a className="skip-link" href="#workspace-main">{text("К содержанию", "Skip to content")}</a>
     <aside className="sidebar" aria-label={text("Навигация Arvectum OS", "Workspace navigation")}>
-      <div className="brand" aria-label="Arvectum OS"><span className="brand-mark" aria-hidden="true"><span>AV</span></span><span className="brand-copy"><strong>Arvectum</strong><small>OS</small></span></div>
+      <div className="brand" aria-label="Arvectum OS"><img src={arvectumLogo} className="brand-logo" alt="Arvectum" /><span className="brand-product">OS</span></div>
       <nav aria-label={text("Навигация Arvectum OS", "Workspace navigation")}><ul>{context.navigation.map((item) => <li key={item.id}><a href={item.href} onClick={navigate(item)} aria-current={item.id === active.id ? "page" : undefined}><span>{navLabel(item)}</span></a></li>)}</ul></nav>
       <div className="sidebar-controls"><div className="language-switch" role="group" aria-label={text("Язык интерфейса", "Interface language")}><button type="button" className={language === "ru" ? "active" : ""} aria-pressed={language === "ru"} onClick={() => setLanguage("ru")}>RU</button><button type="button" className={language === "en" ? "active" : ""} aria-pressed={language === "en"} onClick={() => setLanguage("en")}>EN</button></div><div className="sidebar-footnote">{text("Внутреннее рабочее пространство", "Internal workspace")} · {context.release.id}</div></div>
     </aside>
     <div className="workspace-column">
       <header className="topbar">
         <div className="context-chip" aria-label={`${text("Организация", "Organization")}: ${context.organization.label}`}><span className="eyebrow">{text("Организация", "Organization")}</span><strong>{context.organization.label}</strong></div>
-        <div className="context-chip" aria-label={`${text("Пользователь", "Authenticated actor")}: ${context.actor.label}`}><span className="eyebrow">{text("Пользователь", "Authenticated actor")}</span><strong>{context.actor.label}</strong></div>
+        <div className="context-chip" aria-label={`${text("Пользователь", "User")}: ${context.actor.label}`}><span className="eyebrow">{text("Пользователь", "User")}</span><strong>{context.actor.label}</strong></div>
         <form className="global-search" role="search" onSubmit={(event) => { event.preventDefault(); const query = String(new FormData(event.currentTarget).get("q") ?? "").trim(); navigateTo(query ? `/information?q=${encodeURIComponent(query)}` : "/information"); }}>
           <label className="visually-hidden" htmlFor="global-search-query">{text("Глобальный поиск", "Global search")}</label><input id="global-search-query" name="q" type="search" maxLength={160} placeholder={text("Найти документ, запись, знание…", "Find a document, record, knowledge…")} /><button type="submit">{text("Найти", "Search")}</button>
         </form>

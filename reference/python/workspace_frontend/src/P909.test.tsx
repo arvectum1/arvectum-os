@@ -30,7 +30,7 @@ describe("P9.09 activity and attention routing", () => {
       return new Response(JSON.stringify(payload), { status: 200, headers: { "Content-Type": "application/json" } });
     }));
     render(<Activity />);
-    expect(await screen.findByRole("heading", { name: "Operational activity and alerts" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Events and signals" })).toBeTruthy();
     expect(screen.getByText(/not an Event store, audit log, notification authority/)).toBeTruthy();
     expect(screen.getByText(/No read\/unread state is recorded/)).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Current alerts" })).toBeTruthy();
@@ -46,5 +46,13 @@ describe("P9.09 activity and attention routing", () => {
     render(<Activity />);
     expect(await screen.findByRole("heading", { name: "Activity is unavailable." })).toBeTruthy();
     expect(screen.queryByText("Decision evidence is needed")).toBeNull();
+  });
+
+  it("does not present scenario items in ordinary activity", async () => {
+    const scenarioWork: MyWorkProjection = { ...work, items: [...work.items, { ...work.items[0], id: "22222222222222222222", title: "Scenario approval", evidence_mode: "scenario" }] };
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => new Response(JSON.stringify(String(input).includes("/my-work") ? scenarioWork : governed), { status: 200, headers: { "Content-Type": "application/json" } })));
+    render(<Activity />);
+    expect(await screen.findByRole("heading", { name: "Events and signals" })).toBeTruthy();
+    expect(screen.queryByText("Scenario approval")).toBeNull();
   });
 });
