@@ -9,6 +9,7 @@ import { Organization } from "./Organization";
 import { Products } from "./Products";
 import { System } from "./System";
 import { Work } from "./Work";
+import arvectumLogo from "./assets/arvectum-logo.svg";
 import { navigationLabels, useWorkspaceLanguage } from "./i18n";
 import type { NavigationItem, WorkspaceContext } from "./types";
 
@@ -76,7 +77,10 @@ export function Shell({ context, onLogout }: { context: WorkspaceContext; onLogo
   return <div className="app-shell">
     <a className="skip-link" href="#workspace-main">{text("К содержанию", "Skip to content")}</a>
     <aside className="sidebar" aria-label={text("Навигация Arvectum OS", "Workspace navigation")}>
-      <div className="brand" aria-label="Arvectum OS"><span className="brand-mark" aria-hidden="true"><span>AV</span></span><span className="brand-copy"><strong>Arvectum</strong><small>OS</small></span></div>
+      <div className="brand" aria-label="Arvectum OS">
+        <img src={arvectumLogo} className="brand-logo" alt="Arvectum" />
+        <span className="brand-product">OS</span>
+      </div>
       <nav aria-label={text("Навигация Arvectum OS", "Workspace navigation")}><ul>{context.navigation.map((item) => <li key={item.id}><a href={item.href} onClick={navigate(item)} aria-current={item.id === active.id ? "page" : undefined}><span>{navLabel(item)}</span></a></li>)}</ul></nav>
       <div className="sidebar-controls"><div className="language-switch" role="group" aria-label={text("Язык интерфейса", "Interface language")}><button type="button" className={language === "ru" ? "active" : ""} aria-pressed={language === "ru"} onClick={() => setLanguage("ru")}>RU</button><button type="button" className={language === "en" ? "active" : ""} aria-pressed={language === "en"} onClick={() => setLanguage("en")}>EN</button></div><div className="sidebar-footnote">{text("Внутреннее рабочее пространство", "Internal workspace")} · {context.release.id}</div></div>
     </aside>

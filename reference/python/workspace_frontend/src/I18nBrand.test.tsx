@@ -47,6 +47,26 @@ describe("P9.11 owner-first Workspace", () => {
     expect(screen.getByText("Here is what needs attention now")).toBeTruthy();
   });
 
+  it("renders the real Arvectum SVG logo instead of the AV placeholder", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(projection), { status: 200, headers: { "Content-Type": "application/json" } })));
+    render(<LanguageProvider><Shell context={context} onLogout={() => undefined} /></LanguageProvider>);
+    const logo = screen.getByRole("img", { name: "Arvectum" });
+    expect(logo).toBeTruthy();
+    const src = logo.getAttribute("src") ?? "";
+    expect(src.length > 0).toBe(true);
+    expect(screen.queryByText("AV")).toBeNull();
+    expect(screen.queryByText("Arvectum", { selector: ".brand-copy strong" })).toBeNull();
+  });
+
+  it("shows the OS product identifier without duplicating the Arvectum wordmark", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(projection), { status: 200, headers: { "Content-Type": "application/json" } })));
+    render(<LanguageProvider><Shell context={context} onLogout={() => undefined} /></LanguageProvider>);
+    const brand = screen.getByLabelText("Arvectum OS");
+    expect(brand.querySelector(".brand-product")?.textContent).toBe("OS");
+    const arvectumWords = brand.querySelectorAll("strong");
+    expect(arvectumWords.length).toBe(0);
+  });
+
   it("groups legacy product and technical deep routes under Work and System", () => {
     window.history.replaceState({}, "", "/products/tender-operator");
     const { unmount } = render(<LanguageProvider initialLanguage="en"><Shell context={context} onLogout={() => undefined} /></LanguageProvider>);
