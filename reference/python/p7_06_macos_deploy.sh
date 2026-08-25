@@ -322,7 +322,7 @@ record_pre_activation_stop_failure() {
   observer_ok=false
   if sh "$P702" status >/dev/null 2>&1; then runtime_ok=true; fi
   if sh "$P705" status >/dev/null 2>&1; then observer_ok=true; fi
-  workspace_disposition="$workspace_disposition; stop_for_update=failed; post_stop_state=not_queried_after_signal"
+  workspace_disposition="$workspace_disposition; stop_for_update=failed; post_stop_state=not_queried_after_stop_failure; signal_disposition=unknown_to_adapter"
   payload="$txdir/pre-activation-stop-failure-$(date -u '+%Y%m%dT%H%M%SZ').json"
   write_payload "$payload" "$plan_id" "$source" "$target" FAIL "$backup" "$backup_sha" "$runtime_ok" "$observer_ok" "not executed: target activation never began; current pointer unchanged; backup retained; operator investigation/retry required" "$workspace_disposition"
   tx=$(python3 "$P706" record --runtime-root "$RUNTIME_ROOT" --payload "$payload" --json || true)

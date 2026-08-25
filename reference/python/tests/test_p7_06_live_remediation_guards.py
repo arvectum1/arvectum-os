@@ -45,7 +45,9 @@ class P706LiveRemediationGuardTests(unittest.TestCase):
         end = text.index("preflight()", start)
         failure = text[start:end]
         self.assertIn('"not executed: target activation never began; current pointer unchanged; backup retained', failure)
-        self.assertIn("post_stop_state=not_queried_after_signal", failure)
+        self.assertIn("post_stop_state=not_queried_after_stop_failure", failure)
+        self.assertIn("signal_disposition=unknown_to_adapter", failure)
+        self.assertNotIn("not_queried_after_signal", failure)
         self.assertNotIn("workspace_status", failure)
         self.assertIn('"canonical_mutation_performed_by_deploy": False', text)
         self.assertIn('"product_external_effect_invoked": False', text)

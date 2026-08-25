@@ -35,7 +35,7 @@ The repair preserves full pre-signal `status()` and immediate identity revalidat
 
 ## Pre-Activation Failure Evidence
 
-If a future trusted Workspace stop fails before target activation, P7.06 records an existing-schema `FAIL` transaction when recording is available. It does not query Workspace status again after the helper signal; the record explicitly marks that post-signal state as not queried. It states that target activation never began, the current pointer was unchanged, backup was retained, no rollback occurred, and operator investigation/retry is required. This does not retrospectively alter the historical failed attempt.
+If a future trusted Workspace stop fails before target activation, P7.06 records an existing-schema `FAIL` transaction when recording is available. The adapter deliberately does not re-query Workspace after a failed stop-for-update helper call. The helper may have failed before or after its one permitted SIGTERM, so the adapter records `signal_disposition=unknown_to_adapter` unless separately proven; it performs no second signal or retry. The record states that target activation never began, the current pointer was unchanged, backup was retained, no rollback occurred, and operator investigation/retry is required. This does not retrospectively alter the historical failed attempt.
 
 ## Acceptance Evidence
 
