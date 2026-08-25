@@ -1,14 +1,14 @@
 # Arvectum OS Phase 9 — Productive Workspace & Daily Operations
 
 Status: `Active`
-Version: `1.13.12`
+Version: `1.13.13`
 Created: `2026-08-21`
 Updated: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `product_contract` and `governance`
 Parent roadmap: [`ROADMAP.md`](ROADMAP.md)
 
-Current disposition: F06 remains operationally verified. F07 is owner-rechecked PASS only in its bounded Home/navigation/branding scope on the live `p9.11.3` Workspace. PR `#7` is now merged canonical as `2f1bf8f341c1a779805586e9f239c4442a65d96b`, carrying Workspace `p9.11.4` / app contract `11`, but the selected Mac has not yet been governed-updated to the merged F08 remediation. P9.11 remains Current, R32 locked, P9.12 not started and M9 open.
+Current disposition: F06 remains operationally verified. F07 is owner-rechecked PASS only in its bounded Home/navigation/branding scope on the live `p9.11.3` Workspace. F08 `p9.11.4` was governed-deployed successfully to `dc0e0cff83a9031a3686191b5cf304ee03c2d1eb`, but its owner recheck failed because UI4 preflight proof was misclassified as urgent owner work. The p9.11.5 eligibility repair is under review. P9.11 remains Current, R32 locked, P9.12 not started and M9 open.
 Milestone: `M9 — Daily-use organizational workbench`
 Intermediate milestone: `M9-alpha — Usable Internal Workspace — Achieved / PASS`
 Architecture baseline: Constitution `1.2.0`; RFC-0001 through RFC-0008 `Accepted 1.0.0`; ADR-0001 `Accepted`
@@ -54,7 +54,7 @@ The legacy P4/P7 browser surfaces remain diagnostic/reference/recovery evidence.
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS | non-authoritative activity UX |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS | company-level composition |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS | product/AI boundaries PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F07 bounded PASS; F08 repair merged, deployment + owner recheck pending** | real owner sessions + material friction closure |
+| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F07 bounded PASS; F08 owner-task eligibility repair** | real owner sessions + material friction closure |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked | pre-closure hardening PASS |
 | P9.12 | Phase 9 / M9 closure review | ⬜ | exact-scope M9 closure |
 
@@ -160,7 +160,7 @@ Repository inspection establishes the exact semantics that the repair preserves:
 - running it only re-evaluates retained evidence and records minimized owner-local non-canonical proof evidence;
 - P7.06-UI4 deliberately supplies none of Authorization, Organizational Authority, Data Governance or Consequential Approval and exposes no consequential action request until independently governed evidence exists.
 
-Therefore the current urgent item is not actually resolvable inside Workspace. F08 states that truthfully, makes the safe re-check understandable, and does not invent approval/authority controls merely to make the path look actionable.
+The p9.11.4 deployment passed P7.02/P7.05, exact manifest/assets, `CURRENT_EXACT`, `MANAGED_SPAWN_PROOF`, and launcher checks. The real owner recheck still failed: UI4 has no concrete action request or owner resolution path, so its Waiting gates cannot truthfully be owner work. The p9.11.5 candidate removes UI4 from ordinary attention and Activity alerts, retains it as Settings diagnostics, preserves the gates and fail-closed re-check, and creates no product action, authority, approval, canonical mutation, or external effect.
 
 PR `#7` merged the bounded repair as `2f1bf8f341c1a779805586e9f239c4442a65d96b`, advancing Workspace to `p9.11.4` / app contract `11`. The merged implementation gives the focused task a dedicated Russian-first view, keeps raw evidence expandable, preserves task-context navigation on `/governed`, keeps the desktop sidebar available on long pages, and exposes `Перепроверить состояние` only when the action flags, execution state and all four gate states prove the current waiting/non-consequential boundary. Exact reviewed head `d2949821347fc3078757303d5858a67dfdd7e23b` passed Productive Workspace CI and Reference Python full CI.
 
@@ -169,11 +169,9 @@ F08 remains **OPEN** until the merged repair is governed-deployed and the owner 
 ## 7. Current critical path
 
 ```text
-governed P7.06 update selected Mac to exact current canonical main carrying Workspace p9.11.4 / contract 11
+review + merge p9.11.5 owner-task eligibility repair
         ↓
-verify P7.02/P7.05, CURRENT_EXACT, admissible proof, and exact live assets
-        ↓
-refresh/open exact-release Desktop launcher
+govern-deploy p9.11.5 and verify runtime/readiness/assets/launcher
         ↓
 real owner recheck of urgent-task journey
         ↓
@@ -219,6 +217,6 @@ Phase 9 does not by itself establish public SaaS, customer Production, universal
 
 ## 11. Current canonical action
 
-> **P9.11-F08 — govern-deploy the exact current canonical `main` carrying Workspace `p9.11.4` / app contract `11` to the selected Mac; verify P7.02/P7.05, `CURRENT_EXACT`, admissible proof and exact live assets; refresh/open the exact-release Desktop launcher; then stop at a real owner recheck of the urgent-task → governed-inspection journey. F07 remains bounded PASS; the F08 repair is merged but not yet owner-accepted; P9.11 remains Current and R32 remains locked.**
+> **P9.11-F08 — review and merge the bounded `p9.11.5` owner-task eligibility repair. A preflight/proof/health observation must not become owner work solely because a governance gate is Waiting; a real task requires a concrete product-owned requested outcome. Keep UI4 diagnostics available without authority or effects, then govern-deploy and stop at a real owner recheck. F07 remains bounded PASS; P9.11 remains Current and R32 remains locked.**
 
 R32 remains locked until P9.11 real-session evidence and friction closure criteria are met.

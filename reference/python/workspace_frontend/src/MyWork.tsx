@@ -187,6 +187,7 @@ export function MyWork({ embedded = false }: { embedded?: boolean }) {
       );
     });
   const visible = embedded ? filtered.slice(0, 3) : filtered;
+  const noLiveTasks = !scenarioView && visible.length === 0;
   const focused = focusId
     ? scoped.find((item) => item.id === focusId)
     : undefined;
@@ -282,7 +283,9 @@ export function MyWork({ embedded = false }: { embedded?: boolean }) {
           <Heading id={titleId}>
             {scenarioView
               ? text("Тестовые сценарии", "Test scenarios")
-              : text("Требует внимания", "Needs attention")}
+              : noLiveTasks
+                ? text(embedded ? "Сейчас нет задач" : "Задач сейчас нет", embedded ? "No tasks now" : "No tasks now")
+                : text("Требует внимания", "Needs attention")}
           </Heading>
           <p>
             {scenarioView
@@ -290,10 +293,9 @@ export function MyWork({ embedded = false }: { embedded?: boolean }) {
                   "Сценарные данные отделены от обычной работы и не являются живыми событиями.",
                   "Scenario data is separate from ordinary work and is not live activity.",
                 )
-              : text(
-                  "Показываются только текущие задачи из live-источников.",
-                  "Only current tasks from live sources are shown.",
-                )}
+              : noLiveTasks
+                ? text("Нет текущих задач, которые требуют вашего решения или действия.", "There are no current tasks requiring your decision or action.")
+                : text("Показываются только текущие задачи из live-источников.", "Only current tasks from live sources are shown.")}
           </p>
         </div>
         {embedded ? (
@@ -411,7 +413,7 @@ export function MyWork({ embedded = false }: { embedded?: boolean }) {
           </label>
         </div>
       ) : null}
-      <div className="queue-summary">
+      {visible.length > 0 ? <div className="queue-summary">
         {embedded && scoped.length > visible.length
           ? text(
               `Показано ${visible.length} из ${scoped.length}`,
@@ -421,7 +423,7 @@ export function MyWork({ embedded = false }: { embedded?: boolean }) {
               `Видимых задач: ${visible.length}`,
               `${visible.length} visible item${visible.length === 1 ? "" : "s"}`,
             )}
-      </div>
+      </div> : null}
       {visible.length === 0 ? (
         <div className="empty-queue">
           <strong>
@@ -438,8 +440,8 @@ export function MyWork({ embedded = false }: { embedded?: boolean }) {
           {!scenarioView ? (
             <p>
               {text(
-                "Это не означает, что вне текущей авторизованной области нет защищённой работы.",
-                "This does not assert that no protected work exists outside the current authorized scope.",
+                "Система работает нормально. Технические проверки доступны в настройках.",
+                "The system is operating normally. Technical checks are available in Settings.",
               )}
             </p>
           ) : null}

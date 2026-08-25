@@ -1,6 +1,6 @@
 # P9.11-F08 — Task-to-Governed Action Comprehension and Actionability
 
-Status: `Repair merged / deployment + owner recheck pending`
+Status: `Open / owner-task eligibility repair required`
 Date: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform`
@@ -12,9 +12,9 @@ Parent: `P9.11 — Real daily-use dogfooding + friction/backlog closure`
 - RFC-0001 through RFC-0008 — `Accepted 1.0.0`;
 - RFC-0005 preserves the separation of Authentication, Authorization, Organizational Authority, Data Governance, validation and consequential approval, and requires Governed Execution for consequential canonical mutation;
 - ADR-0001 — `Accepted` Productive Workspace browser topology; browser-visible controls are not authority and consequential commands must revalidate server-side;
-- Workspace canonical source release after PR `#7`: `p9.11.4` / app contract `11`;
+- p9.11.4 deployment runtime: `dc0e0cff83a9031a3686191b5cf304ee03c2d1eb` / app contract `11`;
 - PR `#7` merged as `2f1bf8f341c1a779805586e9f239c4442a65d96b` after exact-head Productive Workspace CI and Reference Python CI PASS;
-- the merged F08 repair has not yet been governed-deployed or owner-rechecked;
+- p9.11.4 governed deployment, exact assets, `CURRENT_EXACT`, and `MANAGED_SPAWN_PROOF` passed; the real owner recheck failed;
 - P9.11 remains `Current`; R32 remains locked.
 
 ## Real owner recheck
@@ -113,7 +113,15 @@ PR `#7`, merged as `2f1bf8f341c1a779805586e9f239c4442a65d96b`, makes the focused
 
 Exact reviewed head `d2949821347fc3078757303d5858a67dfdd7e23b` passed Productive Workspace CI and Reference Python full CI before merge. The local checkout could not collect one Python test path because `arvectum_os_ref` was absent from that local import path; this was not used as a waiver because the repository CI contours completed successfully on the exact reviewed head.
 
-Repository merge is not owner usability acceptance. F08 remains open until the selected Mac is governed-updated to the exact current canonical release carrying `p9.11.4`, runtime/readiness/assets/launcher are verified, and the owner repeats the urgent-task journey.
+## Post-deploy owner recheck
+
+The selected Mac was governed-updated to `dc0e0cff83a9031a3686191b5cf304ee03c2d1eb` / Workspace `p9.11.4`. P7.02/P7.05, exact release manifest and live assets passed; Workspace reached `CURRENT_EXACT` with `MANAGED_SPAWN_PROOF`. The owner found the mechanics clearer but the F08 result remains **FAIL**:
+
+> Интерфейс понятнее стал. Но не понятна суть задачи. Что-то остановлено, требуется 4 каких-то действия. А каких и что конкретно делать — непонятно.
+
+Root cause is semantic, not merely wording: P7.06-UI4 is a preflight-only proof bridge with no concrete action request, owner resolution path, authority, approval, canonical mutation, or external effect. `RuntimeAttentionProvider` nonetheless projected its Waiting gates as a high-urgency `WAITING_INPUT` owner task. Governance gates can qualify a concrete product-owned action; they cannot manufacture one.
+
+The p9.11.5 candidate removes UI4 from ordinary attention, Home, Tasks, and Activity alerts. It retains the same projection as Settings diagnostics at `Технические проверки → Проверка готовности управляемого выполнения`, states that no concrete action is requested, and preserves its four canonical gates and fail-closed safe re-check. A future owner task requires a concrete product-owned subject, requested outcome, responsible resolver, resolution location/path, reason for attention, and justified urgency; this candidate does not implement a product action.
 
 ## Adjacent-route audit
 
@@ -122,6 +130,6 @@ The read-only F08 audit found no additional task-journey change required outside
 1. `/work` embeds the repaired task projection alongside product contexts; no independent owner-flow regression was changed in this repair.
 2. `/information` still presents raw result kind, semantic role, authority mode, health state, and source state in its existing discovery/evidence surface. This is outside the focused task-to-governed repair and should be assessed as separate discovery UX work if owner evidence identifies it as friction.
 3. `/copilot` keeps source roles, freshness, model details, and authority boundaries visible to preserve the existing grounded-answer/evidence boundary. No F08 change is admitted there.
-4. `/system` remains an explicitly diagnostic and technical surface. The governed destination was removed because the governed inspection is part of the Tasks journey, not Settings.
+4. `/system` remains an explicitly diagnostic and technical surface. UI4 is now explicitly available there as `Технические проверки`, not as a Task.
 
-F07 is successful only in its bounded Home/navigation/branding scope. F08 remains the material downstream usability blocker until the post-deploy owner recheck. P9.11 remains `Current`; R32 remains locked; P9.12 has not started; M9 remains open.
+F07 is successful only in its bounded Home/navigation/branding scope. F08 remains open for the owner-task eligibility repair and a subsequent real owner recheck. P9.11 remains `Current`; R32 remains locked; P9.12 has not started; M9 remains open.

@@ -23,16 +23,19 @@ const result: GovernedPreflightResult = { schema: "arvectum.workspace.governed-p
 function renderRu() { return render(<LanguageProvider initialLanguage="ru"><Governed csrfToken="csrf-test" /></LanguageProvider>); }
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); window.history.replaceState({}, "", "/"); });
 
-describe("P9.11 F08 governed task journey", () => {
-  it("uses Russian owner meaning, preserves canonical gates on demand, and returns to the focused task", async () => {
+describe("P9.11 F08 governed diagnostics", () => {
+  it("states that no concrete action is requested and preserves canonical gates on demand", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(projection), { status: 200, headers: { "Content-Type": "application/json" } })));
-    window.history.replaceState({}, "", "/governed?focus=11111111111111111111");
+    window.history.replaceState({}, "", "/governed");
     renderRu();
-    expect(await screen.findByRole("heading", { name: "Выполнение остановлено" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Проверка готовности управляемого выполнения" })).toBeTruthy();
+    expect(screen.getByText("Сейчас конкретное действие не запрошено.")).toBeTruthy();
+    expect(screen.getByText(/а не перечень действий для владельца/)).toBeTruthy();
+    expect(screen.queryByText(/задач/i)).toBeNull();
     for (const label of ["Доступ к действию", "Полномочия организации", "Разрешение на использование данных", "Финальное подтверждение действия"]) expect(screen.getByText(label)).toBeTruthy();
     expect(screen.queryByRole("heading", { name: "EIS document governed execution" })).toBeNull();
     expect(screen.getByText("Техническое основание").closest("details")?.open).toBe(false);
-    expect(screen.getByRole("link", { name: "Назад к задаче" }).getAttribute("href")).toBe("/my-work?focus=11111111111111111111");
+    expect(screen.getByRole("link", { name: "Назад к настройкам" }).getAttribute("href")).toBe("/system");
     fireEvent.click(screen.getByText("Техническое основание"));
     expect(screen.getByText("Authorization")).toBeTruthy();
     expect(screen.getByText(/No action-specific authorization/)).toBeTruthy();
@@ -49,9 +52,20 @@ describe("P9.11 F08 governed task journey", () => {
     fireEvent.click(screen.getByRole("button", { name: "Перепроверить состояние" }));
     expect(await screen.findByText("Проверка завершена")).toBeTruthy();
     expect(screen.getByText(/Ничего не изменено/)).toBeTruthy();
+    expect(screen.getByText(/Конкретное действие не запрошено и не выполнялось/)).toBeTruthy();
+    expect(screen.queryByText(/Задача остаётся остановленной/)).toBeNull();
     expect(screen.queryByRole("button", { name: /одобрить|разрешить|делегировать/i })).toBeNull();
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(fetchMock.mock.calls[1][1]?.method).toBe("POST");
+  });
+
+  it("ignores stale task focus and returns to Settings diagnostics", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(projection), { status: 200, headers: { "Content-Type": "application/json" } })));
+    window.history.replaceState({}, "", "/governed?focus=11111111111111111111");
+    renderRu();
+    expect(await screen.findByRole("heading", { name: "Проверка готовности управляемого выполнения" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Назад к настройкам" }).getAttribute("href")).toBe("/system");
+    expect(screen.queryByRole("link", { name: "Назад к задаче" })).toBeNull();
   });
 
   it("fails closed when any action safety flag drifts", async () => {
@@ -67,7 +81,7 @@ describe("P9.11 F08 governed task journey", () => {
     const changed = { ...projection, execution: { ...projection.execution, status: "Ready" }, decisions: projection.decisions.map((decision) => ({ ...decision, state: "Allow" })) };
     vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(changed), { status: 200, headers: { "Content-Type": "application/json" } })));
     renderRu();
-    expect(await screen.findByRole("heading", { name: "Выполнение требует проверки" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Проверка готовности управляемого выполнения" })).toBeTruthy();
     expect(screen.getByText("Ready")).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Перепроверить состояние" })).toBeNull();
   });
@@ -76,9 +90,10 @@ describe("P9.11 F08 governed task journey", () => {
     const partial = { ...projection, decisions: projection.decisions.map((decision, index) => index < 2 ? { ...decision, state: "Allow" } : decision) };
     vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(partial), { status: 200, headers: { "Content-Type": "application/json" } })));
     renderRu();
-    expect(await screen.findByRole("heading", { name: "Выполнение требует проверки" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Проверка готовности управляемого выполнения" })).toBeTruthy();
     expect(screen.getAllByText("Allow")).toHaveLength(2);
     expect(screen.queryByText(/не хватает 4 обязательных решений/)).toBeNull();
+    expect(screen.queryByText("Остановлено безопасно")).toBeNull();
     expect(screen.queryByRole("button", { name: "Перепроверить состояние" })).toBeNull();
   });
 

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import type {
@@ -48,22 +48,7 @@ const myWork: MyWorkProjection = {
     observed_at: "2026-08-21T13:00:00Z",
     heartbeat_age_seconds: 1,
   },
-  items: [{
-    id: "11111111111111111111",
-    kind: "waiting-input",
-    group: "decision-required",
-    urgency: "high",
-    title: "Governed preflight is waiting for decision evidence",
-    reason: "4 governed gate(s) remain Waiting; technical workspace access does not satisfy them.",
-    source: "ЕИС / zakupki.gov.ru",
-    next_step: "Inspect the blockers and supply independently governed decision evidence through the governed-action flow when available.",
-    evidence_mode: "live",
-    observed_at: "2026-08-21T13:00:00Z",
-    open_href: "/my-work?focus=11111111111111111111",
-    interaction: "inspect-only",
-    technical_evidence_available: true,
-    authority_provided: false,
-  }],
+  items: [],
 };
 
 const discovery: DiscoveryProjection = {
@@ -230,7 +215,7 @@ afterEach(() => {
 });
 
 describe("R30 M9-alpha integrated J1-J4 ordinary path", () => {
-  it("moves from Home/My Work through human discovery/context into a real fail-closed governed preflight", async () => {
+  it("keeps non-actionable preflight out of Home while preserving diagnostic inspection", async () => {
     const requests: Array<{ path: string; method: string; body: BodyInit | null | undefined }> = [];
     vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const path = String(input);
@@ -248,17 +233,11 @@ describe("R30 M9-alpha integrated J1-J4 ordinary path", () => {
     window.history.replaceState({}, "", "/");
     render(<App />);
 
-    // J1: Home is action-first; raw evidence is available only after the owner opens the task.
-    expect(await screen.findByRole("heading", { name: "Needs attention" })).toBeTruthy();
-    expect(screen.getByText("Execution is stopped")).toBeTruthy();
+    // J1: a preflight-only proof does not manufacture ordinary owner work.
+    expect(await screen.findByRole("heading", { name: "No tasks now" })).toBeTruthy();
+    expect(screen.getByText("There are no tasks requiring your decision now.")).toBeTruthy();
+    expect(screen.queryByText("Execution is stopped")).toBeNull();
     expect(screen.queryByText("ЕИС / zakupki.gov.ru")).toBeNull();
-    fireEvent.click(screen.getByRole("link", { name: "View task" }));
-    expect(await screen.findByRole("heading", { name: "Execution is stopped" })).toBeTruthy();
-    expect(screen.getAllByText("ЕИС / zakupki.gov.ru")).not.toHaveLength(0);
-    const executionContext = screen.getByRole("link", { name: "See what is blocking" });
-    fireEvent.click(executionContext);
-    expect(await screen.findByRole("heading", { name: "Execution is stopped" })).toBeTruthy();
-    await waitFor(() => expect(document.activeElement?.id).toBe("workspace-main"));
 
     // J2: use only the human EIS notice number and narrow by human-readable result type.
     const globalSearch = screen.getByLabelText("Global search");
@@ -278,14 +257,17 @@ describe("R30 M9-alpha integrated J1-J4 ordinary path", () => {
     expect(screen.getByText("Outcome: Waiting.")).toBeTruthy();
     expect(screen.queryByText("document-subject/eis-0344100006426000005-exact")).toBeNull();
 
-    // J4: continue by human link, re-check all four decisions, and preserve WAITING/fail-closed truth.
+    // J4: diagnostics retain the gates without presenting them as owner work.
     fireEvent.click(screen.getByRole("link", { name: "Open related execution and governed action" }));
-    expect(await screen.findByRole("heading", { name: "Required conditions" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Governed execution readiness check" })).toBeTruthy();
+    expect(screen.getByText("No concrete action is currently requested.")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Settings" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.queryByText("Execution is stopped")).toBeNull();
     for (const gate of ["Action access", "Organization authority", "Data-use permission", "Final action approval"]) {
       expect(screen.getByText(gate)).toBeTruthy();
     }
     fireEvent.click(screen.getByRole("button", { name: "Re-check status" }));
-    expect(await screen.findByText(/Nothing changed\. Required decisions remain unconfirmed/)).toBeTruthy();
+    expect(await screen.findByText(/Nothing changed\. Readiness conditions remain unconfirmed/)).toBeTruthy();
 
     const post = requests.find((request) => request.path === "/api/app/v1/governed/preflight" && request.method === "POST");
     expect(post).toBeTruthy();
