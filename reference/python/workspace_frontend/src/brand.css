@@ -19,7 +19,7 @@ body {
     var(--av-soft);
 }
 
-h1, h2, h3, .brand-copy strong { font-family: Manrope, Inter, "DejaVu Sans", ui-sans-serif, system-ui, sans-serif; }
+h1, h2, h3 { font-family: Manrope, Inter, "DejaVu Sans", ui-sans-serif, system-ui, sans-serif; }
 button, input, textarea, select { accent-color: var(--av-mint); }
 button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible {
   outline: 3px solid var(--av-mint);
@@ -49,30 +49,8 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 }
 .sidebar > * { position: relative; z-index: 1; }
 .brand { gap: .8rem; padding: .15rem .55rem 1.8rem; }
-.brand-mark {
-  position: relative;
-  width: 2.55rem;
-  height: 2.55rem;
-  border-radius: .7rem;
-  color: var(--av-navy);
-  background: var(--av-mint);
-  box-shadow: 0 0 0 1px rgba(122, 241, 221, .45), 0 0 30px rgba(67, 229, 197, .22);
-  font-family: Manrope, Inter, sans-serif;
-  font-size: .72rem;
-  font-weight: 800;
-  letter-spacing: -.04em;
-}
-.brand-mark::after {
-  content: "";
-  position: absolute;
-  right: -.32rem;
-  top: 50%;
-  width: .6rem;
-  border-top: 2px solid var(--av-mint-light);
-}
-.brand-copy { display: grid; line-height: 1; }
-.brand-copy strong { color: white; font-size: 1.08rem; letter-spacing: -.025em; }
-.brand-copy small { color: var(--av-mint); margin-top: .3rem; font-size: .67rem; letter-spacing: .18em; font-weight: 800; }
+.brand-logo { height: 1.8rem; width: auto; max-width: 100%; }
+.brand-product { color: var(--av-mint); font-size: .67rem; font-weight: 800; letter-spacing: .18em; margin-left: -.3rem; align-self: flex-end; margin-bottom: .15rem; }
 .sidebar nav a { color: #DDE7EE; border: 1px solid transparent; transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease; }
 .sidebar nav a:hover { color: white; background: rgba(255,255,255,.055); transform: translateX(2px); }
 .sidebar nav a[aria-current="page"] {
@@ -190,6 +168,9 @@ h2, h3 { color: var(--av-graphite); }
   .global-search { order: 3; min-width: 100%; }
   main { padding: 2rem 1.25rem; }
   .status-grid { grid-template-columns: 1fr; }
+  .brand { align-items: flex-start; flex-direction: column; gap: .25rem; }
+  .brand-logo { height: 1.55rem; }
+  .brand-product { align-self: auto; margin: 0; }
 }
 
 @media (max-width: 720px) {

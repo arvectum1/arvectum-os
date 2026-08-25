@@ -30,7 +30,7 @@ describe("P9.09 activity and attention routing", () => {
       return new Response(JSON.stringify(payload), { status: 200, headers: { "Content-Type": "application/json" } });
     }));
     render(<Activity />);
-    expect(await screen.findByRole("heading", { name: "Operational activity and alerts" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Events and signals" })).toBeTruthy();
     expect(screen.getByText(/not an Event store, audit log, notification authority/)).toBeTruthy();
     expect(screen.getByText(/No read\/unread state is recorded/)).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Current alerts" })).toBeTruthy();

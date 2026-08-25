@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import arvectumLogo from "./assets/arvectum-logo.svg?raw";
 import { LanguageProvider } from "./i18n";
 import { Shell } from "./Shell";
 import type { MyWorkProjection, WorkspaceContext } from "./types";
@@ -28,14 +29,17 @@ describe("P9.11 owner-first Workspace", () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(projection), { status: 200, headers: { "Content-Type": "application/json" } })));
     render(<LanguageProvider><Shell context={context} onLogout={() => undefined} /></LanguageProvider>);
     expect(document.documentElement.lang).toBe("ru");
-    expect(screen.getAllByRole("link").filter((link) => ["Сегодня", "Работа", "Информация", "Arvectum AI", "Система"].includes(link.textContent ?? "")).map((link) => link.textContent)).toEqual(["Сегодня", "Работа", "Информация", "Arvectum AI", "Система"]);
+    expect(arvectumLogo).toContain('viewBox="86 385.89 425.2 64.92"');
+    expect(screen.getByRole("img", { name: "Arvectum" })).toBeTruthy();
+    expect(screen.queryByText("AV")).toBeNull();
+    expect(screen.getAllByRole("link").filter((link) => ["Главная", "Работа", "Источники", "Arvectum AI", "Система"].includes(link.textContent ?? "")).map((link) => link.textContent)).toEqual(["Главная", "Работа", "Источники", "Arvectum AI", "Система"]);
     expect(screen.queryByRole("link", { name: "Записи" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Документы" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Знания" })).toBeNull();
-    expect(screen.getByRole("heading", { name: "Вот что сейчас требует внимания" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Открыть работу" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Найти информацию" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Спросить Arvectum" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Добро пожаловать" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Открыть" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Найти" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Задать вопрос" })).toBeTruthy();
   });
 
   it("switches to English without browser storage", async () => {
@@ -43,8 +47,23 @@ describe("P9.11 owner-first Workspace", () => {
     render(<LanguageProvider><Shell context={context} onLogout={() => undefined} /></LanguageProvider>);
     fireEvent.click(screen.getByRole("button", { name: "EN" }));
     expect(document.documentElement.lang).toBe("en");
-    expect(screen.getByRole("link", { name: "Today" })).toBeTruthy();
-    expect(screen.getByText("Here is what needs attention now")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Home" })).toBeTruthy();
+    expect(screen.getByText(/Everything that needs your attention/)).toBeTruthy();
+  });
+
+  it("shows first-glance clarity: product identity, welcome, and actionable next steps", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(projection), { status: 200, headers: { "Content-Type": "application/json" } })));
+    render(<LanguageProvider><Shell context={context} onLogout={() => undefined} /></LanguageProvider>);
+    expect(screen.getByText("Arvectum OS · Рабочее пространство")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Добро пожаловать" })).toBeTruthy();
+    expect(screen.getByText(/Всё, что требует вашего внимания/)).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Что сделать дальше" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Открыть" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Найти" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Задать вопрос" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Требует внимания" })).toBeTruthy();
+    expect(screen.getByText("Просмотр задач не даёт разрешений или полномочий.")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Смотреть все" })).toBeTruthy();
   });
 
   it("groups legacy product and technical deep routes under Work and System", () => {

@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.8`
+Version: `2.95.9`
 Created: `2026-08-07`
 Updated: `2026-08-25`
 Owner: `ООО «Арвектум»`
@@ -15,7 +15,7 @@ Roadmap status does not itself change Platform Capability lifecycle, Product Con
 
 ## 2. Version note
 
-Version `2.95.8` records PR `#4` as merged canonical implementation through `3b4d2b2be4a095ff04e5703b36b3ef189c3d4057`. The F06 root cause is established and the space-safe Workspace process-identity repair is now canonical. Exact executable paths containing `Application Support` are recognized without shell-tokenizing internal whitespace; `DIRECT_OS_PROOF` still requires genuine executable identity, while macOS framework-path divergence remains admissible only through exact owner-local `MANAGED_SPAWN_PROOF`. PID-reuse, process-start-identity, exact CWD/entrypoint/release/manifest/assets and `UNKNOWN` fail-closed boundaries remain intact.
+Version `2.95.9` records P9.11-F07, a bounded owner-first Workspace usability repair. The default screen now gives Russian-first product identity, current priorities, and clear next actions; primary navigation uses owner-facing plain-language labels; the canonical Arvectum SVG replaces the placeholder letter mark. This repository change is not selected-Mac runtime, launcher, or owner-recheck evidence.
 
 F06 remains **OPEN operationally**. The selected Mac still runs exact runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63`, Workspace `p9.11.2` / app contract `11` was last observed `NOT_RUNNING`, no post-merge managed Workspace retry has occurred, and the Desktop launcher has not yet been refreshed/opened after the repair. Repository merge is not selected-Mac readiness evidence.
 
@@ -81,7 +81,7 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F06 repair merged; selected-Mac update/retry + owner recheck pending** |
+| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F06 operational prerequisite and F07 owner recheck pending** |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked |
 | P9.12 | Phase 9 / M9 closure review | ⬜ |
 
@@ -95,6 +95,7 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 - installed Workspace payload remains `p9.11.2` / app contract `11`;
 - F06 real failed start: PID `52092` reached Uvicorn startup but helper identity recognition rejected the healthy path-with-spaces command before managed proof, then gracefully cleaned up its own child;
 - **F06 implementation repair:** PR `#4` merged at `3b4d2b2be4a095ff04e5703b36b3ef189c3d4057`; exact executable paths containing whitespace are space-safe, managed provenance remains strict, failed-child cleanup/readiness diagnostics are hardened;
+- **F07 owner-first UX repair:** Russian-first landing orientation, plain-language navigation/helper copy, clear work/search/Arvectum AI next actions, and canonical SVG branding are implemented; real owner recheck remains pending;
 - selected Mac has not yet been updated to the post-merge canonical runtime and no post-merge Workspace start has occurred;
 - last live Workspace state: `NOT_RUNNING`;
 - owner recheck: blocked / pending until Workspace reaches `CURRENT_EXACT` and the exact-release launcher flow opens;

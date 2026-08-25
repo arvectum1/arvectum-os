@@ -10,8 +10,8 @@ const context: WorkspaceContext = {
   actor: { label: "Owner operator", attributable: true, scope_resolved_server_side: true, authentication_source: "P7.04 owner-local credential" },
   session: { csrf_token: "test-only", bounded: true, revocable: true, authority_provided: false },
   navigation: [
-    { id: "home", label: "Home", href: "/", availability: "available" },
-    { id: "my-work", label: "My Work", href: "/my-work", availability: "available" }
+    { id: "today", label: "Home", href: "/", availability: "available" },
+    { id: "work", label: "Work", href: "/work", availability: "available" },
   ],
   data_governance: { protected_read_revalidated: true, response_minimized: "shell-context-only", canonical_state_in_browser: false }
 };
@@ -71,11 +71,11 @@ describe("P9.04 shell", () => {
     window.history.replaceState({}, "", "/");
     render(<Shell context={context} onLogout={() => undefined} />);
     expect(screen.getByLabelText("Organization: ООО «Арвектум»")).toBeTruthy();
-    expect(screen.getByLabelText("Authenticated actor: Owner operator")).toBeTruthy();
+    expect(screen.getByLabelText("User: Owner operator")).toBeTruthy();
     expect(screen.getByRole("navigation", { name: "Workspace navigation" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "My Work" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Work" })).toBeTruthy();
     expect(await screen.findByRole("heading", { name: "Needs attention" })).toBeTruthy();
     expect(screen.getByText("Governed preflight is waiting")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Open My Work" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "View all" })).toBeTruthy();
   });
 });

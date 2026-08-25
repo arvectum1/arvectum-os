@@ -134,6 +134,14 @@ Pre-merge validation included exact `Application Support` paths, real start-to-r
 
 F06 remains **OPEN operationally**. The selected Mac still runs runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63`, Workspace was last observed `NOT_RUNNING`, no post-merge managed retry has occurred, and the Desktop launcher has not yet been refreshed/opened after the repair.
 
+### F07 — first-glance orientation and Russian-first UX repair
+
+Canonical evidence: [`P9.11-F07 — Owner-first Workspace UX repair`](../reviews/P9-11-F07-owner-first-workspace-ux-repair.md).
+
+The bounded Workspace repair makes the default screen explain where the owner is, what currently needs attention, and which next action is available. It adds Russian-first `Главная`, `Работа`, and `Источники` navigation, concise work/search/Arvectum AI routes, simplified owner-facing helper copy, and the canonical Arvectum SVG in place of the placeholder `AV` mark.
+
+F07 changes presentation only. It creates no selected-Mac runtime evidence, managed-start result, launcher evidence, or synthetic owner-session claim. Its owner recheck remains pending after the F06 operational prerequisite.
+
 ## 7. Current critical path
 
 ```text
