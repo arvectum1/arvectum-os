@@ -9,8 +9,6 @@ from typing import Callable, Protocol
 from urllib.parse import quote
 
 import p7_05_operational_visibility as p705
-import p7_06_ui4_owner_preflight as ui4
-
 from .access import AccessContext
 
 
@@ -203,7 +201,6 @@ class AttentionProvider(Protocol):
 
 
 HealthReader = Callable[[Path], p705.HealthStatus]
-PreflightBuilder = Callable[..., ui4.UI4OwnerPreflight]
 
 
 def scenario_item(
@@ -269,31 +266,12 @@ def _runtime_condition(status: p705.HealthStatus, observed_at: str) -> Attention
     )
 
 
-def _preflight_waiting(preflight: ui4.UI4OwnerPreflight, observed_at: str) -> AttentionItem:
-    waiting = tuple(gate.name for gate in preflight.gates if gate.state == "Waiting")
-    if not waiting:
-        raise AttentionProjectionError("real owner preflight no longer has an explicit Waiting gate")
-    if preflight.outcome != "Waiting":
-        raise AttentionProjectionError("real owner preflight outcome drifted from the bounded P9.04 source contract")
-    return AttentionItem(
-        attention_id=_attention_id(f"ui4:{preflight.execution_version}:{preflight.version_identity}"),
-        kind=AttentionKind.WAITING_INPUT,
-        urgency=AttentionUrgency.HIGH,
-        title="Governed preflight is waiting for decision evidence",
-        reason=f"{len(waiting)} governed gate(s) remain Waiting; technical workspace access does not satisfy them.",
-        source_label=preflight.authoritative_source,
-        next_step="Inspect the blockers and supply independently governed decision evidence through the governed-action flow when available.",
-        observed_at=observed_at,
-        technical_evidence_available=True,
-    )
-
-
 class RuntimeAttentionProvider:
     """Bounded live P9.04 adapter over already-governed/private runtime evidence.
 
     The adapter never scans opaque governed payloads for guessed business statuses.
-    It exposes only sources whose semantics are already proven by P7.05/P7.06 and
-    fails closed when those sources cannot be evaluated safely.
+    UI4 preflight evidence is deliberately excluded: it proves no concrete
+    owner-relevant work outcome, so Waiting governance gates cannot create work.
     """
 
     def __init__(
@@ -301,11 +279,9 @@ class RuntimeAttentionProvider:
         runtime_root: Path,
         *,
         health_reader: HealthReader = p705.classify_health,
-        preflight_builder: PreflightBuilder = ui4.build_owner_preflight,
     ) -> None:
         self.runtime_root = runtime_root.expanduser()
         self.health_reader = health_reader
-        self.preflight_builder = preflight_builder
 
     def project(self, access: AccessContext) -> AttentionProjection:
         if not isinstance(access, AccessContext):
@@ -316,45 +292,7 @@ class RuntimeAttentionProvider:
         if health.state is not ProjectionFreshness.FRESH:
             return AttentionProjection(observed_at, health, (_runtime_condition(status, observed_at),))
 
-        credential_file = self.runtime_root / "secrets" / "p7-04" / f"{access.credential_id}.secret"
-        try:
-            preflight = self.preflight_builder(
-                self.runtime_root,
-                organization=access.organization,
-                principal=access.actor,
-                credential_id=access.credential_id,
-                credential_file=credential_file,
-            )
-        except (ui4.ui1.UI1AccessDenied, ui4.ui2.UI2AccessDenied):
-            # A denied source is indistinguishable from no visible source in this
-            # minimized projection. Never leak protected existence/count metadata.
-            return AttentionProjection(observed_at, health, ())
-        except (
-            ui4.UI4BoundaryError,
-            ui4.UI4IntegrityError,
-            ui4.ui1.UI1BoundaryError,
-            ui4.ui1.UI1IntegrityError,
-            ui4.ui2.UI2BoundaryError,
-        ):
-            degraded = ProjectionHealth(
-                ProjectionFreshness.DEGRADED,
-                "ATTENTION_SOURCE_INTEGRITY",
-                "A required attention source could not be revalidated. Protected work items are withheld until the source is repaired.",
-                observed_at,
-                status.heartbeat_age_seconds,
-            )
-            condition = AttentionItem(
-                attention_id=_attention_id("attention-source-integrity"),
-                kind=AttentionKind.RECOVERABLE_SYSTEM_CONDITION,
-                urgency=AttentionUrgency.HIGH,
-                title="Attention source could not be revalidated",
-                reason="The queue cannot safely resolve one of its governed source projections.",
-                source_label="Arvectum OS governed attention source",
-                next_step="Repair or revalidate the governed source, then refresh My Work.",
-                observed_at=observed_at,
-            )
-            return AttentionProjection(observed_at, degraded, (condition,))
-        return AttentionProjection(observed_at, health, (_preflight_waiting(preflight, observed_at),))
+        return AttentionProjection(observed_at, health, ())
 
 
 __all__ = [

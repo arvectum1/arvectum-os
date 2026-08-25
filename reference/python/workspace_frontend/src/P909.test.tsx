@@ -55,4 +55,13 @@ describe("P9.09 activity and attention routing", () => {
     expect(await screen.findByRole("heading", { name: "Events and signals" })).toBeTruthy();
     expect(screen.queryByText("Scenario approval")).toBeNull();
   });
+
+  it("does not turn a preflight-only governed observation into an owner-attention alert", async () => {
+    const noOwnerWork: MyWorkProjection = { ...work, items: [] };
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => new Response(JSON.stringify(String(input).includes("/my-work") ? noOwnerWork : governed), { status: 200, headers: { "Content-Type": "application/json" } })));
+    render(<Activity />);
+    expect(await screen.findByText("No current alert is visible in this authorized projection.")).toBeTruthy();
+    expect(screen.getByText("Governed execution: Waiting")).toBeTruthy();
+    expect(screen.queryByText("Decision evidence is needed")).toBeNull();
+  });
 });

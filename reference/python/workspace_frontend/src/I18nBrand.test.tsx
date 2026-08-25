@@ -7,7 +7,7 @@ import type { MyWorkProjection, WorkspaceContext } from "./types";
 
 const context: WorkspaceContext = {
   schema: "arvectum.workspace.shell-context/1",
-  release: { id: "p9.11.4", app_api_contract: "11", classification: "bounded-internal-provisional", public_api: false },
+  release: { id: "p9.11.5", app_api_contract: "11", classification: "bounded-internal-provisional", public_api: false },
   organization: { label: "ООО «Арвектум»", scope_resolved_server_side: true },
   actor: { label: "Owner operator", attributable: true, scope_resolved_server_side: true, authentication_source: "P7.04 owner-local credential" },
   session: { csrf_token: "test-only", bounded: true, revocable: true, authority_provided: false },
@@ -61,7 +61,7 @@ describe("P9.11 owner-first Workspace", () => {
     expect(screen.getByRole("link", { name: "Открыть задачи" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Найти документ" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Спросить Arvectum" })).toBeTruthy();
-    expect(await screen.findByRole("heading", { name: "Требует внимания" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Сейчас нет задач" })).toBeTruthy();
     expect(screen.getByText("Просмотр задач не даёт разрешений или полномочий.")).toBeTruthy();
     expect(screen.getAllByRole("link", { name: "Открыть задачи" }).length).toBeGreaterThan(0);
     expect(screen.getByText("Сейчас нет задач, требующих вашего решения.")).toBeTruthy();
@@ -84,6 +84,6 @@ describe("P9.11 owner-first Workspace", () => {
 
     window.history.replaceState({}, "", "/governed");
     render(<LanguageProvider initialLanguage="en"><Shell context={context} onLogout={() => undefined} /></LanguageProvider>);
-    expect(screen.getByRole("link", { name: "Tasks" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("link", { name: "Settings" }).getAttribute("aria-current")).toBe("page");
   });
 });

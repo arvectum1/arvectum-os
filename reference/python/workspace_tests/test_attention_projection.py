@@ -9,7 +9,6 @@ from fastapi.testclient import TestClient
 
 from arvectum_os_ref.identity import Identity
 import p7_05_operational_visibility as p705
-import p7_06_ui4_owner_preflight as ui4
 from workspace_app.access import AccessContext, WorkspaceAccessError
 from workspace_app.attention import (
     AttentionItem,
@@ -149,16 +148,10 @@ class AttentionContractTests(unittest.TestCase):
 
 class RuntimeAttentionProviderTests(unittest.TestCase):
     def test_stale_runtime_withholds_work_items_and_surfaces_recoverable_condition(self) -> None:
-        calls = {"preflight": 0}
-
         def health(_: Path) -> p705.HealthStatus:
             return p705.HealthStatus("down", "HEARTBEAT_STALE", "secret diagnostic", "restart", "sha", 120.0)
 
-        def preflight(*args, **kwargs):  # type: ignore[no-untyped-def]
-            calls["preflight"] += 1
-            raise AssertionError("stale projection must not inspect protected work sources")
-
-        provider = RuntimeAttentionProvider(Path("/tmp/runtime"), health_reader=health, preflight_builder=preflight)
+        provider = RuntimeAttentionProvider(Path("/tmp/runtime"), health_reader=health)
         access = AccessContext(
             Identity("organization", "org-a", "platform"),
             Identity("principal", "actor-a", "org-a"),
@@ -167,20 +160,16 @@ class RuntimeAttentionProviderTests(unittest.TestCase):
             "grant",
         )
         payload = provider.project(access).to_payload()
-        self.assertEqual(calls["preflight"], 0)
         self.assertEqual(payload["health"]["state"], "stale")
         self.assertEqual(len(payload["items"]), 1)
         self.assertEqual(payload["items"][0]["kind"], "recoverable-system-condition")
         self.assertNotIn("secret diagnostic", json.dumps(payload))
 
-    def test_source_denial_is_minimized_to_no_visible_item(self) -> None:
+    def test_healthy_runtime_has_no_owner_work_without_an_actionable_source(self) -> None:
         def health(_: Path) -> p705.HealthStatus:
             return p705.HealthStatus("healthy", "OK", "healthy", "none", "sha", 1.0)
 
-        def denied(*args, **kwargs):  # type: ignore[no-untyped-def]
-            raise ui4.ui2.UI2AccessDenied("protected object exists but is denied")
-
-        provider = RuntimeAttentionProvider(Path("/tmp/runtime"), health_reader=health, preflight_builder=denied)
+        provider = RuntimeAttentionProvider(Path("/tmp/runtime"), health_reader=health)
         access = AccessContext(
             Identity("organization", "org-a", "platform"),
             Identity("principal", "actor-a", "org-a"),
@@ -191,37 +180,13 @@ class RuntimeAttentionProviderTests(unittest.TestCase):
         payload = provider.project(access).to_payload()
         self.assertEqual(payload["health"]["state"], "fresh")
         self.assertEqual(payload["items"], [])
-        self.assertNotIn("protected object exists", json.dumps(payload))
+        self.assertNotIn("waiting-input", json.dumps(payload))
 
-    def test_real_ui4_waiting_state_becomes_live_waiting_input_without_raw_identity(self) -> None:
+    def test_preflight_proof_cannot_create_owner_work_without_a_concrete_outcome(self) -> None:
         def health(_: Path) -> p705.HealthStatus:
             return p705.HealthStatus("healthy", "OK", "healthy", "none", "sha", 1.0)
 
-        preflight = ui4.UI4OwnerPreflight(
-            release_sha="release-secret",
-            organization_id="org-secret",
-            actor_id="actor-secret",
-            storage_item_id="storage-secret",
-            subject_identity="document-subject/secret",
-            version_identity="document-version/secret",
-            semantic_type="platform.document",
-            authority_mode="External Reference",
-            authority_scope="EIS notice",
-            authoritative_source="ЕИС / zakupki.gov.ru",
-            execution_subject="execution-secret",
-            execution_version="execution-version-secret",
-            event_version="event-version-secret",
-            checkpoint_id="checkpoint-secret",
-            provenance_refs=("execution-secret", "event-version-secret"),
-            validation_status="CAP-004 reconstruction complete",
-            gates=(
-                ui4.UI4GateView("Authorization", "Waiting", "missing"),
-                ui4.UI4GateView("Organizational Authority", "Waiting", "missing"),
-                ui4.UI4GateView("Data Governance", "Waiting", "missing"),
-                ui4.UI4GateView("Consequential Approval", "Waiting", "missing"),
-            ),
-        )
-        provider = RuntimeAttentionProvider(Path("/tmp/runtime"), health_reader=health, preflight_builder=lambda *a, **k: preflight)
+        provider = RuntimeAttentionProvider(Path("/tmp/runtime"), health_reader=health)
         access = AccessContext(
             Identity("organization", "org-a", "platform"),
             Identity("principal", "actor-a", "org-a"),
@@ -230,23 +195,9 @@ class RuntimeAttentionProviderTests(unittest.TestCase):
             "grant",
         )
         payload = provider.project(access).to_payload()
-        self.assertEqual(payload["items"][0]["kind"], "waiting-input")
-        self.assertEqual(payload["items"][0]["source"], "ЕИС / zakupki.gov.ru")
-        self.assertEqual(payload["items"][0]["evidence_mode"], "live")
-        serialized = json.dumps(payload)
-        for forbidden in (
-            "org-secret",
-            "actor-secret",
-            "storage-secret",
-            "document-subject/secret",
-            "document-version/secret",
-            "execution-secret",
-            "execution-version-secret",
-            "event-version-secret",
-            "checkpoint-secret",
-            "release-secret",
-        ):
-            self.assertNotIn(forbidden, serialized)
+        self.assertEqual(payload["items"], [])
+        self.assertNotIn("waiting-input", json.dumps(payload))
+        self.assertNotIn('"urgency": "high"', json.dumps(payload))
 
 
 class MyWorkBffTests(unittest.TestCase):
