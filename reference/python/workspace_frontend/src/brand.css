@@ -28,8 +28,10 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 
 .app-shell { grid-template-columns: 270px 1fr; }
 .sidebar {
-  position: relative;
-  overflow: hidden;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
   color: var(--av-white);
   background: var(--av-navy);
   border-right: 0;
@@ -90,6 +92,15 @@ h2, h3 { color: var(--av-graphite); }
 .my-work-embedded { margin-top: 2rem; padding-top: 1.5rem; }
 .attention-card-home h3 { margin: .65rem 0; font-size: 1.2rem; }
 .attention-card-home .attention-card-footer { justify-content: flex-start; }
+.task-detail-page { max-width: 760px; }
+.task-detail-summary { max-width: 62ch; color: #526572; font-size: 1.08rem; line-height: 1.55; }
+.task-detail-meaning { margin: 1.5rem 0; padding: 1.25rem; border-left: 3px solid var(--av-mint); background: rgba(67,229,197,.08); }
+.task-detail-meaning h2 { margin-top: 0; }
+.task-detail-actions { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin: 1.75rem 0; }
+.task-primary-action, .task-list-action { display: inline-flex; align-items: center; justify-content: center; min-height: 2.85rem; padding: .65rem 1rem; border: 1px solid var(--av-navy); border-radius: .7rem; background: var(--av-mint); color: var(--av-navy); font-weight: 800; text-decoration: none; }
+.task-secondary-action { display: inline-flex; align-items: center; min-height: 2.85rem; color: var(--av-navy); font-weight: 700; text-underline-offset: .2em; }
+.task-list-action { margin-left: auto; }
+.governed-back-link { margin: .5rem 0 1.5rem; }
 
 .status-grid article,
 .attention-card, .attention-detail, .empty-queue, .attention-unavailable,

@@ -15,7 +15,7 @@ import type { NavigationItem, WorkspaceContext } from "./types";
 
 function groupForPath(path: string): string {
   if (path === "/" || path === "/today") return "today";
-  if (path === "/work" || path === "/my-work" || path === "/products" || path.startsWith("/products/")) return "work";
+  if (path === "/work" || path === "/my-work" || path === "/governed" || path === "/products" || path.startsWith("/products/")) return "work";
   if (path === "/information" || path === "/search" || path === "/records" || path === "/documents" || path === "/knowledge" || path.startsWith("/objects/")) return "information";
   if (path === "/copilot") return "copilot";
   return "system";

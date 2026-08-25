@@ -250,14 +250,14 @@ describe("R30 M9-alpha integrated J1-J4 ordinary path", () => {
 
     // J1: Home is action-first; raw evidence is available only after the owner opens the task.
     expect(await screen.findByRole("heading", { name: "Needs attention" })).toBeTruthy();
-    expect(screen.getByText("Decision needed")).toBeTruthy();
+    expect(screen.getByText("Execution is stopped")).toBeTruthy();
     expect(screen.queryByText("ЕИС / zakupki.gov.ru")).toBeNull();
-    fireEvent.click(screen.getByRole("link", { name: "Open" }));
-    expect(await screen.findAllByText("Governed preflight is waiting for decision evidence")).not.toHaveLength(0);
+    fireEvent.click(screen.getByRole("link", { name: "View task" }));
+    expect(await screen.findByRole("heading", { name: "Execution is stopped" })).toBeTruthy();
     expect(screen.getAllByText("ЕИС / zakupki.gov.ru")).not.toHaveLength(0);
-    const executionContext = screen.getAllByRole("link", { name: "Open execution context" })[0];
+    const executionContext = screen.getByRole("link", { name: "See what is blocking" });
     fireEvent.click(executionContext);
-    expect(await screen.findByRole("heading", { name: "EIS document governed execution" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Execution is stopped" })).toBeTruthy();
     await waitFor(() => expect(document.activeElement?.id).toBe("workspace-main"));
 
     // J2: use only the human EIS notice number and narrow by human-readable result type.
@@ -280,13 +280,12 @@ describe("R30 M9-alpha integrated J1-J4 ordinary path", () => {
 
     // J4: continue by human link, re-check all four decisions, and preserve WAITING/fail-closed truth.
     fireEvent.click(screen.getByRole("link", { name: "Open related execution and governed action" }));
-    expect(await screen.findByRole("heading", { name: "What is still required" })).toBeTruthy();
-    for (const gate of ["Authorization", "Organizational Authority", "Data Governance", "Consequential Approval"]) {
+    expect(await screen.findByRole("heading", { name: "Required conditions" })).toBeTruthy();
+    for (const gate of ["Action access", "Organization authority", "Data-use permission", "Final action approval"]) {
       expect(screen.getByText(gate)).toBeTruthy();
     }
-    fireEvent.click(screen.getByRole("button", { name: "Run governed preflight" }));
-    expect(await screen.findByText(/Preflight executed: WAITING \/ fail-closed/)).toBeTruthy();
-    expect(screen.getByText(/owner-local non-canonical proof evidence/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Re-check status" }));
+    expect(await screen.findByText(/Nothing changed\. Required decisions remain unconfirmed/)).toBeTruthy();
 
     const post = requests.find((request) => request.path === "/api/app/v1/governed/preflight" && request.method === "POST");
     expect(post).toBeTruthy();

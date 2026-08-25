@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MyWork } from "./MyWork";
+import { LanguageProvider } from "./i18n";
 import type { MyWorkProjection } from "./types";
 
 // R30 clean-head trigger after deterministic production-asset reconciliation.
@@ -135,10 +136,10 @@ describe("P9.04 My Work with R30 integration", () => {
     expect(screen.getByText("High urgency")).toBeTruthy();
     expect(screen.queryByText("high urgency")).toBeNull();
     expect(screen.queryByRole("button", { name: /approve|retry/i })).toBeNull();
-    expect(screen.getAllByRole("link", { name: "Open" })[0].getAttribute("href")).toMatch(/^\/my-work\?focus=/);
-    const contextLinks = screen.getAllByRole("link", { name: "Open execution context" });
-    expect(contextLinks).toHaveLength(1);
-    expect(contextLinks[0].getAttribute("href")).toBe("/governed");
+    const taskLinks = screen.getAllByRole("link", { name: "View task" });
+    expect(taskLinks).toHaveLength(1);
+    expect(taskLinks[0].getAttribute("href")).toMatch(/^\/my-work\?focus=/);
+    expect(screen.queryByRole("link", { name: "Open execution context" })).toBeNull();
   });
 
   it("filters only the already-authorized browser projection", async () => {
@@ -149,13 +150,13 @@ describe("P9.04 My Work with R30 integration", () => {
     await screen.findByRole("heading", { name: "Needs attention" });
     fireEvent.change(screen.getByLabelText("Work state"), { target: { value: "decision-required" } });
     expect(screen.getByText("1 visible item")).toBeTruthy();
-    expect(screen.getByText("Governed preflight is waiting")).toBeTruthy();
+    expect(screen.getByText("Execution is stopped")).toBeTruthy();
     expect(screen.queryByText("External outcome is uncertain")).toBeNull();
 
     window.history.replaceState({}, "", "/my-work?mode=scenario");
     render(<MyWork />);
     expect(await screen.findByRole("heading", { name: "Test scenarios" })).toBeTruthy();
-    expect(screen.getByText("External outcome is uncertain")).toBeTruthy();
+    expect(screen.getByText("Check the result")).toBeTruthy();
     expect(screen.getAllByText("Test scenario").length).toBeGreaterThan(0);
   });
 
@@ -189,8 +190,34 @@ describe("P9.04 My Work with R30 integration", () => {
     render(<MyWork />);
 
     expect(await screen.findByText("Stale")).toBeTruthy();
-    expect(screen.getByText("Workspace source is not current")).toBeTruthy();
-    expect(screen.getByText(/Work items are withheld/)).toBeTruthy();
+    expect(screen.getByText("Process needs review")).toBeTruthy();
+    expect(screen.getByText("Task data needs to be checked again.")).toBeTruthy();
     expect(screen.queryByRole("link", { name: "Open execution context" })).toBeNull();
+  });
+
+  it("renders a focused Russian task as a dedicated detail page with raw evidence on demand", async () => {
+    window.history.replaceState({}, "", "/my-work?focus=11111111111111111111");
+    mockProjection(projection);
+    render(<LanguageProvider initialLanguage="ru"><MyWork /></LanguageProvider>);
+
+    expect(await screen.findByRole("heading", { name: "Выполнение остановлено" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Разобраться, что блокирует" }).getAttribute("href")).toBe("/governed?focus=11111111111111111111");
+    expect(screen.getByRole("link", { name: "Назад к задачам" })).toBeTruthy();
+    expect(screen.getByText("Исходные данные").closest("details")?.open).toBe(false);
+    expect(screen.queryByText("Видимых задач: 1")).toBeNull();
+    fireEvent.click(screen.getByText("Исходные данные"));
+    expect(screen.getByText("Governed preflight is waiting")).toBeTruthy();
+    expect(screen.getByText("Inspect blockers through the governed flow.")).toBeTruthy();
+  });
+
+  it("keeps non-decision task details specific to their actual required work", async () => {
+    window.history.replaceState({}, "", "/my-work?focus=22222222222222222222&mode=scenario");
+    mockProjection(projection);
+    render(<MyWork />);
+
+    expect(await screen.findByRole("heading", { name: "Check the result" })).toBeTruthy();
+    expect(screen.getAllByText("Confirm the current state before continuing.")).toHaveLength(2);
+    expect(screen.queryByText("Required decisions are missing. They cannot be issued from this screen.")).toBeNull();
+    expect(screen.queryByRole("link", { name: "See what is blocking" })).toBeNull();
   });
 });

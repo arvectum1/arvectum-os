@@ -1,14 +1,14 @@
 # Arvectum OS Phase 9 — Productive Workspace & Daily Operations
 
 Status: `Active`
-Version: `1.13.10`
+Version: `1.13.11`
 Created: `2026-08-21`
 Updated: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `product_contract` and `governance`
 Parent roadmap: [`ROADMAP.md`](ROADMAP.md)
 
-Current disposition: F06 remains operationally verified. F07 is now owner-rechecked PASS only in its bounded Home/navigation/branding scope on the live `p9.11.3` Workspace. The same real session exposed F08: the urgent-task detail and governed-action journey remain materially unclear and non-actionable. P9.11 remains Current, R32 locked, P9.12 not started and M9 open.
+Current disposition: F06 remains operationally verified. F07 is now owner-rechecked PASS only in its bounded Home/navigation/branding scope on the live `p9.11.3` Workspace. The `p9.11.4` F08 repair candidate is under review, not deployed or owner-rechecked. P9.11 remains Current, R32 locked, P9.12 not started and M9 open.
 Milestone: `M9 — Daily-use organizational workbench`
 Intermediate milestone: `M9-alpha — Usable Internal Workspace — Achieved / PASS`
 Architecture baseline: Constitution `1.2.0`; RFC-0001 through RFC-0008 `Accepted 1.0.0`; ADR-0001 `Accepted`
@@ -160,6 +160,8 @@ Repository inspection establishes the exact semantics that the repair must prese
 - P7.06-UI4 deliberately supplies none of Authorization, Organizational Authority, Data Governance or Consequential Approval and exposes no consequential action request until independently governed evidence exists.
 
 Therefore the current urgent item is not actually resolvable inside Workspace. F08 must state that truthfully, make the safe re-check understandable, and must not invent approval/authority controls merely to make the path look actionable.
+
+The `p9.11.4` candidate moves the focused task into a dedicated Russian-first view, keeps exact source evidence expandable, retains governed inspection in the Tasks context, and exposes `Перепроверить состояние` only when the action flags, execution state, and all four gate states prove the current waiting/non-consequential boundary. Focused repository tests pass, but review, governed deployment, and a real owner recheck remain required.
 
 ## 7. Current critical path
 

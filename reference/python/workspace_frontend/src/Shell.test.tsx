@@ -75,7 +75,7 @@ describe("P9.04 shell", () => {
     expect(screen.getByRole("navigation", { name: "Workspace navigation" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Tasks" })).toBeTruthy();
     expect(await screen.findByRole("heading", { name: "Needs attention" })).toBeTruthy();
-    expect(screen.getByText("Decision needed")).toBeTruthy();
+    expect(screen.getByText("Execution is stopped")).toBeTruthy();
     expect(screen.getAllByRole("link", { name: "Open tasks" })).not.toHaveLength(0);
   });
 });
