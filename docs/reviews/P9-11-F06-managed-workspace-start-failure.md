@@ -1,6 +1,6 @@
 # P9.11-F06 — Managed Workspace Start Failure After Selected-Mac Reconciliation
 
-Status: `Root cause established / bounded repair under review`
+Status: `Repair merged / operational verification pending`
 Date: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `governance`
@@ -15,7 +15,8 @@ Checked against canonical `arvectum1/arvectum-os` after the merged F05 implement
 - ADR-0001 — `Accepted`;
 - F05 implementation merge `0958b97661d51281b069820fd2d1f5ce338a11ec`;
 - owner decision `DECISION-2026-08-25-P9-11-F05-ONE-TIME-LEGACY-WORKSPACE-TERMINATION` — `Approved`;
-- approval commit and selected-Mac target `6ed9dade96417251d3dd5fc8cb175c7136682b63`.
+- F06 executable-path repair PR `#4` merged through `3b4d2b2be4a095ff04e5703b36b3ef189c3d4057`;
+- selected-Mac runtime before F06 deployment remains `6ed9dade96417251d3dd5fc8cb175c7136682b63`.
 
 No higher-authority conflict is identified by this observation.
 
@@ -46,14 +47,14 @@ P7.06 then completed successfully against canonical target `6ed9dade96417251d3dd
 - transaction: `215cb1390708bd4a0e72b567cf9060e4a84173147af618a064c464ca31640ff0`;
 - backup SHA-256: `dbbe6c822385e0cdeccfb87729fdd12359dc8cae8a7531d3fff5be9e2fa4fa2c`;
 - runtime after: `6ed9dade96417251d3dd5fc8cb175c7136682b63`;
-- runtime equals canonical target: YES;
+- runtime equals that canonical target: YES;
 - P7.02: HEALTHY;
 - P7.05: HEALTHY;
 - installed Workspace payload: `p9.11.2`;
 - app API contract: `11`;
 - product/external effect replay: NO.
 
-This establishes successful runtime reconciliation. It does not establish live Workspace readiness.
+This establishes successful F05 runtime reconciliation. It does not establish live Workspace readiness after the F06 repair merge.
 
 ## 4. Root cause — F06
 
@@ -64,72 +65,81 @@ This establishes successful runtime reconciliation. It does not establish live W
 - no application exception occurred (no traceback in stderr);
 - helper never admitted `CURRENT_EXACT`;
 - helper cleanup then produced the observed graceful `SIGTERM` shutdown;
-- `workspace-process.json` absent after the failed attempt (expected: matching cleanup removed it);
-- deterministic path-with-spaces regression reproduces the identity rejection.
+- `workspace-process.json` was absent after the failed attempt because matching cleanup removed it;
+- deterministic path-with-spaces regression reproduced the identity rejection.
 
 ### Root cause
 
-The canonical process identity recognizer (`_process_identity()`) parsed raw macOS `ps command` display text with shell-oriented `shlex.split()`. Exact release paths under `~/Library/Application Support/...` contain whitespace (`Application Support`), so `shlex.split()` produced 4 tokens instead of 3, and the helper rejected the healthy exact Workspace command as `"not Workspace command"` before managed provenance could be evaluated.
+The canonical process identity recognizer (`_process_identity()`) parsed raw macOS `ps command` display text with shell-oriented `shlex.split()`. Exact release paths under `~/Library/Application Support/...` contain whitespace (`Application Support`), so `shlex.split()` produced four tokens instead of three and rejected the healthy exact Workspace command as `not Workspace command` before managed provenance could be evaluated.
 
 ### macOS framework Python nuance
 
-On macOS, `ps command` displays the framework Python path (`Python.app/Contents/MacOS/Python`) rather than the venv Python symlink chain. These are genuinely different binaries (different inodes) within the same Python installation. Therefore `DIRECT_OS_PROOF` is structurally impossible on macOS for venv-spawned processes when `ps command` shows the framework path. The repair correctly returns `(False, None)` for structurally valid commands where the interpreter is not genuinely the same file, allowing `MANAGED_SPAWN_PROOF` to establish exact invocation.
-
-`os.path.samefile()` grants `DIRECT_OS_PROOF` only for genuinely identical executable files; macOS framework-path divergence remains non-direct and is admitted only through `MANAGED_SPAWN_PROOF`.
+On macOS, `ps command` may display the framework Python path (`Python.app/Contents/MacOS/Python`) rather than the exact requested venv Python path. These can be genuinely different files. `DIRECT_OS_PROOF` therefore applies only when `os.path.samefile()` confirms the observed executable and requested release Python are genuinely identical. Framework-path divergence remains non-direct and requires `MANAGED_SPAWN_PROOF`.
 
 ### Absence of workspace-process.json
 
-After the failed attempt, `workspace-process.json` is absent. This is expected behavior from matching cleanup (`_cleanup_own_spawn()` invalidates metadata matching the failed PID/release/start_identity). It is not evidence that metadata write was the primary failure.
+After the failed attempt, `workspace-process.json` was absent. This is expected matching cleanup behavior and is not evidence that metadata write was the primary failure.
 
-## 5. Bounded repair
+## 5. Canonical bounded repair
 
-Branch: `p9-11-f06-space-safe-process-identity`
+PR `#4` is merged through `3b4d2b2be4a095ff04e5703b36b3ef189c3d4057`.
 
-### Changes
+The canonical repair:
 
-1. **`_process_identity()`** — Replaced `shlex.split()` with right-to-left suffix matching:
-   - Matches absolute entrypoint suffix (`/{exact_path} serve`);
-   - Matches relative entrypoint suffix (`p9_03_workspace.py serve`);
-   - Extracts executable display by removing suffix from the right (no splitting on internal whitespace);
-   - Guards against flags/extra arguments in executable display;
-   - Uses `os.path.samefile()` for interpreter comparison (handles macOS framework vs venv symlink chains);
-   - Returns `(False, None)` for structurally valid commands where interpreter doesn't exactly match, allowing managed proof.
+1. replaces shell-token parsing of raw `ps command` display text with right-to-left exact entrypoint recognition that preserves legitimate executable paths containing whitespace;
+2. validates the extracted executable as an executable file without treating internal whitespace as argument separation;
+3. grants `DIRECT_OS_PROOF` only for genuinely identical executable files and leaves framework divergence to managed provenance;
+4. preserves exact CWD, entrypoint, manifest, live-asset, PID and process-start-identity checks;
+5. removes matching failed-spawn metadata when a newly created child has already exited;
+6. exposes bounded last-state/reason/proof-mode readiness diagnostics.
 
-2. **`_cleanup_own_spawn()`** — When child has already exited before cleanup runs, now invalidates matching metadata instead of silently returning. Prevents stale metadata from remaining after failed spawns.
+Validation evidence before merge:
 
-3. **`start()` readiness diagnostics** — Timeout error now includes `state`, `reason`, and `proof_mode` from the last observed status. Prevents opaque 30-second failures.
+- focused F06 / Workspace lifecycle tests: PASS;
+- exact venv Python and entrypoint paths containing `Application Support`: PASS;
+- real start-to-real-status managed-provenance regression: PASS;
+- framework + managed proof: `CURRENT_EXACT`;
+- framework without managed proof: `UNKNOWN` / proof `NONE`;
+- PID reuse and historical unproven-process fail-closed behavior: PASS;
+- GitHub Reference Python CI / full `unittest discover`: PASS on exact reviewed head `99d4d1a130885c6a399e3077f4ac15a113d67a98`.
+
+Two local Python `3.14.7` baseline failures were reproduced unchanged on canonical pre-F06 `main` and do not involve PR `#4`: one brittle P7.05 error-message assertion and one macOS `/var` → `/private/var` temporary-path equivalence assertion. They do not constitute F06 operational proof or waiver.
 
 ### Security non-regression
 
-- UNKNOWN unsignallable: preserved;
-- PID-reuse protection: preserved;
-- process-start-identity revalidation: preserved;
-- exact entrypoint/CWD/release/manifest/assets: preserved;
-- owner-only metadata: preserved;
-- P7.06 fail closed on UNKNOWN: preserved;
-- P7.02 `network_listener_mode = none`: preserved;
-- no second production service lifecycle: preserved;
-- no `SIGKILL` normal path: preserved.
+- `UNKNOWN` remains unsignallable;
+- PID-reuse protection remains binding;
+- process-start-identity revalidation remains binding;
+- exact entrypoint/CWD/release/manifest/assets remain required;
+- managed metadata remains owner-local and non-authoritative;
+- P7.06 remains fail closed on `UNKNOWN`;
+- P7.02 remains `network_listener_mode = none`;
+- no second production service lifecycle is introduced;
+- no normal `SIGKILL` path is introduced.
 
-## 6. Current safety state
+## 6. Current safety and operational state
 
 - historical PID `30686`: terminated by the consumed one-time owner decision;
 - no repeated signal is authorized by that decision;
-- current runtime: exact canonical `6ed9dade96417251d3dd5fc8cb175c7136682b63`;
-- P7.02/P7.05: healthy;
-- current Workspace payload: `p9.11.2` / contract `11`;
-- live Workspace: `NOT_RUNNING`;
-- owner recheck: **blocked / not yet executable**, because the Desktop launcher was neither refreshed nor opened and no live Workspace reached `CURRENT_EXACT`;
+- F06 repair: merged canonical;
+- selected-Mac runtime: still `6ed9dade96417251d3dd5fc8cb175c7136682b63` until the next governed update;
+- last verified P7.02/P7.05 state on that runtime: healthy;
+- installed Workspace payload: `p9.11.2` / contract `11`;
+- live Workspace: `NOT_RUNNING` in the last selected-Mac observation;
+- no post-merge managed Workspace retry has occurred;
+- Desktop launcher has not yet been refreshed/opened after the repair;
+- owner recheck remains **blocked / not yet executable**;
 - P9.11 remains `Current`;
 - R32 remains locked;
 - no synthetic owner-session evidence is permitted.
 
+F06 therefore remains **OPEN operationally**. Repository merge proves the repair is canonical; it does not prove selected-Mac `CURRENT_EXACT` readiness.
+
 ## 7. Required next steps
 
-After the bounded repair is merged:
-
-1. retry managed Workspace start through the exact helper;
-2. verify `CURRENT_EXACT` with `MANAGED_SPAWN_PROOF`;
-3. refresh Desktop launcher from exact canonical release;
-4. open Desktop launcher for owner recheck;
-5. stop automation at real owner feedback.
+1. governed-update the selected Mac from installed runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63` to the exact current canonical `main`, while the Workspace remains `NOT_RUNNING`;
+2. verify P7.02/P7.05 and exact Workspace payload `p9.11.2` / contract `11` on the new runtime;
+3. start Workspace once through the canonical managed helper;
+4. require `CURRENT_EXACT` with admissible `MANAGED_SPAWN_PROOF` (or genuine `DIRECT_OS_PROOF`) and exact loopback assets;
+5. refresh and open the exact-release Desktop launcher;
+6. stop automation at the real owner recheck and collect actual owner feedback.
