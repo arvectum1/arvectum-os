@@ -148,21 +148,26 @@ def _process_identity(command: str, cwd: Path | None, python: Path, entrypoint: 
     relative_name = entrypoint.name
     if command.endswith(absolute_suffix):
         executable_display = command[: -len(absolute_suffix)]
-        if not executable_display or " " in executable_display:
-            return False, "not Workspace command"
         resolved_entrypoint = entrypoint.resolve()
     elif command.endswith(f" {relative_name} serve"):
         idx = len(command) - len(f" {relative_name} serve")
         if idx <= 0:
             return False, "not Workspace command"
         executable_display = command[:idx]
-        if not executable_display or " " in executable_display:
-            return False, "not Workspace command"
         resolved_entrypoint = (cwd / relative_name).resolve()
     else:
         return False, "wrong entrypoint"
+    if not executable_display or executable_display != executable_display.strip():
+        return False, "not Workspace command"
+    if any(ord(c) < 0x20 or ord(c) == 0x7F for c in executable_display):
+        return False, "not Workspace command"
     if resolved_entrypoint != entrypoint.resolve():
         return False, "wrong entrypoint"
+    candidate = Path(executable_display)
+    if not candidate.is_file():
+        return False, "not Workspace command"
+    if not os.access(candidate, os.X_OK):
+        return False, "not Workspace command"
     try:
         direct_proof = os.path.samefile(executable_display, python)
     except OSError:

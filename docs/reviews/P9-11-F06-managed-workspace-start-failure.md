@@ -73,7 +73,9 @@ The canonical process identity recognizer (`_process_identity()`) parsed raw mac
 
 ### macOS framework Python nuance
 
-On macOS, `ps command` displays the framework Python path (`Python.app/Contents/MacOS/Python`) rather than the venv Python symlink chain. These are genuinely different binaries (different inodes) within the same Python installation. Therefore `DIRECT_OS_PROOF` is structurally impossible on macOS for venv-spawned processes. The repair correctly returns `(False, None)` for structurally valid commands with framework Python, allowing `MANAGED_SPAWN_PROOF` to establish exact invocation.
+On macOS, `ps command` displays the framework Python path (`Python.app/Contents/MacOS/Python`) rather than the venv Python symlink chain. These are genuinely different binaries (different inodes) within the same Python installation. Therefore `DIRECT_OS_PROOF` is structurally impossible on macOS for venv-spawned processes when `ps command` shows the framework path. The repair correctly returns `(False, None)` for structurally valid commands where the interpreter is not genuinely the same file, allowing `MANAGED_SPAWN_PROOF` to establish exact invocation.
+
+`os.path.samefile()` grants `DIRECT_OS_PROOF` only for genuinely identical executable files; macOS framework-path divergence remains non-direct and is admitted only through `MANAGED_SPAWN_PROOF`.
 
 ### Absence of workspace-process.json
 
