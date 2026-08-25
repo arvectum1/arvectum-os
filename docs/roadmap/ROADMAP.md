@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.7`
+Version: `2.95.8`
 Created: `2026-08-07`
 Updated: `2026-08-25`
 Owner: `ООО «Арвектум»`
@@ -15,15 +15,19 @@ Roadmap status does not itself change Platform Capability lifecycle, Product Con
 
 ## 2. Version note
 
-Version `2.95.7` records the F06 root cause establishment and bounded space-safe repair under review. The managed Workspace start failure after selected-Mac reconciliation was caused by `_process_identity()` using `shlex.split()` on macOS `ps command` display text; paths under `~/Library/Application Support/...` contain whitespace, producing4 tokens instead of3 and rejecting the healthy Workspace command. The repair replaces `shlex.split()` with right-to-left suffix matching, adds executable-file validation, handles macOS framework vs venv Python divergence via `os.path.samefile()` (DIRECT_OS_PROOF only for genuinely identical files; framework divergence admitted only through MANAGED_SPAWN_PROOF), fixes stale metadata cleanup on failed child exit, and adds bounded readiness diagnostics. F06 remains OPEN until the repair is merged, the selected-Mac runtime is updated, managed Workspace start reaches `CURRENT_EXACT`, and Desktop launcher flow is verified. Selected-Mac runtime remains `6ed9dade96417251d3dd5fc8cb175c7136682b63`; Workspace is `NOT_RUNNING`; owner recheck remains blocked.
+Version `2.95.8` records PR `#4` as merged canonical implementation through `3b4d2b2be4a095ff04e5703b36b3ef189c3d4057`. The F06 root cause is established and the space-safe Workspace process-identity repair is now canonical. Exact executable paths containing `Application Support` are recognized without shell-tokenizing internal whitespace; `DIRECT_OS_PROOF` still requires genuine executable identity, while macOS framework-path divergence remains admissible only through exact owner-local `MANAGED_SPAWN_PROOF`. PID-reuse, process-start-identity, exact CWD/entrypoint/release/manifest/assets and `UNKNOWN` fail-closed boundaries remain intact.
 
-F06 root cause is established and a bounded repair is under review: [`P9.11-F06 — Managed Workspace Start Failure After Selected-Mac Reconciliation`](../reviews/P9-11-F06-managed-workspace-start-failure.md). The finding remains OPEN until repair is merged, selected-Mac runtime is updated, Workspace reaches CURRENT_EXACT, and Desktop launcher flow is verified.
+F06 remains **OPEN operationally**. The selected Mac still runs exact runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63`, Workspace `p9.11.2` / app contract `11` was last observed `NOT_RUNNING`, no post-merge managed Workspace retry has occurred, and the Desktop launcher has not yet been refreshed/opened after the repair. Repository merge is not selected-Mac readiness evidence.
+
+Canonical evidence: [`P9.11-F06 — Managed Workspace Start Failure After Selected-Mac Reconciliation`](../reviews/P9-11-F06-managed-workspace-start-failure.md) — `Repair merged / operational verification pending`.
+
+The earlier F05 operational reconciliation succeeded: the exact one-time owner decision for historical PID `30686` was consumed with one graceful `SIGTERM`; PID `30686` exited and port `8769` became free; P7.06 transaction `215cb1390708bd4a0e72b567cf9060e4a84173147af618a064c464ca31640ff0` then updated the selected Mac to runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63`; P7.02/P7.05 were healthy; no product/external effect replay occurred.
 
 The canonical repository for current checkouts and new deployments is `arvectum1/arvectum-os`. Historical `arvectum/arvectum-os` identity is retained only where immutable provenance of already-installed historical releases requires it.
 
 The one-time owner decision `DECISION-2026-08-25-P9-11-F05-ONE-TIME-LEGACY-WORKSPACE-TERMINATION` is consumed. It is not reusable for another PID or another signal attempt. Normal `UNKNOWN` Workspace listeners remain fail-closed and unsignallable without a separate exact owner decision.
 
-`P9.11` remains Current, `R32` remains locked, and owner recheck is **blocked / pending** because no live `CURRENT_EXACT` Workspace or Desktop launcher flow exists yet.
+`P9.11` remains Current, `R32` remains locked, and owner recheck remains blocked until the exact post-merge selected-Mac runtime reaches live `CURRENT_EXACT` and the Desktop launcher flow opens.
 
 Lane B is internally complete through prepared `INT-B7`; no additional internal integration-planning task is admitted until an exact real 1С/CRM/СЭД/ЭДО endpoint/deployment/account is available.
 
@@ -58,7 +62,7 @@ This update creates no public/stable API/connector/browser contract, no customer
 
 ## 5. Active Phase 9
 
-Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.6`.
+Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.7`.
 
 | ID | Work item | Status |
 |---|---|---:|
@@ -77,7 +81,7 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F06 managed-start investigation; owner recheck blocked** |
+| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F06 repair merged; selected-Mac update/retry + owner recheck pending** |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked |
 | P9.12 | Phase 9 / M9 closure review | ⬜ |
 
@@ -86,25 +90,28 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 - F03 owner-first IA repair remains implemented in Workspace `p9.11.2`;
 - F04 canonical repository identity migration is merged;
 - F05 listener-lifecycle implementation is merged in `0958b97661d51281b069820fd2d1f5ce338a11ec`;
-- the one-time F05 legacy-listener owner decision is consumed: historical PID `30686` exited after the single approved `SIGTERM`; port `8769` was freed;
-- selected-Mac P7.06 transaction `215cb1390708bd4a0e72b567cf9060e4a84173147af618a064c464ca31640ff0` updated successfully to exact canonical runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63`; P7.02/P7.05 are healthy;
-- installed Workspace remains `p9.11.2` / app contract `11`;
-- **F06 managed Workspace start:** attempted child PID `52092`, final helper state `NOT_RUNNING`; no accepted managed proof/live exact assets; launcher not refreshed/opened;
-- owner recheck: blocked / pending until Workspace reaches `CURRENT_EXACT` and the real launcher flow opens;
+- F05 selected-Mac operational reconciliation succeeded: historical PID `30686` exited after the single approved `SIGTERM`, port `8769` was freed, and the authorization is consumed;
+- P7.06 transaction `215cb1390708bd4a0e72b567cf9060e4a84173147af618a064c464ca31640ff0` updated the selected Mac successfully to runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63`; last verified P7.02/P7.05 state there was healthy;
+- installed Workspace payload remains `p9.11.2` / app contract `11`;
+- F06 real failed start: PID `52092` reached Uvicorn startup but helper identity recognition rejected the healthy path-with-spaces command before managed proof, then gracefully cleaned up its own child;
+- **F06 implementation repair:** PR `#4` merged at `3b4d2b2be4a095ff04e5703b36b3ef189c3d4057`; exact executable paths containing whitespace are space-safe, managed provenance remains strict, failed-child cleanup/readiness diagnostics are hardened;
+- selected Mac has not yet been updated to the post-merge canonical runtime and no post-merge Workspace start has occurred;
+- last live Workspace state: `NOT_RUNNING`;
+- owner recheck: blocked / pending until Workspace reaches `CURRENT_EXACT` and the exact-release launcher flow opens;
 - synthetic owner-session evidence: prohibited.
 
 Current critical sequence:
 
 ```text
-read-only F06 selected-Mac diagnostics
+governed P7.06 update selected Mac from 6ed9dade... to current canonical main
         ↓
-identify exact managed-start failure mode
+verify P7.02/P7.05 + Workspace p9.11.2 / contract 11
         ↓
-bounded repair or reviewed retry plan
+one managed Workspace start through canonical helper
         ↓
-verify live Workspace CURRENT_EXACT on p9.11.2 / contract 11
+verify CURRENT_EXACT + admissible proof + exact loopback assets
         ↓
-refresh/open Desktop launcher
+refresh/open exact-release Desktop launcher
         ↓
 real owner recheck / continued daily dogfooding
         ↓
@@ -142,8 +149,10 @@ Preferred first prepared candidate remains a bounded read-only `1С:ERP 2.5` pro
 ## 7. Quality / test state
 
 - merged F04 repository-identity repair: focused P7.06 Python/shell validation `44 passed`; shell syntax and Python compilation PASS;
-- merged F05 PR `#3`: final focused lifecycle/P7.06/P7.02 evidence `72 passed`; historical roadmap guards `4 passed`; GitHub `Reference Python CI` / `Full reference test suite` PASS on exact reviewed head `9474b846d316ed4fb038ce90a11999401b83fcc9`;
-- selected-Mac F05 termination + governed runtime update succeeded, but managed Workspace start failed before `CURRENT_EXACT`; this is now F06 and no owner-recheck PASS is claimed;
+- merged F05 PR `#3`: final focused lifecycle/P7.06/P7.02 evidence `72 passed`; historical roadmap guards `4 passed`; GitHub Reference Python CI / full suite PASS on exact reviewed head `9474b846d316ed4fb038ce90a11999401b83fcc9`;
+- merged F06 PR `#4`: exact `Application Support` executable/entrypoint regressions PASS, framework + managed proof reaches `CURRENT_EXACT`, framework without managed proof remains `UNKNOWN` / `NONE`, PID-reuse and historical unproven-process guards PASS, and GitHub full Reference Python CI PASS on exact reviewed head `99d4d1a130885c6a399e3077f4ac15a113d67a98`;
+- local Python `3.14.7` full suite reported `1340 passed` plus two baseline failures reproduced unchanged on pre-F06 canonical `main`: one P7.05 error-message-string assertion and one macOS `/var` → `/private/var` temporary-path equivalence assertion; neither involves PR `#4` files and neither is treated as a waiver or selected-Mac readiness proof;
+- no post-merge F06 selected-Mac `CURRENT_EXACT` or owner-recheck PASS is claimed;
 - R32 remains locked and therefore no M9 code-health PASS is claimed.
 
 ## 8. M9 definition
@@ -156,7 +165,7 @@ Parallel integration progress cannot substitute for P9.11 operational evidence.
 
 **Critical path:**
 
-> **P9.11-F06 — perform read-only selected-Mac diagnostics of the failed managed Workspace spawn (logs/process/metadata/current exact checks), determine the exact failure mode, and only then admit a bounded repair or retry. Do not retry `start()` or launcher before diagnosis.**
+> **P9.11-F06 — governed-update the selected Mac from installed runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63` to the exact current canonical `main` while Workspace remains `NOT_RUNNING`; verify P7.02/P7.05 and Workspace `p9.11.2` / contract `11`; perform one managed Workspace start and require `CURRENT_EXACT` with admissible proof and exact loopback assets; then refresh/open the exact-release Desktop launcher and stop at the real owner recheck.**
 
 **Lane B:**
 
