@@ -260,7 +260,11 @@ def _live_assets_match(index: Path) -> bool:
         return False
     for asset in ASSET_HREF.findall(expected):
         path = index.parent / asset.decode("ascii")
-        if not path.is_file() or _fetch("/" + asset.decode("ascii")) != path.read_bytes():
+        try:
+            matches = path.is_file() and _fetch("/" + asset.decode("ascii")) == path.read_bytes()
+        except (OSError, WorkspaceProcessError):
+            return False
+        if not matches:
             return False
     return True
 
@@ -389,6 +393,31 @@ def start(root: Path) -> dict[str, Any]:
     )
 
 
+def _wait_for_exact_process_stop(root: Path, pid: int, release: str, start_identity: str) -> dict[str, Any]:
+    """Wait for the already-proven process without consulting shutdown-volatile HTTP."""
+    deadline = time.monotonic() + MAX_WAIT_SECONDS
+    while time.monotonic() < deadline:
+        observed_identity = _process_start_identity(pid)
+        if observed_identity is not None and observed_identity != start_identity:
+            raise WorkspaceProcessError("Workspace stop refused: process identity changed after signal")
+        listener = _listener()
+        if listener is not None and listener[0] != pid:
+            raise WorkspaceProcessError("Workspace stop refused: foreign listener appeared after signal")
+        if observed_identity is None and listener is None:
+            _invalidate_matching_metadata(root, pid, release, start_identity)
+            _atomic_json(root / "run/workspace-last-stop.json", {
+                "schema": STOP_SCHEMA,
+                "classification": "non-canonical operational telemetry",
+                "pid": pid,
+                "release_sha": release,
+                "stopped_at": _utc_now(),
+                "bind": f"{HOST}:{PORT}",
+            })
+            return {"state": NOT_RUNNING, "stopped_pid": pid, "stopped_release": release}
+        time.sleep(POLL_SECONDS)
+    raise WorkspaceProcessError("known Workspace process did not stop gracefully")
+
+
 def stop_for_update(root: Path) -> dict[str, Any]:
     root = root.expanduser().resolve()
     before = status(root)
@@ -404,21 +433,7 @@ def stop_for_update(root: Path) -> dict[str, Any]:
     if revalidated.get("state") != before["state"] or revalidated.get("pid") != pid or revalidated.get("release_sha") != before.get("release_sha") or revalidated.get("proof_mode") != before.get("proof_mode") or revalidated.get("process_start_identity") != start_identity:
         raise WorkspaceProcessError("Workspace stop refused: process identity changed")
     os.kill(pid, signal.SIGTERM)
-    deadline = time.monotonic() + MAX_WAIT_SECONDS
-    while time.monotonic() < deadline:
-        if status(root)["state"] == NOT_RUNNING:
-            _invalidate_matching_metadata(root, pid, before["release_sha"], start_identity)
-            _atomic_json(root / "run/workspace-last-stop.json", {
-                "schema": STOP_SCHEMA,
-                "classification": "non-canonical operational telemetry",
-                "pid": pid,
-                "release_sha": before["release_sha"],
-                "stopped_at": _utc_now(),
-                "bind": f"{HOST}:{PORT}",
-            })
-            return {"state": NOT_RUNNING, "stopped_pid": pid, "stopped_release": before["release_sha"]}
-        time.sleep(POLL_SECONDS)
-    raise WorkspaceProcessError("known Workspace process did not stop gracefully")
+    return _wait_for_exact_process_stop(root, pid, before["release_sha"], start_identity)
 
 
 def _parser() -> argparse.ArgumentParser:

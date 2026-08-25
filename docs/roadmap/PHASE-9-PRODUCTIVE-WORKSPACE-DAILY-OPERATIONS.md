@@ -1,14 +1,14 @@
 # Arvectum OS Phase 9 — Productive Workspace & Daily Operations
 
 Status: `Active`
-Version: `1.13.14`
+Version: `1.13.15`
 Created: `2026-08-21`
 Updated: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `product_contract` and `governance`
 Parent roadmap: [`ROADMAP.md`](ROADMAP.md)
 
-Current disposition: F06 remains operationally verified. F07 is owner-rechecked PASS only in its bounded Home/navigation/branding scope on the live `p9.11.3` Workspace. F08 `p9.11.4` was governed-deployed successfully to `dc0e0cff83a9031a3686191b5cf304ee03c2d1eb`, but its owner recheck failed because UI4 preflight proof was misclassified as urgent owner work. PR `#8` is now merged canonical as `037cd59d7917d52b3ff6aa2dea20dcad22ed484d`, carrying Workspace `p9.11.5` / app contract `11`; selected-Mac deployment and owner recheck of that repair are pending. P9.11 remains Current, R32 locked, P9.12 not started and M9 open.
+Current disposition: F06 remains operationally verified. F07 is owner-rechecked PASS only in its bounded Home/navigation/branding scope. F08 p9.11.5 semantic repair is merged, but its first governed deployment stopped the trusted source Workspace and failed before target activation because post-SIGTERM HTTP readiness was consulted during graceful shutdown. Source runtime remains `dc0e0cff83a9031a3686191b5cf304ee03c2d1eb`; P7.02/P7.05 are healthy and Workspace is `NOT_RUNNING`. F09 lifecycle repair is under review. P9.11 remains Current, R32 locked, P9.12 not started and M9 open.
 Milestone: `M9 — Daily-use organizational workbench`
 Intermediate milestone: `M9-alpha — Usable Internal Workspace — Achieved / PASS`
 Architecture baseline: Constitution `1.2.0`; RFC-0001 through RFC-0008 `Accepted 1.0.0`; ADR-0001 `Accepted`
@@ -54,7 +54,7 @@ The legacy P4/P7 browser surfaces remain diagnostic/reference/recovery evidence.
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS | non-authoritative activity UX |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS | company-level composition |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS | product/AI boundaries PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F07 bounded PASS; F08 p9.11.5 merged, deployment + owner recheck pending** | real owner sessions + material friction closure |
+| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F07 bounded PASS; F08 p9.11.5 merged, deployment blocked by F09** | real owner sessions + material friction closure |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked | pre-closure hardening PASS |
 | P9.12 | Phase 9 / M9 closure review | ⬜ | exact-scope M9 closure |
 
@@ -168,10 +168,20 @@ PR `#8` merged the owner-task eligibility repair as `037cd59d7917d52b3ff6aa2dea2
 
 No product business action, authority, approval, canonical mutation or external effect was introduced. F08 remains **OPEN** until p9.11.5 is governed-deployed and the owner confirms that ordinary Home/Tasks contain no false urgent task while UI4 remains understandable as optional technical diagnostics.
 
+### F09 — Workspace stop-for-update graceful-shutdown race
+
+Canonical evidence: [`P9.11-F09 — Workspace Stop-for-Update Graceful-Shutdown Race`](../reviews/P9-11-F09-workspace-stop-for-update-graceful-shutdown-race.md).
+
+The first p9.11.5 governed update passed preflight and retained a verified backup, but failed before target activation when the post-SIGTERM stop poll reused HTTP/asset readiness while the known process was exiting. No pointer mutation, transaction, retry, SIGKILL, canonical mutation, product/external effect, or historical-effect replay occurred. F09 keeps pre-signal full exact proof and replaces only the post-signal wait with original-process identity and loopback-listener proof. Future pre-activation stop failures are recorded as `FAIL`, not rollback. F09 blocks deployment until merged.
+
 ## 7. Current critical path
 
 ```text
-govern-deploy p9.11.5 and verify runtime/readiness/assets/launcher
+review and merge F09 lifecycle repair
+        ↓
+govern-deploy new canonical main from Workspace NOT_RUNNING state
+        ↓
+verify runtime/readiness/assets, then start target Workspace exactly once
         ↓
 real owner recheck: Home/Tasks no false task + Settings/UI4 task-neutral diagnostics
         ↓
@@ -217,6 +227,6 @@ Phase 9 does not by itself establish public SaaS, customer Production, universal
 
 ## 11. Current canonical action
 
-> **P9.11-F08 — govern-deploy the exact current canonical `main` carrying Workspace `p9.11.5` / app contract `11` to the selected Mac; verify P7.02/P7.05, `CURRENT_EXACT`, admissible proof, exact live assets and the Desktop launcher; then stop at a real owner recheck that ordinary Home/Tasks contain no false owner task and UI4 remains only task-neutral Settings diagnostics. F07 remains bounded PASS; F08 remains open; P9.11 remains Current and R32 remains locked.**
+> **P9.11-F09 — review and merge the bounded Workspace graceful-stop lifecycle repair. Then govern-deploy the new canonical main carrying Workspace `p9.11.5` / app contract `11` from the current `NOT_RUNNING` Workspace state, verify exact runtime/assets, start the target Workspace exactly once through its exact helper, refresh/open the launcher, and resume the F08 real owner recheck. F07 remains bounded PASS; F08 remains open; P9.11 remains Current and R32 remains locked.**
 
 R32 remains locked until P9.11 real-session evidence and friction closure criteria are met.
