@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.3`
+Version: `2.95.4`
 Created: `2026-08-07`
 Updated: `2026-08-24`
 Owner: `ООО «Арвектум»`
@@ -11,11 +11,11 @@ Task classification: `governance`
 
 This document is the canonical planning source for Arvectum OS sequencing and concurrency. It coordinates work but does not override the Constitution, Accepted RFC/ADR, approved governance, Product Contracts, code/tests or canonical implementation evidence.
 
-Roadmap progress does not itself change Platform Capability lifecycle, Product Contract lifecycle, operational environment/readiness, conformance maturity or commercial commitments.
+Roadmap status does not itself change Platform Capability lifecycle, Product Contract lifecycle, operational environment/readiness, conformance maturity, SLA/support or commercial commitments.
 
 ## 2. Version note
 
-Version `2.95.3` synchronizes the roadmap to the latest real P9.11 operating state and current parallel-lane state.
+Version `2.95.4` preserves the `2.95.3` real operating-state record and adds the F05 Case-C disposition: PID `30686` remains `UNKNOWN` because original venv invocation provenance cannot be reconstructed. No retrospective provenance or automatic signal is permitted; future helper-created Workspace processes carry managed spawn provenance bound to OS process-start identity. PR #3, selected-Mac reconciliation and owner recheck remain pending.
 
 The canonical repository for current checkouts and new deployments is `arvectum1/arvectum-os`. Historical `arvectum/arvectum-os` identity is retained only where immutable provenance of already-installed historical releases requires it.
 
@@ -48,17 +48,17 @@ This update creates no public/stable API/connector/browser contract, no customer
 | `Phase 0` | Foundation / Architecture Bootstrap | 🟩 Complete | M0 |
 | `Phase 1` | Reference Implementation | 🟩 Complete | M1 |
 | `Phase 2` | Core Runtime | 🟩 Complete | M2 |
-| `Phase 3` | Shared Platform Capabilities | 🟩 Complete | M3 |
+| `Phase 3` | Shared Platform Capabilities | 🟩 Complete | `M3` Validated shared capability baseline |
 | `Phase 4` | Workspace / Operator Experience | 🟩 Complete | M4 |
 | `Phase 5` | SDK, Contracts and Extension Experience | 🟩 Complete | M5 |
 | `Phase 6` | Product-driven Platform Validation | 🟩 Complete / PASS | M6 |
 | `Phase 7` | Operational / Enterprise Readiness | 🟩 Complete / PASS | M7 |
-| `Phase 8` | Ecosystem and External Integration | 🟩 Complete / PASS | M8 |
+| `Phase 8` | Ecosystem and External Integration | 🟩 Complete / PASS | `M8` Governed external ecosystem baseline — exact activated one-Organization scope |
 | **`Phase 9`** | **Productive Workspace & Daily Operations** | **🟨 Active** | **M9 — Daily-use organizational workbench** |
 
 ## 5. Active Phase 9
 
-Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.3`.
+Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.4`.
 
 | ID | Work item | Status |
 |---|---|---:|

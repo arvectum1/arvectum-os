@@ -7,6 +7,7 @@ REPO_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd)
 P702="$SCRIPT_DIR/p7_02_macos_service.sh"
 P705="$SCRIPT_DIR/p7_05_macos_observer.sh"
 P706="$SCRIPT_DIR/p7_06_governed_deploy.py"
+P911="$SCRIPT_DIR/p9_11_workspace_process.py"
 RUNTIME_LABEL="com.arvectum.os.persistent-internal"
 OBSERVER_LABEL="com.arvectum.os.p7-05-observer"
 DOMAIN="gui/$(id -u)"
@@ -113,6 +114,11 @@ current_release() {
 release_python() { printf '%s/venvs/%s/bin/python\n' "$RUNTIME_ROOT" "$1"; }
 release_source() { printf '%s/releases/%s/source/reference/python\n' "$RUNTIME_ROOT" "$1"; }
 
+workspace_status() { python3 "$P911" status --runtime-root "$RUNTIME_ROOT"; }
+workspace_start() { python3 "$P911" start --runtime-root "$RUNTIME_ROOT"; }
+workspace_stop_for_update() { python3 "$P911" stop-for-update --runtime-root "$RUNTIME_ROOT"; }
+workspace_state() { printf '%s' "$1" | python3 -c 'import json,sys; print(json.load(sys.stdin)["state"])'; }
+
 acquire_lock() {
   mkdir -p "$RUNTIME_ROOT/run"
   chmod 700 "$RUNTIME_ROOT/run"
@@ -218,6 +224,13 @@ restore_plist_and_start() {
   [ -d "$RUNTIME_ROOT/releases/$rel" ] || fail "rollback release is no longer installed: $rel"
   [ -x "$(release_python "$rel")" ] || fail "rollback release Python missing"
 
+  workspace=$(workspace_status) || fail "rollback Workspace listener classification failed"
+  case "$(workspace_state "$workspace")" in
+    NOT_RUNNING) ;;
+    CURRENT_EXACT|STALE_KNOWN_EXACT) workspace_stop_for_update >/dev/null || fail "rollback known Workspace listener did not stop" ;;
+    UNKNOWN) fail "rollback refused: Workspace listener is UNKNOWN" ;;
+  esac
+
   sh "$P705" uninstall >/dev/null || fail "rollback observer did not unload within bounded wait"
   sh "$P702" stop >/dev/null || fail "rollback runtime launchd target did not unload within bounded wait"
   wait_runtime_quiescent || fail "rollback runtime process did not release the single-instance lock"
@@ -243,6 +256,9 @@ restore_plist_and_start() {
   rm -f "$OBSERVER_PLIST"
   if ! sh "$P705" install >/dev/null; then fail "rollback observer exact-release re-pin failed"; fi
   if ! sh "$P705" status >/dev/null; then fail "rollback observer exact-release verification failed"; fi
+  if [ "${workspace_was_running:-false}" = "true" ]; then
+    workspace_start >/dev/null || fail "rollback Workspace exact-source restart failed"
+  fi
 }
 
 backup_preupdate() {
@@ -260,10 +276,10 @@ backup_preupdate() {
 }
 
 write_payload() {
-  path=$1; plan_id=$2; source=$3; target=$4; result=$5; backup=$6; backup_sha=$7; runtime_ok=$8; observer_ok=$9; rollback=${10}
-  python3 - "$path" "$plan_id" "$source" "$target" "$result" "$backup" "$backup_sha" "$runtime_ok" "$observer_ok" "$rollback" <<'PY'
+  path=$1; plan_id=$2; source=$3; target=$4; result=$5; backup=$6; backup_sha=$7; runtime_ok=$8; observer_ok=$9; rollback=${10}; workspace=${11}
+  python3 - "$path" "$plan_id" "$source" "$target" "$result" "$backup" "$backup_sha" "$runtime_ok" "$observer_ok" "$rollback" "$workspace" <<'PY'
 import json, sys
-path, plan_id, source, target, result, backup, backup_sha, runtime_ok, observer_ok, rollback = sys.argv[1:]
+path, plan_id, source, target, result, backup, backup_sha, runtime_ok, observer_ok, rollback, workspace = sys.argv[1:]
 payload = {
     "plan_id": plan_id,
     "source_release": source,
@@ -273,6 +289,7 @@ payload = {
     "backup_sha256": backup_sha,
     "runtime_release_verified": runtime_ok == "true",
     "observer_release_verified": observer_ok == "true",
+    "workspace_listener_disposition": workspace,
     "rollback_disposition": rollback,
     "canonical_mutation_performed_by_deploy": False,
     "product_external_effect_invoked": False,
@@ -288,7 +305,7 @@ rollback_and_record_failure() {
   reason=$1
   restore_plist_and_start "$txdir" "$source"
   payload="$txdir/failure-rollback-$(date -u '+%Y%m%dT%H%M%SZ').json"
-  write_payload "$payload" "$plan_id" "$source" "$target" ROLLED_BACK "$backup" "$backup_sha" true true "executed after failed update: $reason; exact source release restored; backup retained and not replayed"
+  write_payload "$payload" "$plan_id" "$source" "$target" ROLLED_BACK "$backup" "$backup_sha" true true "executed after failed update: $reason; exact source release restored; backup retained and not replayed" "$workspace_disposition"
   tx=$(python3 "$P706" record --runtime-root "$RUNTIME_ROOT" --payload "$payload" --json || true)
   if [ -n "$tx" ]; then
     txid=$(printf '%s' "$tx" | python3 -c 'import json,sys; print(json.load(sys.stdin)["transaction_id"])' 2>/dev/null || true)
@@ -305,6 +322,8 @@ preflight() {
   assert_macos
   target=$(assert_canonical_checkout)
   source=$(current_release)
+  workspace=$(workspace_status) || fail "Workspace listener classification failed"
+  [ "$(workspace_state "$workspace")" != "UNKNOWN" ] || fail "Workspace listener is UNKNOWN; operator investigation required"
   [ "$source" != "$target" ] || fail "canonical target is already the active release"
   prepare_target "$target"
   python3 "$P706" preflight --runtime-root "$RUNTIME_ROOT" --target-release "$target" --decision-ref "$decision_ref"
@@ -320,6 +339,14 @@ update_runtime() {
   [ "$source" != "$target" ] || fail "canonical target is already the active release"
   sh "$P702" status >/dev/null
   verify_source_observer_preupdate "$source"
+  workspace=$(workspace_status) || fail "Workspace listener classification failed"
+  workspace_state_value=$(workspace_state "$workspace")
+  [ "$workspace_state_value" != "UNKNOWN" ] || fail "Workspace listener is UNKNOWN; operator investigation required"
+  workspace_was_running=false
+  if [ "$workspace_state_value" = "CURRENT_EXACT" ] || [ "$workspace_state_value" = "STALE_KNOWN_EXACT" ]; then
+    workspace_was_running=true
+  fi
+  workspace_disposition="preflight=$workspace_state_value; previously_running=$workspace_was_running"
   prepare_target "$target"
   plan=$(python3 "$P706" preflight --runtime-root "$RUNTIME_ROOT" --target-release "$target" --decision-ref "$decision_ref" --json) || fail "compatibility/migration preflight rejected target"
   plan_id=$(printf '%s' "$plan" | python3 -c 'import json,sys; print(json.load(sys.stdin)["plan_id"])')
@@ -336,25 +363,36 @@ update_runtime() {
   backup_info=$(backup_preupdate "$source")
   backup=${backup_info%%|*}; backup_sha=${backup_info#*|}
   info "pre-update backup PASS sha256=$backup_sha"
+  printf '%s\n' "$workspace_was_running" > "$txdir/workspace-was-running"
+  chmod 600 "$txdir/workspace-was-running"
 
-  sh "$P705" uninstall
-  sh "$P702" stop
+  if [ "$workspace_was_running" = "true" ]; then
+    workspace_stop_for_update >/dev/null || fail "known Workspace listener did not stop for update"
+    workspace_disposition="$workspace_disposition; stopped_for_update=true"
+  fi
+
+  if ! sh "$P705" uninstall; then rollback_and_record_failure "source observer did not unload"; fi
+  if ! sh "$P702" stop; then rollback_and_record_failure "source runtime did not stop"; fi
   wait_runtime_quiescent || rollback_and_record_failure "source runtime process did not quiesce after stop"
   if ! sh "$P702" install >/dev/null; then rollback_and_record_failure "target activation failed"; fi
   [ "$(current_release)" = "$target" ] || rollback_and_record_failure "target release did not become current"
   if ! sh "$P702" status >/dev/null; then rollback_and_record_failure "target runtime exact-release health verification failed"; fi
   if ! sh "$P705" install >/dev/null; then rollback_and_record_failure "observer re-pin failed"; fi
   if ! sh "$P705" status >/dev/null; then rollback_and_record_failure "observer exact-release verification failed"; fi
+  if [ "$workspace_was_running" = "true" ]; then
+    if ! workspace_start >/dev/null; then rollback_and_record_failure "target Workspace exact-release restart failed"; fi
+    workspace_disposition="$workspace_disposition; restarted_target=true"
+  fi
 
   payload="$txdir/transaction-payload.json"
-  write_payload "$payload" "$plan_id" "$source" "$target" PASS "$backup" "$backup_sha" true true "safe: unchanged P7.03 store schema; exact release re-pin available"
+  write_payload "$payload" "$plan_id" "$source" "$target" PASS "$backup" "$backup_sha" true true "safe: unchanged P7.03 store schema; exact release re-pin available" "$workspace_disposition"
   tx=$(python3 "$P706" record --runtime-root "$RUNTIME_ROOT" --payload "$payload" --json)
   txid=$(printf '%s' "$tx" | python3 -c 'import json,sys; print(json.load(sys.stdin)["transaction_id"])')
-  python3 - "$RUNTIME_ROOT/run/p7-06-last-success.json" "$txdir" "$txid" "$source" "$target" "$plan_id" "$backup" "$backup_sha" <<'PY'
+  python3 - "$RUNTIME_ROOT/run/p7-06-last-success.json" "$txdir" "$txid" "$source" "$target" "$plan_id" "$backup" "$backup_sha" "$workspace_was_running" <<'PY'
 import json, os, sys
-path, txdir, txid, source, target, plan, backup, backup_sha = sys.argv[1:]
+path, txdir, txid, source, target, plan, backup, backup_sha, workspace_was_running = sys.argv[1:]
 with open(path, "w", encoding="utf-8") as h:
-    json.dump({"transaction_id":txid,"work_dir":txdir,"source_release":source,"target_release":target,"plan_id":plan,"backup_path":backup,"backup_sha256":backup_sha}, h, sort_keys=True, indent=2); h.write("\n")
+    json.dump({"transaction_id":txid,"work_dir":txdir,"source_release":source,"target_release":target,"plan_id":plan,"backup_path":backup,"backup_sha256":backup_sha,"workspace_was_running":workspace_was_running == "true"}, h, sort_keys=True, indent=2); h.write("\n")
 os.chmod(path, 0o600)
 PY
   info "update PASS source=$source target=$target transaction=$txid"
@@ -371,11 +409,13 @@ rollback_last() {
   plan_id=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["plan_id"])' "$pointer")
   backup=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["backup_path"])' "$pointer")
   backup_sha=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["backup_sha256"])' "$pointer")
+  workspace_was_running=$(python3 -c 'import json,sys; print(str(json.load(open(sys.argv[1])).get("workspace_was_running", False)).lower())' "$pointer")
   [ "$(current_release)" = "$target" ] || fail "rollback source mismatch: active release is not transaction target"
   acquire_lock; trap 'release_lock' EXIT HUP INT TERM
   restore_plist_and_start "$txdir" "$source"
   payload="$txdir/rollback-payload-$(date -u '+%Y%m%dT%H%M%SZ').json"
-  write_payload "$payload" "$plan_id" "$source" "$target" ROLLED_BACK "$backup" "$backup_sha" true true "executed: exact source release re-pin; durable schema unchanged; backup retained and not restored"
+  workspace_disposition="manual rollback; prior Workspace running=$workspace_was_running"
+  write_payload "$payload" "$plan_id" "$source" "$target" ROLLED_BACK "$backup" "$backup_sha" true true "executed: exact source release re-pin; durable schema unchanged; backup retained and not restored" "$workspace_disposition"
   tx=$(python3 "$P706" record --runtime-root "$RUNTIME_ROOT" --payload "$payload" --json)
   txid=$(printf '%s' "$tx" | python3 -c 'import json,sys; print(json.load(sys.stdin)["transaction_id"])')
   info "rollback PASS active=$source from_target=$target transaction=$txid"
@@ -436,6 +476,11 @@ if len(args) < 2 or args[0] != expected_python or args[1] != expected_runtime:
 print(release)
 PY
   ) || fail "latest interrupted work evidence does not identify an exact valid source release"
+  workspace_was_running=false
+  if [ -f "$txdir/workspace-was-running" ]; then
+    workspace_was_running=$(cat "$txdir/workspace-was-running")
+    [ "$workspace_was_running" = "true" ] || [ "$workspace_was_running" = "false" ] || fail "interrupted work Workspace state is invalid"
+  fi
 
   before=$(current_release)
   restore_plist_and_start "$txdir" "$source"

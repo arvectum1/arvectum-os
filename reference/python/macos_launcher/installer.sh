@@ -21,7 +21,6 @@ LAUNCHER_LOG="$RUNTIME_ROOT/logs/desktop-launcher.log"
 WORKSPACE_URL="http://127.0.0.1:8769"
 OPEN=/usr/bin/open
 LAUNCHCTL=/bin/launchctl
-CURL=/usr/bin/curl
 APPLESCRIPT=/usr/bin/osascript
 
 fail() { printf '%s\n' "Installer FAIL: $*" >&2; exit 1; }
@@ -133,20 +132,17 @@ status_app() {
 
   printf '%s\n' ""
 
-  local target="gui/$(id -u)/$LABEL"
-  if "$LAUNCHCTL" print "$target" >/dev/null 2>&1; then
-    local pid
-    pid=$("$LAUNCHCTL" print "$target" 2>/dev/null | awk '/^[[:space:]]*pid = / {print $3; exit}')
-    printf '%s\n' "Workspace: running (pid=$pid)"
-    local http_code
-    http_code=$("$CURL" -s -o /dev/null -w "%{http_code}" --max-time 3 "$WORKSPACE_URL/" 2>/dev/null || echo "000")
-    if [ "$http_code" = "200" ]; then
-      printf '%s\n' "  HTTP: $WORKSPACE_URL returned $http_code"
+  local release helper python workspace
+  if [ -L "$RUNTIME_ROOT/current" ]; then
+    release=$(basename "$(readlink "$RUNTIME_ROOT/current")")
+    helper="$RUNTIME_ROOT/current/source/reference/python/p9_11_workspace_process.py"
+    python="$RUNTIME_ROOT/venvs/$release/bin/python"
+    if [ -x "$python" ] && [ -f "$helper" ]; then
+      workspace=$("$python" "$helper" status --runtime-root "$RUNTIME_ROOT" 2>/dev/null || true)
+      printf '%s\n' "Workspace listener: ${workspace:-unavailable}"
     else
-      printf '%s\n' "  HTTP: $WORKSPACE_URL returned $http_code (may still be starting)"
+      printf '%s\n' "Workspace listener: helper unavailable for current release"
     fi
-  else
-    printf '%s\n' "Workspace: not running"
   fi
 
   printf '%s\n' ""

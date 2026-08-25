@@ -53,6 +53,9 @@ class P706Tests(unittest.TestCase):
         self.assertEqual(plan["migration"]["mode"], "none")
         self.assertTrue(plan["migration"]["rollback_safe"])
         self.assertFalse(plan["external_effect_replay_authorized"])
+        self.assertIn("classify-workspace-listener", plan["required_sequence"])
+        self.assertIn("conditionally-stop-known-workspace-listener", plan["required_sequence"])
+        self.assertIn("conditionally-start-and-verify-exact-target-workspace-listener", plan["required_sequence"])
         self.assertTrue((self.root / "evidence/p7-06/plans" / f"{plan['plan_id']}.json").is_file())
 
     def test_same_release_rejected(self):
@@ -122,7 +125,7 @@ class P706Tests(unittest.TestCase):
         payload.write_text(json.dumps({
             "plan_id":plan["plan_id"],"source_release":SHA1,"target_release":SHA2,"result":"PASS",
             "backup_path":str(backup),"backup_sha256":backup_sha,
-            "runtime_release_verified":True,"observer_release_verified":True,"rollback_disposition":"safe"
+            "runtime_release_verified":True,"observer_release_verified":True,"workspace_listener_disposition":"not-running","rollback_disposition":"safe"
         }))
         tx = m.record_transaction(self.root, payload)
         self.assertEqual(tx["schema"], m.TX_SCHEMA)

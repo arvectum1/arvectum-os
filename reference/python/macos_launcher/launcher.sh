@@ -13,7 +13,6 @@ set -eu
 
 APPLESCRIPT=/usr/bin/osascript
 OPEN=/usr/bin/open
-CURL=/usr/bin/curl
 LAUNCHCTL=/bin/launchctl
 RUNTIME_ROOT="${ARVECTUM_P7_02_ROOT:-$HOME/Library/Application Support/ArvectumOS/persistent-internal}"
 LABEL="com.arvectum.os.persistent-internal"
@@ -107,29 +106,23 @@ release_lock() {
 }
 
 is_workspace_running() {
-  local target="gui/$(id -u)/$LABEL"
-  if ! "$LAUNCHCTL" print "$target" >/dev/null 2>&1; then
-    return 1
-  fi
-  local pid
-  pid=$("$LAUNCHCTL" print "$target" 2>/dev/null | awk '/^[[:space:]]*pid = / {print $3; exit}')
-  if [ -z "$pid" ]; then
-    return 1
-  fi
-  if ! kill -0 "$pid" 2>/dev/null; then
-    return 1
-  fi
-  local http_code
-  http_code=$("$CURL" -s -o /dev/null -w "%{http_code}" --max-time 3 "$WORKSPACE_URL/" 2>/dev/null || echo "000")
-  [ "$http_code" = "200" ]
+  [ "$(workspace_state 2>/dev/null || true)" = "CURRENT_EXACT" ]
+}
+
+workspace_state() {
+  local release helper python
+  [ -L "$RUNTIME_ROOT/current" ] || return 1
+  release=$(basename "$(readlink "$RUNTIME_ROOT/current")")
+  helper="$RUNTIME_ROOT/current/source/reference/python/p9_11_workspace_process.py"
+  python="$RUNTIME_ROOT/venvs/$release/bin/python"
+  [ -x "$python" ] && [ -f "$helper" ] || return 1
+  "$python" "$helper" status --runtime-root "$RUNTIME_ROOT" 2>/dev/null | python3 -c 'import json,sys; print(json.load(sys.stdin)["state"])'
 }
 
 wait_for_readiness() {
   local elapsed=0
   while [ "$elapsed" -lt "$HEALTH_TIMEOUT_SECONDS" ]; do
-    local http_code
-    http_code=$("$CURL" -s -o /dev/null -w "%{http_code}" --max-time 3 "$WORKSPACE_URL/" 2>/dev/null || echo "000")
-    if [ "$http_code" = "200" ]; then
+    if is_workspace_running; then
       return 0
     fi
     sleep "$HEALTH_POLL_INTERVAL"
@@ -139,7 +132,7 @@ wait_for_readiness() {
 }
 
 start_workspace() {
-  log "Workspace not running; starting via P7.02"
+  log "Workspace not running; starting exact current release"
 
   local target="gui/$(id -u)/$LABEL"
   local plist="$HOME/Library/LaunchAgents/$LABEL.plist"
@@ -155,6 +148,17 @@ start_workspace() {
   fi
 
   "$LAUNCHCTL" kickstart "$target" >/dev/null 2>&1 || true
+
+  local state
+  state=$(workspace_state 2>/dev/null || true)
+  if [ -n "$state" ] && [ "$state" != "NOT_RUNNING" ]; then
+    fail_with_dialog "Workspace listener is $state and was not modified. Use P7.06 update or investigate the listener."
+  fi
+  local release helper python
+  release=$(basename "$(readlink "$RUNTIME_ROOT/current")")
+  helper="$RUNTIME_ROOT/current/source/reference/python/p9_11_workspace_process.py"
+  python="$RUNTIME_ROOT/venvs/$release/bin/python"
+  "$python" "$helper" start --runtime-root "$RUNTIME_ROOT" >> "$LAUNCHER_LOG" 2>&1 || fail_with_dialog "Current exact Workspace process could not be started. Check logs for details."
 
   log "Waiting for Workspace readiness (timeout=${HEALTH_TIMEOUT_SECONDS}s)"
   if ! wait_for_readiness; then

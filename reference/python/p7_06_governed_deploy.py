@@ -217,13 +217,16 @@ def build_plan(root: Path, target_release: str, decision_ref: str, migration_pla
         "migration": migration,
         "required_sequence": [
             "verify-exact-releases",
+            "classify-workspace-listener",
             "pre-update-backup",
+            "conditionally-stop-known-workspace-listener",
             "stop-observer",
             "stop-runtime",
             "activate-target-release",
             "re-pin-observer",
             "verify-runtime-exact-release-health",
             "verify-observer-loaded-exact-release-pin",
+            "conditionally-start-and-verify-exact-target-workspace-listener",
         ],
         "canonical_mutation_authorized_by_plan": False,
         "organizational_authority_satisfied_by_plan": False,
@@ -246,7 +249,7 @@ def record_transaction(root: Path, payload_path: Path) -> dict[str, Any]:
     payload = _load_json(payload_path)
     required = {
         "plan_id", "source_release", "target_release", "result", "backup_path", "backup_sha256",
-        "runtime_release_verified", "observer_release_verified", "rollback_disposition",
+        "runtime_release_verified", "observer_release_verified", "workspace_listener_disposition", "rollback_disposition",
     }
     missing = sorted(required - set(payload))
     if missing:
