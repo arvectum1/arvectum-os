@@ -1,6 +1,6 @@
 # P9.11-F08 — Task-to-Governed Action Comprehension and Actionability
 
-Status: `p9.11.5 deployed / real owner recheck pending`
+Status: `Resolved in bounded owner-task eligibility scope / real-task journey awaits natural evidence`
 Date: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform`
@@ -17,7 +17,7 @@ Parent: `P9.11 — Real daily-use dogfooding + friction/backlog closure`
 - p9.11.4 governed deployment, exact assets, `CURRENT_EXACT`, and `MANAGED_SPAWN_PROOF` passed; the real owner recheck failed;
 - PR `#8` merged as `037cd59d7917d52b3ff6aa2dea20dcad22ed484d`; exact reviewed head `dde1102d0892a6c71e7a47de9c3a93fba98c84de` passed Productive Workspace CI and Reference Python CI;
 - canonical Workspace source/release is `p9.11.5` / app contract `11`;
-- p9.11.5 is now deployed on selected-Mac canonical runtime `03ba2c72fb9460e97b628c4b3dac36ac496cb942`, with exact managed Workspace readiness verified;
+- p9.11.5 is deployed on selected-Mac runtime `03ba2c72fb9460e97b628c4b3dac36ac496cb942`, with exact managed Workspace readiness verified;
 - P9.11 remains `Current`; R32 remains locked.
 
 ## Real owner recheck
@@ -153,7 +153,22 @@ After the F09 lifecycle repair was merged and canonically synchronized, the sele
 - concrete-action diagnostic copy: `PASS`;
 - Desktop launcher: `PASS`.
 
-These are structural/runtime readiness checks, not real owner usability acceptance. F08 is now ready for the required real owner recheck on the deployed p9.11.5 Workspace.
+These are structural/runtime readiness checks, not real owner usability acceptance.
+
+## p9.11.5 bounded owner recheck result
+
+The owner rechecked the deployed p9.11.5 Workspace and reported:
+
+> сейчас все чисто, но задач нет, поэтому полноценно проверить не могу
+
+This is accepted as real owner evidence for the exact condition that F08's owner-task eligibility repair was intended to correct:
+
+- ordinary Home/Tasks no longer contain the fabricated UI4 urgent task — `PASS`;
+- the absence of work is presented cleanly rather than as a broken or alarming state — `PASS`;
+- no synthetic task is introduced merely to exercise the UI — required by the P9.11 real-use evidence boundary;
+- because no genuine actionable owner task exists at this time, the real task-detail → governed-action journey cannot yet be evidenced end-to-end.
+
+Accordingly, F08 is **resolved in its bounded owner-task eligibility scope**. The future real-task journey remains an explicit natural-evidence item: when the first genuine actionable owner task appears, the owner should recheck task meaning, next action and governed-action comprehension using that real item. This deferred evidence is not a reason to manufacture a task and does not by itself block ordinary P9.11 dogfooding.
 
 ## Adjacent-route audit
 
@@ -164,4 +179,4 @@ The read-only F08 audit found no additional task-journey change required outside
 3. `/copilot` keeps source roles, freshness, model details, and authority boundaries visible to preserve the existing grounded-answer/evidence boundary. No F08 change is admitted there.
 4. `/system` remains an explicitly diagnostic and technical surface. UI4 is explicitly available there as `Технические проверки`, not as a Task.
 
-F07 is successful only in its bounded Home/navigation/branding scope. F08 remains open pending the real p9.11.5 owner recheck. P9.11 remains `Current`; R32 remains locked; P9.12 has not started; M9 remains open.
+F07 remains successful only in its bounded Home/navigation/branding scope. F08 is resolved in bounded owner-task eligibility scope, with the first genuine real-task journey still awaiting natural evidence. P9.11 remains `Current`; R32 remains locked; P9.12 has not started; M9 remains open.
