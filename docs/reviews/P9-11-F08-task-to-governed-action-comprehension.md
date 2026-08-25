@@ -1,6 +1,6 @@
 # P9.11-F08 — Task-to-Governed Action Comprehension and Actionability
 
-Status: `Observed / repair required`
+Status: `Repair under review`
 Date: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform`
@@ -12,7 +12,7 @@ Parent: `P9.11 — Real daily-use dogfooding + friction/backlog closure`
 - RFC-0001 through RFC-0008 — `Accepted 1.0.0`;
 - RFC-0005 preserves the separation of Authentication, Authorization, Organizational Authority, Data Governance, validation and consequential approval, and requires Governed Execution for consequential canonical mutation;
 - ADR-0001 — `Accepted` Productive Workspace browser topology; browser-visible controls are not authority and consequential commands must revalidate server-side;
-- Workspace source/release under owner recheck: `p9.11.3` / app contract `11`;
+- Workspace candidate release under review: `p9.11.4` / app contract `11`; it is not deployed and has not received an owner recheck;
 - P9.11 remains `Current`; R32 remains locked.
 
 ## Real owner recheck
@@ -109,4 +109,17 @@ No repository test or simulated click substitutes for that real owner recheck.
 
 ## Status
 
-F07 is successful only in its bounded Home/navigation/branding scope. F08 now carries the material downstream usability blocker. P9.11 remains `Current`; R32 remains locked; P9.12 has not started; M9 remains open.
+The `p9.11.4` repair candidate makes the focused task a dedicated Russian-first detail state, reduces the ordinary task card to `Посмотреть задачу`, moves raw evidence behind `Исходные данные`, and preserves return navigation. The governed inspection remains in the `Задачи` shell context, presents the four gate concepts in owner language with canonical evidence on demand, and permits `Перепроверить состояние` only when the live action flags, execution state, and all four gate states prove the exact waiting/non-consequential boundary. It creates no decision-supply, approval, authority, canonical-mutation, or external-effect control.
+
+Focused frontend tests cover the task/detail journey, Russian-first governed presentation, technical evidence, safe preflight, flag-drift fail-closed behavior, unavailable source handling, and task navigation. This is repository evidence only: F08 still requires review, merge, governed deployment, and a real owner recheck.
+
+## Adjacent-route audit
+
+The read-only F08 audit found no additional task-journey change required outside this repair:
+
+1. `/work` embeds the repaired task projection alongside product contexts; no independent owner-flow regression was changed in this candidate.
+2. `/information` still presents raw result kind, semantic role, authority mode, health state, and source state in its existing discovery/evidence surface. This is outside the focused task-to-governed repair and should be assessed as separate discovery UX work if owner evidence identifies it as friction.
+3. `/copilot` keeps source roles, freshness, model details, and authority boundaries visible to preserve the existing grounded-answer/evidence boundary. No F08 change is admitted there.
+4. `/system` remains an explicitly diagnostic and technical surface. The governed destination was removed because the governed inspection is part of the Tasks journey, not Settings.
+
+F07 is successful only in its bounded Home/navigation/branding scope. F08 remains the material downstream usability blocker until that owner recheck. P9.11 remains `Current`; R32 remains locked; P9.12 has not started; M9 remains open.

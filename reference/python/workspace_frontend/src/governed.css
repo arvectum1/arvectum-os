@@ -17,6 +17,7 @@
 .action-safety-note { font-size: .88rem; }
 .preflight-result { margin-top: 1rem; padding: 1rem; border: 2px solid #20242b; border-radius: .7rem; }
 .preflight-result p { margin-bottom: 0; overflow-wrap: anywhere; }
+.governed-action-panel ul { display: grid; gap: .45rem; margin: 1rem 0; padding-left: 1.25rem; color: #515965; line-height: 1.5; }
 .governed-unavailable code { display: inline-block; padding: .4rem .55rem; background: #eef1f4; border-radius: .4rem; }
 @media (max-width: 760px) {
   .governed-summary, .decision-list { grid-template-columns: 1fr; }

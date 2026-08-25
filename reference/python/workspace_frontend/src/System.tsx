@@ -3,7 +3,6 @@ import { useWorkspaceLanguage } from "./i18n";
 const destinations = [
   { href: "/organization", ru: "Организация", en: "Organization", ruDetail: "Общий контекст организации и структура.", enDetail: "Organization context and structure." },
   { href: "/activity", ru: "Активность", en: "Activity", ruDetail: "Наблюдаемые события и сигналы.", enDetail: "Observed events and signals." },
-  { href: "/governed", ru: "Управляемые действия", en: "Governed actions", ruDetail: "Проверка текущего состояния и ограничений.", enDetail: "Inspect current state and gates." },
   { href: "/my-work?mode=scenario", ru: "Тестовые сценарии", en: "Test scenarios", ruDetail: "Отдельно просмотреть сценарные данные.", enDetail: "Inspect scenario data separately." },
   { href: "/dogfooding", ru: "Обратная связь", en: "Feedback", ruDetail: "Сообщить о наблюдении или проблеме.", enDetail: "Report an observation or issue." },
 ];

@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.11`
+Version: `2.95.12`
 Created: `2026-08-07`
 Updated: `2026-08-25`
 Owner: `ООО «Арвектум»`
@@ -15,7 +15,7 @@ Roadmap status does not itself change Platform Capability lifecycle, Product Con
 
 ## 2. Version note
 
-Version `2.95.11` records the next real P9.11 owner-session result after the F07 repair. The live `p9.11.3` Workspace was reviewed by the owner: the Home page is now understandable and visually acceptable, the top-level navigation is clear, and the owner-provided Arvectum Block logo is accepted in this bounded presentation scope. F07 is therefore closed only for Home/navigation/branding.
+Version `2.95.12` records the `p9.11.4` F08 repair candidate under review. The live `p9.11.3` Workspace was reviewed by the owner: the Home page is now understandable and visually acceptable, the top-level navigation is clear, and the owner-provided Arvectum Block logo is accepted in this bounded presentation scope. F07 is therefore closed only for Home/navigation/branding.
 
 The same real session exposed **P9.11-F08 — Task-to-Governed Action Comprehension and Actionability**. After entering the urgent task, the owner could not understand the task-detail/governed-action flow: raw English and internal governance terminology dominate the screens; `Открыть` versus `Открыть выполнение` is ambiguous and visually crowded; the focused task remains duplicated in the queue so the list-level `Открыть` can appear non-functional; and the visually primary `Run governed preflight` control does not explain in plain Russian what it does or whether it is safe.
 
@@ -24,7 +24,7 @@ Repository review confirms a deeper truthfulness issue. The current P7.06-UI4 br
 Canonical evidence:
 
 - [`P9.11-F07 — Owner-first Workspace UX repair`](../reviews/P9-11-F07-owner-first-workspace-ux-repair.md) — `Owner recheck PASS in bounded Home/navigation/branding scope`;
-- [`P9.11-F08 — Task-to-Governed Action Comprehension and Actionability`](../reviews/P9-11-F08-task-to-governed-action-comprehension.md) — `Observed / repair required`.
+- [`P9.11-F08 — Task-to-Governed Action Comprehension and Actionability`](../reviews/P9-11-F08-task-to-governed-action-comprehension.md) — `Repair under review` (`p9.11.4` candidate; no deployment or owner recheck).
 
 F06 remains **operationally verified** in its bounded process-identity scope. F08 does not reopen F05/F06 and does not authorize any new effect, authority grant or decision path.
 
@@ -65,7 +65,7 @@ This update creates no public/stable API/connector/browser contract, no customer
 
 ## 5. Active Phase 9
 
-Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.10`.
+Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.11`.
 
 | ID | Work item | Status |
 |---|---|---:|
@@ -97,6 +97,7 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 - F07 implementation repair PR `#6` merged at `3e0b472a015bde7a44ac8202f364fbf5ea568ebb`, advancing Workspace to `p9.11.3` / app contract `11`;
 - **F07 bounded owner recheck:** PASS for Home first-glance orientation, primary actions, top-level navigation and Arvectum branding;
 - **F08 real owner finding:** FAIL for the urgent-task detail and governed-action path — raw English/internal terminology, ambiguous/crowded actions, apparent same-route `Открыть` behavior, and unclear safety/purpose of `Run governed preflight`;
+- **F08 repair candidate:** `p9.11.4` is under repository review with Russian-first focused-task/governed inspection, evidence on demand, task-context navigation, and a fail-closed safe re-check that requires the exact action, execution, and gate-state boundary; it is not deployed or owner-rechecked;
 - repository inspection confirms the current preflight is non-consequential (`canonical_mutation_requested=false`, `external_effect_requested=false`, authority/approval not provided) and only records minimized local non-canonical proof evidence;
 - repository inspection also confirms no admitted in-Workspace path currently exists to satisfy the four missing RFC-0005 decisions; UI must not imply otherwise or manufacture approval controls;
 - next owner recheck: pending after F08 repair and exact deployment/readiness verification;

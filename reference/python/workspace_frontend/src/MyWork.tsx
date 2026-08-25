@@ -205,13 +205,13 @@ export function MyWork({ embedded = false }: { embedded?: boolean }) {
       event.preventDefault();
       pushWorkspaceHref(href);
     };
-  const homeCopy = (item: AttentionItem) =>
+  const ownerCopy = (item: AttentionItem) =>
     item.kind === "waiting-approval" || item.kind === "waiting-input"
       ? {
-          title: text("Требуется решение", "Decision needed"),
+          title: text("Выполнение остановлено", "Execution is stopped"),
           reason: text(
-            "Ожидается ваше подтверждение.",
-            "Your confirmation is needed.",
+            "Для продолжения не хватает обязательных решений.",
+            "Required decisions are missing before work can continue.",
           ),
         }
       : item.kind === "reconciliation-required"
@@ -238,6 +238,32 @@ export function MyWork({ embedded = false }: { embedded?: boolean }) {
                 "Open the context if more information is needed.",
               ),
             };
+  const healthSummary =
+    projection.health.state === "fresh"
+      ? text("Источники задач проверены, данные актуальны.", "Task sources were checked and are current.")
+      : projection.health.state === "stale"
+        ? text("Данные задач требуют повторной проверки.", "Task data needs to be checked again.")
+        : text("Часть источников задач сейчас недоступна.", "Some task sources are currently unavailable.");
+  const detailMeaning = (item: AttentionItem) =>
+    item.kind === "waiting-approval" || item.kind === "waiting-input"
+      ? text("Для продолжения системе не хватает обязательных решений. Сейчас они не могут быть выданы из этого экрана.", "Required decisions are missing. They cannot be issued from this screen.")
+      : item.kind === "reconciliation-required"
+        ? text("Нужно подтвердить текущее состояние перед продолжением.", "Confirm the current state before continuing.")
+        : item.kind === "guarded-action-failed"
+          ? text("Нужно проверить причину и текущее состояние процесса.", "Review the cause and current process status.")
+          : text("Откройте исходные данные, если требуется дополнительный контекст.", "Open the source data if more context is needed.");
+  if (!embedded && focused) {
+    const copy = ownerCopy(focused);
+    const governedHref = governedContextHref(focused) ? `/governed?focus=${encodeURIComponent(focused.id)}` : null;
+    return <section className="my-work task-detail-page" aria-labelledby="task-detail-title">
+      <p className="eyebrow">{text("Задача", "Task")}</p>
+      <h1 id="task-detail-title">{copy.title}</h1>
+      <p className="task-detail-summary">{copy.reason}</p>
+      <section className="task-detail-meaning" aria-labelledby="task-meaning-title"><h2 id="task-meaning-title">{text("Что это значит", "What this means")}</h2><p>{detailMeaning(focused)}</p></section>
+      {governedHref ? <div className="task-detail-actions"><a className="task-primary-action" href={governedHref} onClick={navigateContext(governedHref)}>{text("Разобраться, что блокирует", "See what is blocking")}</a><a className="task-secondary-action" href="/my-work" onClick={navigateContext("/my-work")}>{text("Назад к задачам", "Back to tasks")}</a></div> : <div className="task-detail-actions"><a className="task-secondary-action" href="/my-work" onClick={navigateContext("/my-work")}>{text("Назад к задачам", "Back to tasks")}</a></div>}
+      <details className="technical-details"><summary>{text("Исходные данные", "Source data")}</summary><dl><div><dt>{text("Заголовок источника", "Source title")}</dt><dd>{focused.title}</dd></div><div><dt>{text("Объяснение источника", "Source reason")}</dt><dd>{focused.reason}</dd></div><div><dt>{text("Следующий шаг источника", "Source next step")}</dt><dd>{focused.next_step}</dd></div><div><dt>{text("Источник", "Source")}</dt><dd>{focused.source}</dd></div><div><dt>{text("Состояние источников задач", "Task source health")}</dt><dd>{projection.health.message}</dd></div></dl></details>
+    </section>;
+  }
   return (
     <section
       className={`my-work${embedded ? " my-work-embedded" : ""}`}
@@ -302,7 +328,7 @@ export function MyWork({ embedded = false }: { embedded?: boolean }) {
               ? text("Устарело", "Stale")
               : text("Ограничено", "Degraded")}
         </strong>
-        <span>{projection.health.message}</span>
+        <span>{healthSummary}</span>
         <small>
           {text("Проверено", "Checked")}{" "}
           {displayTime(projection.health.observed_at)}
@@ -319,73 +345,7 @@ export function MyWork({ embedded = false }: { embedded?: boolean }) {
               "This queue is non-authoritative. Visibility does not grant permission or replace approval.",
             )}
       </p>
-      {!embedded && focused ? (
-        <article className="attention-detail">
-          <p className="eyebrow">
-            {text("Выбранная задача", "Focused work item")} ·{" "}
-            {kindLabels[focused.kind]}
-          </p>
-          <h2>{focused.title}</h2>
-          <p>{focused.reason}</p>
-          <dl>
-            <div>
-              <dt>{text("Почему сейчас", "Why now")}</dt>
-              <dd>{groupLabels[focused.group]}</dd>
-            </div>
-            <div>
-              <dt>
-                {text("Следующий допустимый шаг", "Legitimate next step")}
-              </dt>
-              <dd>{focused.next_step}</dd>
-            </div>
-          </dl>
-          <section className="technical-details">
-            <h3>{text("Исходные данные", "Source data")}</h3>
-            <dl>
-              <div>
-                <dt>{text("Источник", "Source")}</dt>
-                <dd>{focused.source}</dd>
-              </div>
-              <div>
-                <dt>{text("Режим данных", "Evidence mode")}</dt>
-                <dd>
-                  {focused.evidence_mode === "scenario"
-                    ? text("Тестовый сценарий", "Test scenario")
-                    : text("Текущий источник", "Live source")}
-                </dd>
-              </div>
-            </dl>
-          </section>
-          {focused.evidence_mode === "scenario" ? (
-            <p className="scenario-note">
-              {text(
-                "Контролируемый сценарий — не живое событие.",
-                "Controlled scenario evidence — not a live occurrence.",
-              )}
-            </p>
-          ) : null}
-          {governedContextHref(focused) ? (
-            <a
-              className="context-action-link"
-              href="/governed"
-              onClick={navigateContext("/governed")}
-            >
-              {text("Открыть контекст выполнения", "Open execution context")}
-            </a>
-          ) : null}
-          <a
-            href={scenarioView ? "/my-work?mode=scenario" : "/my-work"}
-            onClick={(e) => {
-              e.preventDefault();
-              pushWorkspaceHref(
-                scenarioView ? "/my-work?mode=scenario" : "/my-work",
-              );
-            }}
-          >
-            {text("Назад к списку", "Back to queue")}
-          </a>
-        </article>
-      ) : !embedded && focusId ? (
+      {!embedded && focusId ? (
         <div className="attention-unavailable" role="status">
           <strong>
             {text(
@@ -500,15 +460,15 @@ export function MyWork({ embedded = false }: { embedded?: boolean }) {
                     )}
                   </span>
                 </div>
-                <h3>{homeCopy(item).title}</h3>
-                <p>{homeCopy(item).reason}</p>
+                <h3>{ownerCopy(item).title}</h3>
+                <p>{ownerCopy(item).reason}</p>
                 <div className="attention-card-footer">
                   <a
                     className="home-item-action"
                     href={detailHref(item)}
                     onClick={navigateTo(item)}
                   >
-                    {text("Открыть", "Open")}
+                    {text("Посмотреть задачу", "View task")}
                   </a>
                 </div>
               </article>
@@ -526,32 +486,12 @@ export function MyWork({ embedded = false }: { embedded?: boolean }) {
                     <span>{text("Тестовый сценарий", "Test scenario")}</span>
                   ) : null}
                 </div>
-                <h2>{item.title}</h2>
-                <p>{item.reason}</p>
-                <dl>
-                  <div>
-                    <dt>{text("Источник", "Source")}</dt>
-                    <dd>{item.source}</dd>
-                  </div>
-                  <div>
-                    <dt>{text("Следующий шаг", "Next step")}</dt>
-                    <dd>{item.next_step}</dd>
-                  </div>
-                </dl>
+                <h2>{ownerCopy(item).title}</h2>
+                <p>{ownerCopy(item).reason}</p>
                 <div className="attention-card-footer">
                   <small>{displayTime(item.observed_at)}</small>
                   <div className="attention-actions">
-                    <a href={detailHref(item)} onClick={navigateTo(item)}>
-                      {text("Открыть", "Open")}
-                    </a>
-                    {governedContextHref(item) ? (
-                      <a
-                        href="/governed"
-                        onClick={navigateContext("/governed")}
-                      >
-                        {text("Открыть выполнение", "Open execution context")}
-                      </a>
-                    ) : null}
+                    <a className="task-list-action" href={detailHref(item)} onClick={navigateTo(item)}>{text("Посмотреть задачу", "View task")}</a>
                   </div>
                 </div>
               </article>
