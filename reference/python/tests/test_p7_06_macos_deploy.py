@@ -111,6 +111,25 @@ class ShellTests(unittest.TestCase):
         self.assertIn('wait_runtime_quiescent', restore)
         self.assertIn("rollback runtime process did not release the single-instance lock", restore)
 
+    def test_pre_activation_workspace_stop_failure_records_fail_without_rollback(self):
+        text = DEPLOY.read_text()
+        failure_start = text.index("record_pre_activation_stop_failure()")
+        failure_end = text.index("preflight()", failure_start)
+        failure = text[failure_start:failure_end]
+        update_start = text.index("update_runtime()")
+        update_end = text.index("rollback_last()", update_start)
+        update = text[update_start:update_end]
+        self.assertIn('write_payload "$payload" "$plan_id" "$source" "$target" FAIL', failure)
+        self.assertIn("target activation never began", failure)
+        self.assertIn("current pointer unchanged", failure)
+        self.assertIn("post_stop_state=not_queried_after_stop_failure", failure)
+        self.assertIn("signal_disposition=unknown_to_adapter", failure)
+        self.assertNotIn("not_queried_after_signal", failure)
+        self.assertNotIn("workspace_status", failure)
+        self.assertNotIn("rollback_and_record_failure", failure)
+        self.assertIn('workspace_stop_for_update >/dev/null || record_pre_activation_stop_failure', update)
+        self.assertLess(update.index("workspace_stop_for_update"), update.index('sh "$P705" uninstall'))
+
     def test_interrupted_recovery_is_exact_source_and_effect_free(self):
         text = DEPLOY.read_text()
         self.assertIn("recover_interrupted_latest()", text)

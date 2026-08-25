@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.15`
+Version: `2.95.16`
 Created: `2026-08-07`
 Updated: `2026-08-25`
 Owner: `ООО «Арвектум»`
@@ -15,7 +15,7 @@ Roadmap status does not itself change Platform Capability lifecycle, Product Con
 
 ## 2. Version note
 
-Version `2.95.15` records PR `#8` as merged canonical implementation through `037cd59d7917d52b3ff6aa2dea20dcad22ed484d`, advancing Workspace source/release identity to `p9.11.5` / app contract `11`. The repair removes the UI4 preflight-only proof from ordinary owner attention, Home/Tasks and Activity alerts, keeps UI4 available as Settings technical diagnostics, preserves the four RFC-0005 gates and fail-closed safe re-check, ignores stale task-focus navigation, and no longer describes the diagnostic result as a blocked owner task. Exact reviewed head `dde1102d0892a6c71e7a47de9c3a93fba98c84de` passed Productive Workspace CI and Reference Python CI. Merge is not deployment or owner-acceptance evidence.
+Version `2.95.16` records F09 as an open operational lifecycle repair. The p9.11.5 target `edfd1e835a74c80bc49a94a85f2ab71965653afa` preflight passed, but trusted Workspace stop-for-update failed after its one SIGTERM because post-signal HTTP/asset readiness was consulted during graceful shutdown. Target activation/current-pointer mutation did not begin; the retained backup SHA-256 is `1fd797ead8a6aa8f077885e83ae9753baab507e26c165e59e117d8d3062c43bb`; no new transaction was emitted and none is fabricated retrospectively. F09 preserves pre-signal exact readiness proof, replaces post-signal HTTP checks with identity/listener-only stop proof, and records future pre-activation stop failures truthfully as `FAIL`, not rollback. Workspace remains `p9.11.5` / contract `11`; F08 semantic repair remains merged but deployment-blocked.
 
 The live `p9.11.3` Workspace was reviewed by the owner before the F08 sequence: the Home page is understandable and visually acceptable, the top-level navigation is clear, and the owner-provided Arvectum Block logo is accepted in that bounded presentation scope. F07 is therefore closed only for Home/navigation/branding.
 
@@ -26,7 +26,8 @@ Repository review confirms the binding truthfulness boundary. The P7.06-UI4 brid
 Canonical evidence:
 
 - [`P9.11-F07 — Owner-first Workspace UX repair`](../reviews/P9-11-F07-owner-first-workspace-ux-repair.md) — `Owner recheck PASS in bounded Home/navigation/branding scope`;
-- [`P9.11-F08 — Task-to-Governed Action Comprehension and Actionability`](../reviews/P9-11-F08-task-to-governed-action-comprehension.md) — `Owner-task eligibility repair merged / deployment + owner recheck pending`.
+- [`P9.11-F08 — Task-to-Governed Action Comprehension and Actionability`](../reviews/P9-11-F08-task-to-governed-action-comprehension.md) — `Owner-task eligibility repair merged / deployment blocked by F09`.
+- [`P9.11-F09 — Workspace Stop-for-Update Graceful-Shutdown Race`](../reviews/P9-11-F09-workspace-stop-for-update-graceful-shutdown-race.md) — `Repair under review`.
 
 F06 remains **operationally verified** in its bounded process-identity scope. F08 does not reopen F05/F06 and does not authorize any new effect, authority grant or decision path.
 
@@ -86,7 +87,7 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F07 bounded PASS; F08 p9.11.5 merged, deployment + owner recheck pending** |
+| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F07 bounded PASS; F08 p9.11.5 merged, deployment blocked by F09** |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked |
 | P9.12 | Phase 9 / M9 closure review | ⬜ |
 
@@ -101,6 +102,7 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 - **F08 p9.11.4 deployment:** target `dc0e0cff83a9031a3686191b5cf304ee03c2d1eb` reached P7.02/P7.05 healthy, exact manifest/assets, `CURRENT_EXACT`, and `MANAGED_SPAWN_PROOF`;
 - **F08 p9.11.4 owner recheck:** FAIL. UI4's preflight-only proof was still projected as high-urgency owner work despite no concrete requested action or resolution path;
 - **F08 p9.11.5 repair:** PR `#8` merged at `037cd59d7917d52b3ff6aa2dea20dcad22ed484d`; UI4 is absent from ordinary Home/Tasks attention and Activity alerts, remains available under Settings technical diagnostics, and no stale task-focus or diagnostic result copy manufactures owner-task semantics;
+- **F09 graceful-shutdown race:** the first p9.11.5 deployment preflight passed but update failed before target activation when post-SIGTERM status consulted unavailable HTTP. Source runtime `dc0e...` and current pointer remained unchanged; P7.02/P7.05 are healthy and Workspace is `NOT_RUNNING`. F09 repair is under review; no retry is authorized;
 - repository inspection confirms the current preflight is non-consequential (`canonical_mutation_requested=false`, `external_effect_requested=false`, authority/approval not provided) and only records minimized local non-canonical proof evidence;
 - no product business action, Authorization, Organizational Authority, Data Governance permission or Consequential Approval was invented by the p9.11.5 repair;
 - next owner recheck: pending after governed deployment and exact runtime/readiness/assets/launcher verification of p9.11.5;
@@ -160,7 +162,7 @@ Preferred first prepared candidate remains a bounded read-only `1С:ERP 2.5` pro
 - merged F08 PR `#7`: reviewed head `d2949821347fc3078757303d5858a67dfdd7e23b`; frontend `32 passed`; typecheck/build/diff check PASS; Productive Workspace CI `32856696161` PASS including SPA and BFF security/context jobs; Reference Python CI `32856696061` full reference suite PASS;
 - F08 p9.11.4 selected-Mac deployment passed exact runtime/readiness/assets/launcher checks, but the real owner recheck failed because a non-actionable preflight proof was projected as owner work;
 - merged F08 owner-task eligibility PR `#8`: reviewed head `dde1102d0892a6c71e7a47de9c3a93fba98c84de`; frontend `34 passed`; typecheck, Web Storage guard, build and diff check PASS; Productive Workspace CI `32864084390` PASS; Reference Python CI `32864084387` PASS;
-- p9.11.5 selected-Mac deployment and owner recheck are pending;
+- p9.11.5 selected-Mac deployment is blocked by F09; owner recheck remains pending;
 - R32 remains locked and therefore no M9 code-health PASS is claimed.
 
 ## 8. M9 definition
@@ -173,7 +175,7 @@ Parallel integration progress cannot substitute for P9.11 operational evidence.
 
 **Critical path:**
 
-> **P9.11-F08 — govern-deploy the exact current canonical `main` carrying Workspace `p9.11.5` / app contract `11` to the selected Mac; verify P7.02/P7.05, `CURRENT_EXACT`, admissible process proof, exact live assets and the Desktop launcher; then stop at a real owner recheck that ordinary Home/Tasks contain no false owner task and UI4 remains only task-neutral Settings diagnostics. F07 remains bounded PASS; F08 remains open until this real recheck; P9.11 remains Current and R32 remains locked.**
+> **P9.11-F09 — review and merge the bounded Workspace graceful-stop lifecycle repair. Then govern-deploy the new canonical main carrying Workspace `p9.11.5` / app contract `11` from the current `NOT_RUNNING` Workspace state, verify exact runtime/assets, start the target Workspace exactly once through its exact helper, refresh the launcher, and resume the real F08 owner recheck. F07 remains bounded PASS; F08 remains open; P9.11 remains Current and R32 remains locked.**
 
 **Lane B:**
 

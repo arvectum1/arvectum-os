@@ -159,13 +159,92 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
     def test_stop_revalidates_stale_process_before_signalling(self):
         stale = {"state": process.STALE_KNOWN_EXACT, "pid": 7, "release_sha": "a" * 40, "proof_mode": "DIRECT_OS_PROOF", "process_start_identity": "start"}
         with (
-            mock.patch.object(process, "status", side_effect=[stale, stale, {"state": process.NOT_RUNNING}]),
+            mock.patch.object(process, "status", side_effect=[stale, stale]) as status,
             mock.patch.object(process.os, "kill") as kill,
+            mock.patch.object(process, "_process_start_identity", side_effect=["start", None]),
+            mock.patch.object(process, "_listener", side_effect=[(7, "Python"), None]),
             mock.patch.object(process, "_atomic_json"),
         ):
             observed = process.stop_for_update(pathlib.Path("/tmp/runtime"))
         kill.assert_called_once_with(7, process.signal.SIGTERM)
+        self.assertEqual(status.call_count, 2)
         self.assertEqual(observed["state"], process.NOT_RUNNING)
+
+    def test_stop_waits_for_process_after_socket_closes_without_http_status(self):
+        stale = {"state": process.CURRENT_EXACT, "pid": 7, "release_sha": "a" * 40, "proof_mode": "DIRECT_OS_PROOF", "process_start_identity": "start"}
+        with (
+            mock.patch.object(process, "status", side_effect=[stale, stale]) as status,
+            mock.patch.object(process.os, "kill") as kill,
+            mock.patch.object(process, "_process_start_identity", side_effect=["start", "start", None]),
+            mock.patch.object(process, "_listener", side_effect=[None, None, None]),
+            mock.patch.object(process, "_atomic_json"),
+            mock.patch.object(process.time, "sleep"),
+        ):
+            observed = process.stop_for_update(pathlib.Path("/tmp/runtime"))
+        self.assertEqual(observed["state"], process.NOT_RUNNING)
+        kill.assert_called_once_with(7, process.signal.SIGTERM)
+        self.assertEqual(status.call_count, 2)
+
+    def test_stop_waits_for_listener_after_process_exit(self):
+        stale = {"state": process.CURRENT_EXACT, "pid": 7, "release_sha": "a" * 40, "proof_mode": "DIRECT_OS_PROOF", "process_start_identity": "start"}
+        with (
+            mock.patch.object(process, "status", side_effect=[stale, stale]),
+            mock.patch.object(process.os, "kill") as kill,
+            mock.patch.object(process, "_process_start_identity", side_effect=[None, None]),
+            mock.patch.object(process, "_listener", side_effect=[(7, "Python"), None]),
+            mock.patch.object(process, "_atomic_json"),
+            mock.patch.object(process.time, "sleep"),
+        ):
+            observed = process.stop_for_update(pathlib.Path("/tmp/runtime"))
+        self.assertEqual(observed["state"], process.NOT_RUNNING)
+        kill.assert_called_once_with(7, process.signal.SIGTERM)
+
+    def test_stop_fails_closed_for_pid_reuse_after_one_signal(self):
+        stale = {"state": process.CURRENT_EXACT, "pid": 7, "release_sha": "a" * 40, "proof_mode": "DIRECT_OS_PROOF", "process_start_identity": "start"}
+        with (
+            mock.patch.object(process, "status", side_effect=[stale, stale]),
+            mock.patch.object(process.os, "kill") as kill,
+            mock.patch.object(process, "_process_start_identity", return_value="reused"),
+            mock.patch.object(process, "_invalidate_matching_metadata") as invalidate,
+            self.assertRaisesRegex(process.WorkspaceProcessError, "identity changed after signal"),
+        ):
+            process.stop_for_update(pathlib.Path("/tmp/runtime"))
+        kill.assert_called_once_with(7, process.signal.SIGTERM)
+        invalidate.assert_not_called()
+
+    def test_stop_fails_closed_for_foreign_listener_after_one_signal(self):
+        stale = {"state": process.CURRENT_EXACT, "pid": 7, "release_sha": "a" * 40, "proof_mode": "DIRECT_OS_PROOF", "process_start_identity": "start"}
+        with (
+            mock.patch.object(process, "status", side_effect=[stale, stale]),
+            mock.patch.object(process.os, "kill") as kill,
+            mock.patch.object(process, "_process_start_identity", return_value="start"),
+            mock.patch.object(process, "_listener", return_value=(8, "Python")),
+            self.assertRaisesRegex(process.WorkspaceProcessError, "foreign listener"),
+        ):
+            process.stop_for_update(pathlib.Path("/tmp/runtime"))
+        kill.assert_called_once_with(7, process.signal.SIGTERM)
+
+    def test_stop_times_out_without_a_second_signal_or_sigkill(self):
+        stale = {"state": process.CURRENT_EXACT, "pid": 7, "release_sha": "a" * 40, "proof_mode": "DIRECT_OS_PROOF", "process_start_identity": "start"}
+        with (
+            mock.patch.object(process, "status", side_effect=[stale, stale]),
+            mock.patch.object(process.os, "kill") as kill,
+            mock.patch.object(process, "MAX_WAIT_SECONDS", 0),
+            self.assertRaisesRegex(process.WorkspaceProcessError, "did not stop gracefully"),
+        ):
+            process.stop_for_update(pathlib.Path("/tmp/runtime"))
+        kill.assert_called_once_with(7, process.signal.SIGTERM)
+
+    def test_asset_fetch_failure_is_classified_as_mismatch(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            dist = pathlib.Path(temporary)
+            index = dist / "index.html"
+            asset = dist / "assets/app.js"
+            asset.parent.mkdir()
+            index.write_bytes(b'<script src="/assets/app.js"></script>')
+            asset.write_bytes(b"expected")
+            with mock.patch.object(process, "_fetch", side_effect=[index.read_bytes(), process.WorkspaceProcessError("Workspace HTTP is unavailable")]):
+                self.assertFalse(process._live_assets_match(index))
 
     def test_stop_does_not_signal_when_identity_changes(self):
         before = {"state": process.STALE_KNOWN_EXACT, "pid": 7, "release_sha": "a" * 40, "proof_mode": "DIRECT_OS_PROOF"}
