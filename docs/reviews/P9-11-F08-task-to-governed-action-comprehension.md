@@ -1,6 +1,6 @@
 # P9.11-F08 — Task-to-Governed Action Comprehension and Actionability
 
-Status: `Open / owner-task eligibility repair required`
+Status: `Owner-task eligibility repair merged / deployment + owner recheck pending`
 Date: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform`
@@ -15,6 +15,8 @@ Parent: `P9.11 — Real daily-use dogfooding + friction/backlog closure`
 - p9.11.4 deployment runtime: `dc0e0cff83a9031a3686191b5cf304ee03c2d1eb` / app contract `11`;
 - PR `#7` merged as `2f1bf8f341c1a779805586e9f239c4442a65d96b` after exact-head Productive Workspace CI and Reference Python CI PASS;
 - p9.11.4 governed deployment, exact assets, `CURRENT_EXACT`, and `MANAGED_SPAWN_PROOF` passed; the real owner recheck failed;
+- PR `#8` merged as `037cd59d7917d52b3ff6aa2dea20dcad22ed484d`; exact reviewed head `dde1102d0892a6c71e7a47de9c3a93fba98c84de` passed Productive Workspace CI and Reference Python CI;
+- canonical Workspace source/release is now `p9.11.5` / app contract `11`;
 - P9.11 remains `Current`; R32 remains locked.
 
 ## Real owner recheck
@@ -55,7 +57,7 @@ The governed projection exposes a bounded preflight action with these exact sema
 
 The underlying P7.06-UI4 proof bridge additionally states that it supplies none of the four action-specific decisions and exposes no consequential action request. Running the preflight only re-evaluates current retained evidence and records minimized owner-local non-canonical proof evidence; it cannot grant authority or approval and performs no canonical mutation or external effect.
 
-Therefore the current Workspace still does **not** provide an admitted path to satisfy the four missing decisions. Presenting the item as if a confirmation can simply be supplied in the current screen would be misleading. The truthful state is a blocked governed execution with no in-Workspace resolution path yet, plus a safe optional re-check operation when the exact non-consequential boundary is proved.
+Therefore the Workspace must not manufacture owner work from these Waiting gates when no concrete requested action exists. Governance gates may qualify or block a concrete product-owned action; they do not themselves define the owner task.
 
 ## Required repair direction
 
@@ -69,59 +71,62 @@ The bounded F08 repair improves presentation without manufacturing authority or 
 
 2. **Truthful task semantics**
    - do not say `Ожидается ваше подтверждение` when the current Workspace has no admitted decision-input path;
-   - classify this exact live item in owner-facing presentation as blocked / awaiting governed decisions;
-   - explain plainly that the system will not continue until the required decisions exist and that they cannot currently be supplied from this screen;
-   - retain exact source/provenance under `Исходные данные` rather than presenting raw English as the primary explanation.
+   - do not project a preflight/proof as owner work when no concrete requested outcome exists;
+   - retain exact source/provenance on demand rather than presenting raw implementation evidence as ordinary work.
 
-3. **Governed screen**
-   - Russian-first owner summary at the top: what is stopped, why it is stopped, and whether anything is happening externally now;
-   - translate the four fixed domain-neutral RFC-0005 gate concepts into plain Russian presentation while preserving the exact canonical gate names/bases on demand;
-   - raw status codes, validation strings, provenance and English source evidence move under expandable technical/source details;
-   - do not alter gate semantics or infer approval from UI state;
-   - preserve task orientation: governed inspection reached from a task remains in the `Задачи` owner context rather than unexpectedly highlighting `Настройки`;
-   - on desktop, keep primary navigation available while scrolling long detail/governed pages.
+3. **Governed diagnostics**
+   - UI4 remains available as Settings diagnostics rather than an ordinary owner task;
+   - the diagnostic surface states that no concrete action is requested;
+   - the four fixed domain-neutral RFC-0005 gate concepts remain inspectable with exact canonical gate names/bases on demand;
+   - raw status codes, validation strings, provenance and English source evidence remain technical/source detail rather than task semantics.
 
 4. **Preflight action**
    - owner-facing action is `Перепроверить состояние`;
    - directly beside/before it state that this only re-checks the four conditions and records local non-canonical evidence; it does **not** change the document, perform an external effect, grant authority or approve anything;
-   - visually distinguish this safe diagnostic re-check from a real consequential action;
    - render the positive `Безопасная проверка` explanation only when the live projection explicitly proves the exact waiting/non-consequential boundary; otherwise fail closed and withhold the safe action;
-   - after execution, present the result in plain Russian while preserving exact evidence on demand.
+   - after execution, present the result without inventing a blocked owner task.
 
 5. **No fake resolution path**
-   - do not add `Approve`, `Authorize`, delegation, Data Governance approval or consequential approval controls merely to make the task resolvable;
+   - do not add `Approve`, `Authorize`, delegation, Data Governance approval or consequential approval controls merely to make the surface resolvable;
    - a real decision-supply/action workflow, if required, is a separate governed capability and must be designed against RFC-0003/RFC-0005 and applicable product/platform boundaries before implementation.
 
 ## Acceptance for F08 repair
 
-A real owner should be able to answer, without reading internal English text:
+A real owner should be able to establish, without reading internal English text:
 
-- what is blocked;
-- why it is blocked;
+- whether there is a real task requiring action now;
+- that UI4 is a technical readiness check rather than an owner task when no concrete action request exists;
 - whether anything external is happening now;
 - whether the available re-check button is safe;
 - what the button will and will not do;
-- whether the task can actually be resolved inside Workspace today;
-- where to return after inspection;
-- why the top-level navigation still indicates that they are working with a task rather than editing Settings.
+- where the diagnostics live and how to return to Settings;
+- that no urgency or required decision has been manufactured solely from Waiting governance gates.
 
 No repository test or simulated click substitutes for that real owner recheck.
 
-## Merged repair
+## Merged presentation repair
 
-PR `#7`, merged as `2f1bf8f341c1a779805586e9f239c4442a65d96b`, makes the focused task a dedicated Russian-first detail state, reduces the ordinary task card to `Посмотреть задачу`, moves raw evidence behind `Исходные данные`, preserves return navigation, and keeps the governed inspection in the `Задачи` shell context. The governed page presents the four gate concepts in owner language with canonical evidence on demand and permits `Перепроверить состояние` only when the current waiting/non-consequential boundary is proved. It creates no decision-supply, approval, authority, canonical-mutation, or external-effect control.
-
-Exact reviewed head `d2949821347fc3078757303d5858a67dfdd7e23b` passed Productive Workspace CI and Reference Python full CI before merge. The local checkout could not collect one Python test path because `arvectum_os_ref` was absent from that local import path; this was not used as a waiver because the repository CI contours completed successfully on the exact reviewed head.
+PR `#7`, merged as `2f1bf8f341c1a779805586e9f239c4442a65d96b`, made the focused task a dedicated Russian-first detail state, reduced the ordinary task card to `Посмотреть задачу`, moved raw evidence behind `Исходные данные`, and made the safe re-check understandable. Exact reviewed head `d2949821347fc3078757303d5858a67dfdd7e23b` passed Productive Workspace CI and Reference Python full CI before merge.
 
 ## Post-deploy owner recheck
 
-The selected Mac was governed-updated to `dc0e0cff83a9031a3686191b5cf304ee03c2d1eb` / Workspace `p9.11.4`. P7.02/P7.05, exact release manifest and live assets passed; Workspace reached `CURRENT_EXACT` with `MANAGED_SPAWN_PROOF`. The owner found the mechanics clearer but the F08 result remains **FAIL**:
+The selected Mac was governed-updated to `dc0e0cff83a9031a3686191b5cf304ee03c2d1eb` / Workspace `p9.11.4`. P7.02/P7.05, exact release manifest and live assets passed; Workspace reached `CURRENT_EXACT` with `MANAGED_SPAWN_PROOF`. The owner found the mechanics clearer but the F08 result remained **FAIL**:
 
 > Интерфейс понятнее стал. Но не понятна суть задачи. Что-то остановлено, требуется 4 каких-то действия. А каких и что конкретно делать — непонятно.
 
 Root cause is semantic, not merely wording: P7.06-UI4 is a preflight-only proof bridge with no concrete action request, owner resolution path, authority, approval, canonical mutation, or external effect. `RuntimeAttentionProvider` nonetheless projected its Waiting gates as a high-urgency `WAITING_INPUT` owner task. Governance gates can qualify a concrete product-owned action; they cannot manufacture one.
 
-The p9.11.5 candidate removes UI4 from ordinary attention, Home, Tasks, and Activity alerts. It retains the same projection as Settings diagnostics at `Технические проверки → Проверка готовности управляемого выполнения`, states that no concrete action is requested, and preserves its four canonical gates and fail-closed safe re-check. A future owner task requires a concrete product-owned subject, requested outcome, responsible resolver, resolution location/path, reason for attention, and justified urgency; this candidate does not implement a product action.
+## Merged owner-task eligibility repair
+
+PR `#8`, merged as `037cd59d7917d52b3ff6aa2dea20dcad22ed484d`, advances Workspace to `p9.11.5` / app contract `11` and removes UI4 from ordinary attention, Home/Tasks and Activity alerts. UI4 remains available through `Настройки → Технические проверки` and its four canonical gates and fail-closed safe re-check are preserved. The diagnostic surface explicitly states that no concrete action is requested, ignores stale task-focus query parameters, returns to Settings, and does not describe an unchanged re-check result as a blocked task.
+
+Exact reviewed head `dde1102d0892a6c71e7a47de9c3a93fba98c84de` passed:
+
+- Productive Workspace CI, including SPA interaction/storage gates and BFF security/context tests;
+- Reference Python CI full reference test suite;
+- frontend `34 passed`, typecheck, Web Storage guard, production build and `git diff --check` as reported by the implementation task.
+
+This merge creates no product business action, Authorization, Organizational Authority, Data Governance permission, consequential approval, canonical mutation or external effect. It is not owner usability acceptance. F08 remains open until `p9.11.5` is governed-deployed to the selected Mac, exact runtime/readiness/assets/launcher are verified, and the owner rechecks the ordinary Home/Tasks empty state plus the Settings diagnostic boundary.
 
 ## Adjacent-route audit
 
@@ -130,6 +135,6 @@ The read-only F08 audit found no additional task-journey change required outside
 1. `/work` embeds the repaired task projection alongside product contexts; no independent owner-flow regression was changed in this repair.
 2. `/information` still presents raw result kind, semantic role, authority mode, health state, and source state in its existing discovery/evidence surface. This is outside the focused task-to-governed repair and should be assessed as separate discovery UX work if owner evidence identifies it as friction.
 3. `/copilot` keeps source roles, freshness, model details, and authority boundaries visible to preserve the existing grounded-answer/evidence boundary. No F08 change is admitted there.
-4. `/system` remains an explicitly diagnostic and technical surface. UI4 is now explicitly available there as `Технические проверки`, not as a Task.
+4. `/system` remains an explicitly diagnostic and technical surface. UI4 is explicitly available there as `Технические проверки`, not as a Task.
 
-F07 is successful only in its bounded Home/navigation/branding scope. F08 remains open for the owner-task eligibility repair and a subsequent real owner recheck. P9.11 remains `Current`; R32 remains locked; P9.12 has not started; M9 remains open.
+F07 is successful only in its bounded Home/navigation/branding scope. F08 remains open pending p9.11.5 selected-Mac deployment and real owner recheck. P9.11 remains `Current`; R32 remains locked; P9.12 has not started; M9 remains open.
