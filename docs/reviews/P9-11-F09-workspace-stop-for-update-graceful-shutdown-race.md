@@ -1,6 +1,6 @@
 # P9.11-F09 — Workspace Stop-for-Update Graceful-Shutdown Race
 
-Status: `Repair under review`
+Status: `Repair merged / operational verification pending`
 Date: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform / operational lifecycle`
@@ -37,6 +37,15 @@ The repair preserves full pre-signal `status()` and immediate identity revalidat
 
 If a future trusted Workspace stop fails before target activation, P7.06 records an existing-schema `FAIL` transaction when recording is available. The adapter deliberately does not re-query Workspace after a failed stop-for-update helper call. The helper may have failed before or after its one permitted SIGTERM, so the adapter records `signal_disposition=unknown_to_adapter` unless separately proven; it performs no second signal or retry. The record states that target activation never began, the current pointer was unchanged, backup was retained, no rollback occurred, and operator investigation/retry is required. This does not retrospectively alter the historical failed attempt.
 
+## Repository Review And Merge Evidence
+
+- PR `#9` reviewed head: `a451451037f8f77382264418039dac1ed5a9089f`;
+- targeted lifecycle validation: `90 passed`;
+- Python compilation, shell syntax and `git diff --check`: `PASS`;
+- exact-head Reference Python CI run `32890992380`: `PASS`;
+- merge commit on canonical `main`: `8d10059c8b45abfd679891a0442bca3073a36dcc`;
+- selected-Mac runtime mutation during repair/review: `NO`.
+
 ## Acceptance Evidence
 
 - Full status/HTTP/assets verification remains mandatory before `SIGTERM`.
@@ -44,9 +53,10 @@ If a future trusted Workspace stop fails before target activation, P7.06 records
 - Original PID exit and port release are both required.
 - PID reuse and foreign listener states fail closed without signaling another process.
 - Exactly one `SIGTERM`; no `SIGKILL`.
+- Future pre-activation stop failures preserve signal uncertainty rather than claiming a signal occurred.
 - Workspace app release remains `p9.11.5`; app API remains `11`.
 - No Workspace owner-task eligibility or F08 UI semantics change is admitted.
 
 ## Disposition
 
-F09 blocks the next F08 deployment. After F09 merge, the selected Mac must govern-deploy the new canonical main from the current `NOT_RUNNING` Workspace state, verify exact runtime/assets, start the target Workspace once through its new exact helper, then resume the real F08 owner recheck. F08 remains open; P9.11 remains Current; R32 remains locked.
+The bounded F09 repository repair is merged canonical, but F09 is not yet operationally verified on the selected Mac. The next governed action is to deploy the exact current canonical `main` from the existing `NOT_RUNNING` Workspace state. Because no Workspace is running before that deployment, the repaired stop path is not exercised by the transition itself; after exact runtime/P7.02/P7.05/assets verification, the target Workspace must be started exactly once through the target release helper and reach `CURRENT_EXACT` with admissible proof. That deployment resumes the F08 real owner recheck. F08 remains open; P9.11 remains Current; R32 remains locked.
