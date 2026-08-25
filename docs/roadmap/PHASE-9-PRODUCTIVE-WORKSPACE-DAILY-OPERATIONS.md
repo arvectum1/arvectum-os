@@ -1,14 +1,14 @@
 # Arvectum OS Phase 9 — Productive Workspace & Daily Operations
 
 Status: `Active`
-Version: `1.13.9`
+Version: `1.13.10`
 Created: `2026-08-21`
 Updated: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `product_contract` and `governance`
 Parent roadmap: [`ROADMAP.md`](ROADMAP.md)
 
-Current disposition: F06 is operationally verified on canonical runtime `470d4e310973ed873eb71d1bec3cf0985288be6b`. The subsequent real F07 owner recheck failed on that deployed UI. PR `#6` is now merged canonical as `3e0b472a015bde7a44ac8202f364fbf5ea568ebb`, carrying Workspace `p9.11.3` / app contract `11`, but the selected Mac has not yet been governed-updated to the merged remediation. P9.11 remains Current, R32 locked, P9.12 not started and M9 open.
+Current disposition: F06 remains operationally verified. F07 is now owner-rechecked PASS only in its bounded Home/navigation/branding scope on the live `p9.11.3` Workspace. The same real session exposed F08: the urgent-task detail and governed-action journey remain materially unclear and non-actionable. P9.11 remains Current, R32 locked, P9.12 not started and M9 open.
 Milestone: `M9 — Daily-use organizational workbench`
 Intermediate milestone: `M9-alpha — Usable Internal Workspace — Achieved / PASS`
 Architecture baseline: Constitution `1.2.0`; RFC-0001 through RFC-0008 `Accepted 1.0.0`; ADR-0001 `Accepted`
@@ -54,7 +54,7 @@ The legacy P4/P7 browser surfaces remain diagnostic/reference/recovery evidence.
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS | non-authoritative activity UX |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS | company-level composition |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS | product/AI boundaries PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F06 verified; F07 repair merged, deployment + owner recheck pending** | real owner sessions + material friction closure |
+| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F07 bounded PASS; F08 task/governed flow blocker** | real owner sessions + material friction closure |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked | pre-closure hardening PASS |
 | P9.12 | Phase 9 / M9 closure review | ⬜ | exact-scope M9 closure |
 
@@ -84,15 +84,7 @@ P9.11 cannot close from repository tests or simulated clicks alone. Real owner w
 
 ### F03 — owner-first information architecture
 
-Real owner use found that the Workspace did not make ordinary work obvious enough. `p9.11.2` repairs the navigation/presentation around:
-
-- Today;
-- Work;
-- Information;
-- Arvectum AI;
-- System.
-
-Legacy deep routes and protected projection semantics remain available; product/security/authority semantics are unchanged.
+Real owner use found that the Workspace did not make ordinary work obvious enough. `p9.11.2` repaired the navigation/presentation around Today, Work, Information, Arvectum AI and System. Later F07 work superseded the owner-facing labels without changing the stable route/backend identities.
 
 ### F04 — canonical repository identity migration
 
@@ -112,7 +104,7 @@ The owner then approved one bounded graceful termination attempt for exact histo
 
 P7.06 transaction `215cb1390708bd4a0e72b567cf9060e4a84173147af618a064c464ca31640ff0` then updated the selected Mac successfully to exact runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63`; P7.02/P7.05 were healthy, Workspace payload was `p9.11.2` / contract `11`, and no product/external effect replay occurred.
 
-F05 is therefore complete in its exact operational reconciliation scope. The next failed managed start is tracked separately as F06.
+F05 is complete in its exact operational reconciliation scope.
 
 ### F06 — managed Workspace process identity on macOS paths
 
@@ -130,30 +122,55 @@ PR `#4` merged the bounded repair through `3b4d2b2be4a095ff04e5703b36b3ef189c3d4
 - exact CWD, release manifest, live assets, PID and process-start identity remain required;
 - failed-child matching metadata cleanup and bounded readiness diagnostics are hardened.
 
-Pre-merge validation included exact `Application Support` paths, real start-to-real-status managed provenance, PID reuse, historical unproven-process fail-closed behavior and GitHub full Reference Python CI PASS on reviewed head `99d4d1a130885c6a399e3077f4ac15a113d67a98`.
-
-F06 is **operationally verified**: runtime equals canonical `470d4e310973ed873eb71d1bec3cf0985288be6b`; P7.02/P7.05 are healthy; Workspace reached `CURRENT_EXACT` with `MANAGED_SPAWN_PROOF`; exact live assets passed; and the Desktop launcher was refreshed/opened.
+F06 is **operationally verified**: runtime `470d4e310973ed873eb71d1bec3cf0985288be6b` reached healthy P7.02/P7.05, Workspace `CURRENT_EXACT` with `MANAGED_SPAWN_PROOF`, exact live assets PASS, and refreshed/opened Desktop launcher.
 
 ### F07 — first-glance orientation and Russian-first UX repair
 
 Canonical evidence: [`P9.11-F07 — Owner-first Workspace UX repair`](../reviews/P9-11-F07-owner-first-workspace-ux-repair.md).
 
-The real owner recheck failed on a screenshot of deployed canonical runtime `470d4e310973ed873eb71d1bec3cf0985288be6b`: the next action was unclear, the large welcome hero displaced useful information, scenario fixtures looked like live work, raw technical evidence leaked into Home, actions looked secondary, and branding was unacceptable.
+The first F07 owner recheck on the pre-remediation UI failed because the next action was unclear, scenario fixtures looked live, raw technical evidence leaked on Home, actions were secondary, and branding was unacceptable.
 
-PR `#6` merged the bounded remediation through `3e0b472a015bde7a44ac8202f364fbf5ea568ebb`. Canonical Workspace source/release is now `p9.11.3` / app contract `11`. The merged behavior makes Home compact and action-first, keeps ordinary Home/Tasks live-only, isolates scenario evidence under `Настройки → Тестовые сценарии`, excludes scenario attention from ordinary Activity, preserves raw provenance in task detail under `Исходные данные`, uses explicit Russian urgency/navigation, and ships the owner-provided Block SVG as the local brand asset.
+PR `#6` merged the bounded remediation through `3e0b472a015bde7a44ac8202f364fbf5ea568ebb`, advancing Workspace to `p9.11.3` / app contract `11`. The merged behavior makes Home compact and action-first, keeps ordinary Home/Tasks live-only, isolates scenario evidence under `Настройки → Тестовые сценарии`, excludes scenario attention from ordinary Activity, preserves raw provenance in task detail under `Исходные данные`, uses explicit Russian urgency/navigation, and ships the owner-provided Block SVG as the local brand asset.
 
-F07 remains **OPEN** until the merged repair is governed-deployed and the owner performs another real recheck. Repository merge and green CI are not owner usability acceptance.
+A real owner session on live `p9.11.3` now gives **PASS in the bounded F07 scope**: Home is understandable and visually acceptable, the primary actions are clear, the top-level navigation is understandable, and the Arvectum Block logo is accepted.
+
+This does not close P9.11 because the same session exposed F08 downstream.
+
+### F08 — task-to-governed action comprehension and actionability
+
+Canonical evidence: [`P9.11-F08 — Task-to-Governed Action Comprehension and Actionability`](../reviews/P9-11-F08-task-to-governed-action-comprehension.md).
+
+The real owner opened the single urgent task and then the governed execution surface. Result: **FAIL**.
+
+Observed material friction:
+
+- task-detail primary text remains raw English/internal wording rather than owner-facing Russian explanation;
+- the focused detail and ordinary queue are rendered together, so the same task appears again below; the list-level `Открыть` can navigate to the already-focused route and appear broken;
+- `Открыть` and `Открыть выполнение` are visually crowded and their difference is unclear;
+- governed execution is dominated by `EIS document governed execution`, `Waiting`, `External Reference`, the four English gate names/bases and other internal evidence;
+- the prominent `Run governed preflight` control looks consequential, while the interface does not clearly explain in Russian what it does or whether it is safe.
+
+Repository inspection establishes the exact semantics that the repair must preserve:
+
+- current preflight action is `consequential=false`;
+- `canonical_mutation_requested=false`;
+- `external_effect_requested=false`;
+- `authority_provided=false`;
+- running it only re-evaluates retained evidence and records minimized owner-local non-canonical proof evidence;
+- P7.06-UI4 deliberately supplies none of Authorization, Organizational Authority, Data Governance or Consequential Approval and exposes no consequential action request until independently governed evidence exists.
+
+Therefore the current urgent item is not actually resolvable inside Workspace. F08 must state that truthfully, make the safe re-check understandable, and must not invent approval/authority controls merely to make the path look actionable.
 
 ## 7. Current critical path
 
 ```text
-governed P7.06 update selected Mac to exact current canonical main carrying Workspace p9.11.3 / contract 11
+repair F08 task detail + governed-action comprehension/actionability
         ↓
-verify P7.02/P7.05, CURRENT_EXACT, admissible proof, and exact live assets
+review + merge exact repair
         ↓
-refresh/open exact-release Desktop launcher
+govern-deploy exact release and verify runtime/readiness/assets/launcher
         ↓
-real owner recheck
+real owner recheck of urgent-task journey
         ↓
 continue ordinary daily dogfooding
         ↓
@@ -197,6 +214,6 @@ Phase 9 does not by itself establish public SaaS, customer Production, universal
 
 ## 11. Current canonical action
 
-> **P9.11-F07 — govern-deploy the exact current canonical `main` carrying Workspace `p9.11.3` / app contract `11` to the selected Mac; verify P7.02/P7.05, `CURRENT_EXACT`, admissible proof and exact live assets; refresh/open the exact-release Desktop launcher; then stop at the next real owner recheck. F06 is operationally verified; the F07 repair is merged but not yet owner-accepted; P9.11 remains Current and R32 remains locked.**
+> **P9.11-F08 — repair the urgent-task detail and governed-action journey so the owner can understand what is blocked, why it is blocked, whether anything external is happening now, what the available re-check does and does not do, and whether the task is actually resolvable inside Workspace. Remove ambiguous/same-route task actions; make the current non-consequential preflight explicitly safe and Russian-first; preserve exact source/provenance on demand; do not manufacture missing Authorization, Organizational Authority, Data Governance or Consequential Approval controls. Then review, merge, govern-deploy and stop at a real owner recheck.**
 
 R32 remains locked until P9.11 real-session evidence and friction closure criteria are met.
