@@ -1,6 +1,6 @@
 # P9.11-F06 — Managed Workspace Start Failure After Selected-Mac Reconciliation
 
-Status: `Observed / investigation pending`
+Status: `Root cause established / bounded repair under review`
 Date: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `governance`
@@ -55,30 +55,61 @@ P7.06 then completed successfully against canonical target `6ed9dade96417251d3dd
 
 This establishes successful runtime reconciliation. It does not establish live Workspace readiness.
 
-## 4. New real finding
+## 4. Root cause — F06
 
-After the successful P7.06 update, the canonical managed Workspace lifecycle attempted to start the exact current Workspace.
+### Evidence chain
 
-Reported attempted child PID: `52092`.
+- real PID `52092` reached Uvicorn application startup;
+- port `127.0.0.1:8769` became live;
+- no application exception occurred (no traceback in stderr);
+- helper never admitted `CURRENT_EXACT`;
+- helper cleanup then produced the observed graceful `SIGTERM` shutdown;
+- `workspace-process.json` absent after the failed attempt (expected: matching cleanup removed it);
+- deterministic path-with-spaces regression reproduces the identity rejection.
 
-The final observed state was:
+### Root cause
 
-- Workspace helper state: `NOT_RUNNING`;
-- admissible Workspace proof: none reported;
-- managed metadata: FAIL / absent or invalid after the failed start attempt;
-- live exact assets: FAIL because no accepted live exact Workspace remained ready;
-- Desktop launcher refresh: not executed;
-- Desktop launcher open: not executed.
+The canonical process identity recognizer (`_process_identity()`) parsed raw macOS `ps command` display text with shell-oriented `shlex.split()`. Exact release paths under `~/Library/Application Support/...` contain whitespace (`Application Support`), so `shlex.split()` produced 4 tokens instead of 3, and the helper rejected the healthy exact Workspace command as `"not Workspace command"` before managed provenance could be evaluated.
 
-Therefore the selected Mac is now on the exact canonical runtime, but Productive Workspace is not live.
+### macOS framework Python nuance
 
-Finding:
+On macOS, `ps command` displays the framework Python path (`Python.app/Contents/MacOS/Python`) rather than the venv Python symlink chain. These are genuinely different binaries (different inodes) within the same Python installation. Therefore `DIRECT_OS_PROOF` is structurally impossible on macOS for venv-spawned processes. The repair correctly returns `(False, None)` for structurally valid commands with framework Python, allowing `MANAGED_SPAWN_PROOF` to establish exact invocation.
 
-`P9.11-F06 — Canonical managed Workspace spawn exits or disappears before CURRENT_EXACT readiness.`
+### Absence of workspace-process.json
 
-The root cause is **not yet established** by this observation. Repository code shows that `start()` first performs the exact Workspace check, spawns the exact release Python/entrypoint, writes managed provenance, and waits for `CURRENT_EXACT`; a child that exits before readiness causes the helper to fail. The selected-Mac stdout/stderr and process evidence are required to determine the actual cause.
+After the failed attempt, `workspace-process.json` is absent. This is expected behavior from matching cleanup (`_cleanup_own_spawn()` invalidates metadata matching the failed PID/release/start_identity). It is not evidence that metadata write was the primary failure.
 
-## 5. Current safety state
+## 5. Bounded repair
+
+Branch: `p9-11-f06-space-safe-process-identity`
+
+### Changes
+
+1. **`_process_identity()`** — Replaced `shlex.split()` with right-to-left suffix matching:
+   - Matches absolute entrypoint suffix (`/{exact_path} serve`);
+   - Matches relative entrypoint suffix (`p9_03_workspace.py serve`);
+   - Extracts executable display by removing suffix from the right (no splitting on internal whitespace);
+   - Guards against flags/extra arguments in executable display;
+   - Uses `os.path.samefile()` for interpreter comparison (handles macOS framework vs venv symlink chains);
+   - Returns `(False, None)` for structurally valid commands where interpreter doesn't exactly match, allowing managed proof.
+
+2. **`_cleanup_own_spawn()`** — When child has already exited before cleanup runs, now invalidates matching metadata instead of silently returning. Prevents stale metadata from remaining after failed spawns.
+
+3. **`start()` readiness diagnostics** — Timeout error now includes `state`, `reason`, and `proof_mode` from the last observed status. Prevents opaque 30-second failures.
+
+### Security non-regression
+
+- UNKNOWN unsignallable: preserved;
+- PID-reuse protection: preserved;
+- process-start-identity revalidation: preserved;
+- exact entrypoint/CWD/release/manifest/assets: preserved;
+- owner-only metadata: preserved;
+- P7.06 fail closed on UNKNOWN: preserved;
+- P7.02 `network_listener_mode = none`: preserved;
+- no second production service lifecycle: preserved;
+- no `SIGKILL` normal path: preserved.
+
+## 6. Current safety state
 
 - historical PID `30686`: terminated by the consumed one-time owner decision;
 - no repeated signal is authorized by that decision;
@@ -91,17 +122,12 @@ The root cause is **not yet established** by this observation. Repository code s
 - R32 remains locked;
 - no synthetic owner-session evidence is permitted.
 
-## 6. Required next evidence
+## 7. Required next steps
 
-Before any retry of `start()` or launcher execution, collect read-only selected-Mac evidence for the failed managed spawn, including at minimum:
+After the bounded repair is merged:
 
-- `workspace.stderr.log` and `workspace.stdout.log` from the failed attempt;
-- whether PID `52092` still exists;
-- whether any listener currently owns port `8769`;
-- current strict helper `status` output;
-- presence, ownership, mode and content identity of `run/workspace-process.json`, if it exists;
-- exact `p9_03_workspace.py check` result on current release;
-- exact target Python / `uvicorn` / `fastapi` import evidence;
-- relevant current release paths and manifest verification.
-
-No second Workspace start should be attempted until the failure mode is understood or a bounded repair/retry plan is reviewed.
+1. retry managed Workspace start through the exact helper;
+2. verify `CURRENT_EXACT` with `MANAGED_SPAWN_PROOF`;
+3. refresh Desktop launcher from exact canonical release;
+4. open Desktop launcher for owner recheck;
+5. stop automation at real owner feedback.

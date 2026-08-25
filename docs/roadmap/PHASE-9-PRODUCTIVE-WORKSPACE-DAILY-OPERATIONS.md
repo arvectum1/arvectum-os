@@ -1,7 +1,7 @@
 # Arvectum OS Phase 9 — Productive Workspace & Daily Operations
 
 Status: `Active`
-Version: `1.13.5`
+Version: `1.13.6`
 Created: `2026-08-21`
 Updated: `2026-08-25`
 Owner: `ООО «Арвектум»`

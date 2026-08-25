@@ -11,7 +11,6 @@ import argparse
 import json
 import os
 import re
-import shlex
 import signal
 import stat
 import subprocess
@@ -143,20 +142,32 @@ def _process_start_identity(pid: int) -> str | None:
 def _process_identity(command: str, cwd: Path | None, python: Path, entrypoint: Path) -> tuple[bool, str | None]:
     if cwd is None:
         return False, "wrong cwd"
-    try:
-        arguments = shlex.split(command)
-    except ValueError:
+    if not command.endswith(" serve"):
         return False, "not Workspace command"
-    if len(arguments) != 3 or arguments[2] != "serve":
-        return False, "not Workspace command"
-    candidate = Path(arguments[1])
-    actual_entrypoint = (candidate if candidate.is_absolute() else cwd / candidate).resolve()
-    if actual_entrypoint != entrypoint.resolve():
+    absolute_suffix = f" {entrypoint} serve"
+    relative_name = entrypoint.name
+    if command.endswith(absolute_suffix):
+        executable_display = command[: -len(absolute_suffix)]
+        if not executable_display or " " in executable_display:
+            return False, "not Workspace command"
+        resolved_entrypoint = entrypoint.resolve()
+    elif command.endswith(f" {relative_name} serve"):
+        idx = len(command) - len(f" {relative_name} serve")
+        if idx <= 0:
+            return False, "not Workspace command"
+        executable_display = command[:idx]
+        if not executable_display or " " in executable_display:
+            return False, "not Workspace command"
+        resolved_entrypoint = (cwd / relative_name).resolve()
+    else:
+        return False, "wrong entrypoint"
+    if resolved_entrypoint != entrypoint.resolve():
         return False, "wrong entrypoint"
     try:
-        return Path(arguments[0]).resolve(strict=True) == python.resolve(), None
+        direct_proof = os.path.samefile(executable_display, python)
     except OSError:
-        return False, "wrong interpreter"
+        direct_proof = False
+    return direct_proof, None
 
 
 def _managed_proof(root: Path, pid: int, release: str, python: Path, entrypoint: Path, source: Path) -> bool:
@@ -207,6 +218,8 @@ def _invalidate_matching_metadata(root: Path, pid: int, release: str, start_iden
 
 def _cleanup_own_spawn(process: subprocess.Popen[Any], start_identity: str | None, root: Path, release: str) -> None:
     if process.poll() is not None:
+        if start_identity is not None:
+            _invalidate_matching_metadata(root, process.pid, release, start_identity)
         return
     if start_identity is None:
         process.terminate()
@@ -353,15 +366,22 @@ def start(root: Path) -> dict[str, Any]:
         _cleanup_own_spawn(process, start_identity, root, release)
         raise
     deadline = time.monotonic() + MAX_WAIT_SECONDS
+    last_observed: dict[str, Any] = before
     while time.monotonic() < deadline:
-        observed = status(root)
-        if observed["state"] == CURRENT_EXACT and observed.get("pid") == process.pid:
-            return observed
+        last_observed = status(root)
+        if last_observed["state"] == CURRENT_EXACT and last_observed.get("pid") == process.pid:
+            return last_observed
         if process.poll() is not None:
             break
         time.sleep(POLL_SECONDS)
     _cleanup_own_spawn(process, start_identity, root, release)
-    raise WorkspaceProcessError("exact Workspace process did not become ready")
+    last_state = last_observed.get("state", "UNKNOWN")
+    reason = last_observed.get("reason", "unknown")
+    proof_mode = last_observed.get("proof_mode", "NONE")
+    raise WorkspaceProcessError(
+        f"exact Workspace process did not become ready: "
+        f"state={last_state} reason={reason} proof_mode={proof_mode}"
+    )
 
 
 def stop_for_update(root: Path) -> dict[str, Any]:

@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.6`
+Version: `2.95.7`
 Created: `2026-08-07`
 Updated: `2026-08-25`
 Owner: `ООО «Арвектум»`
@@ -15,9 +15,9 @@ Roadmap status does not itself change Platform Capability lifecycle, Product Con
 
 ## 2. Version note
 
-Version `2.95.6` records the real selected-Mac result after the owner-approved one-time F05 legacy-listener termination and governed P7.06 reconciliation. Historical PID `30686` passed every approved pre-signal gate, received exactly one `SIGTERM`, exited, and released port `8769`; no `SIGKILL` or second signal was used. P7.06 then updated the selected Mac successfully to exact canonical runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63` with transaction `215cb1390708bd4a0e72b567cf9060e4a84173147af618a064c464ca31640ff0`; P7.02/P7.05 are healthy and Workspace payload remains `p9.11.2` / contract `11`.
+Version `2.95.7` records the F06 root cause establishment and bounded space-safe repair. The managed Workspace start failure after selected-Mac reconciliation was caused by `_process_identity()` using `shlex.split()` on macOS `ps command` display text; paths under `~/Library/Application Support/...` contain whitespace, producing4 tokens instead of3 and rejecting the healthy Workspace command. The repair replaces `shlex.split()` with right-to-left suffix matching, handles macOS framework vs venv Python symlink chains via `os.path.samefile()`, fixes stale metadata cleanup on failed child exit, and adds bounded readiness diagnostics. F06 deterministic reproduction confirms the fix. Selected-Mac runtime remains `6ed9dade96417251d3dd5fc8cb175c7136682b63`; Workspace is `NOT_RUNNING`; owner recheck remains blocked until the merged repair is deployed and Workspace reaches `CURRENT_EXACT`.
 
-A new real finding is now active: [`P9.11-F06 — Managed Workspace Start Failure After Selected-Mac Reconciliation`](../reviews/P9-11-F06-managed-workspace-start-failure.md). The first canonical managed Workspace spawn after reconciliation produced attempted PID `52092` but did not reach `CURRENT_EXACT`; final helper state was `NOT_RUNNING`, managed provenance was not accepted, live exact assets were not available, and the Desktop launcher was neither refreshed nor opened. Root cause is not yet established and requires selected-Mac stderr/stdout/process evidence before any retry.
+A previous finding is now resolved: [`P9.11-F06 — Managed Workspace Start Failure After Selected-Mac Reconciliation`](../reviews/P9-11-F06-managed-workspace-start-failure.md). Root cause established as path-with-spaces identity rejection; bounded repair implemented and under review.
 
 The canonical repository for current checkouts and new deployments is `arvectum1/arvectum-os`. Historical `arvectum/arvectum-os` identity is retained only where immutable provenance of already-installed historical releases requires it.
 
@@ -58,7 +58,7 @@ This update creates no public/stable API/connector/browser contract, no customer
 
 ## 5. Active Phase 9
 
-Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.5`.
+Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.6`.
 
 | ID | Work item | Status |
 |---|---|---:|
