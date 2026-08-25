@@ -1,6 +1,6 @@
 # P9.11-F08 — Task-to-Governed Action Comprehension and Actionability
 
-Status: `Repair under review`
+Status: `Repair merged / deployment + owner recheck pending`
 Date: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform`
@@ -12,7 +12,9 @@ Parent: `P9.11 — Real daily-use dogfooding + friction/backlog closure`
 - RFC-0001 through RFC-0008 — `Accepted 1.0.0`;
 - RFC-0005 preserves the separation of Authentication, Authorization, Organizational Authority, Data Governance, validation and consequential approval, and requires Governed Execution for consequential canonical mutation;
 - ADR-0001 — `Accepted` Productive Workspace browser topology; browser-visible controls are not authority and consequential commands must revalidate server-side;
-- Workspace candidate release under review: `p9.11.4` / app contract `11`; it is not deployed and has not received an owner recheck;
+- Workspace canonical source release after PR `#7`: `p9.11.4` / app contract `11`;
+- PR `#7` merged as `2f1bf8f341c1a779805586e9f239c4442a65d96b` after exact-head Productive Workspace CI and Reference Python CI PASS;
+- the merged F08 repair has not yet been governed-deployed or owner-rechecked;
 - P9.11 remains `Current`; R32 remains locked.
 
 ## Real owner recheck
@@ -34,17 +36,17 @@ Observed owner feedback:
 
 ## Repository evidence
 
-The current task projection creates the live preflight item as `WAITING_INPUT` / high urgency with source text:
+The pre-repair task projection creates the live preflight item as `WAITING_INPUT` / high urgency with source text:
 
 - title: `Governed preflight is waiting for decision evidence`;
 - reason: four governed gates remain `Waiting`;
 - next step: inspect blockers and supply independently governed decision evidence through a governed-action flow `when available`.
 
-The current My Work detail presents those raw values directly. When a focused item is open, the ordinary queue is also rendered below it; the list-level `Открыть` link can therefore navigate to the same focused URL and produce no visible transition.
+The pre-repair My Work detail presents those raw values directly. When a focused item is open, the ordinary queue is also rendered below it; the list-level `Открыть` link can therefore navigate to the same focused URL and produce no visible transition.
 
-The current shell groups `/governed` into the fallback `system` navigation bucket, so a route entered from an urgent task highlights `Настройки` rather than preserving task context.
+The pre-repair shell groups `/governed` into the fallback `system` navigation bucket, so a route entered from an urgent task highlights `Настройки` rather than preserving task context.
 
-The current governed projection hard-codes English presentation copy and exact RFC-0005 gate names/bases. Its preflight action is explicitly bounded:
+The governed projection exposes a bounded preflight action with these exact semantics:
 
 - `consequential = false`;
 - `canonical_mutation_requested = false`;
@@ -53,13 +55,11 @@ The current governed projection hard-codes English presentation copy and exact R
 
 The underlying P7.06-UI4 proof bridge additionally states that it supplies none of the four action-specific decisions and exposes no consequential action request. Running the preflight only re-evaluates current retained evidence and records minimized owner-local non-canonical proof evidence; it cannot grant authority or approval and performs no canonical mutation or external effect.
 
-Therefore the current `Run governed preflight` operation is non-consequential within this exact implementation, but the UI fails to communicate that truthfully and prominently.
-
-More importantly, the current Workspace does **not** provide an admitted path to satisfy the four missing decisions. Presenting the item to the owner as if a confirmation can simply be supplied in the current screen is therefore misleading. The truthful state is a blocked governed execution with no in-Workspace resolution path yet, plus a safe optional re-check operation.
+Therefore the current Workspace still does **not** provide an admitted path to satisfy the four missing decisions. Presenting the item as if a confirmation can simply be supplied in the current screen would be misleading. The truthful state is a blocked governed execution with no in-Workspace resolution path yet, plus a safe optional re-check operation when the exact non-consequential boundary is proved.
 
 ## Required repair direction
 
-The bounded F08 repair must improve presentation without manufacturing authority or an approval workflow that does not exist.
+The bounded F08 repair improves presentation without manufacturing authority or an approval workflow that does not exist.
 
 1. **Task list vs detail**
    - ordinary list card has one clear CTA: `Посмотреть задачу`;
@@ -78,15 +78,15 @@ The bounded F08 repair must improve presentation without manufacturing authority
    - translate the four fixed domain-neutral RFC-0005 gate concepts into plain Russian presentation while preserving the exact canonical gate names/bases on demand;
    - raw status codes, validation strings, provenance and English source evidence move under expandable technical/source details;
    - do not alter gate semantics or infer approval from UI state;
-   - preserve task orientation: governed inspection reached from a task must remain in the `Задачи` owner context rather than unexpectedly highlighting `Настройки`;
+   - preserve task orientation: governed inspection reached from a task remains in the `Задачи` owner context rather than unexpectedly highlighting `Настройки`;
    - on desktop, keep primary navigation available while scrolling long detail/governed pages.
 
 4. **Preflight action**
-   - rename owner-facing action to a truthful plain-language label such as `Перепроверить состояние`;
-   - directly beside/before it state: this only re-checks the four conditions and records local non-canonical evidence; it does **not** change the document, does not call an external effect, does not grant authority and does not approve anything;
+   - owner-facing action is `Перепроверить состояние`;
+   - directly beside/before it state that this only re-checks the four conditions and records local non-canonical evidence; it does **not** change the document, perform an external effect, grant authority or approve anything;
    - visually distinguish this safe diagnostic re-check from a real consequential action;
-   - render the positive `безопасная проверка` explanation only when the live projection explicitly proves `consequential=false`, `canonical_mutation_requested=false`, `external_effect_requested=false` and `authority_provided=false`; if those characteristics drift, fail closed and do not present the action as safe;
-   - after execution, present the result in plain Russian, including that nothing was changed and which decisions remain unresolved.
+   - render the positive `Безопасная проверка` explanation only when the live projection explicitly proves the exact waiting/non-consequential boundary; otherwise fail closed and withhold the safe action;
+   - after execution, present the result in plain Russian while preserving exact evidence on demand.
 
 5. **No fake resolution path**
    - do not add `Approve`, `Authorize`, delegation, Data Governance approval or consequential approval controls merely to make the task resolvable;
@@ -107,19 +107,21 @@ A real owner should be able to answer, without reading internal English text:
 
 No repository test or simulated click substitutes for that real owner recheck.
 
-## Status
+## Merged repair
 
-The `p9.11.4` repair candidate makes the focused task a dedicated Russian-first detail state, reduces the ordinary task card to `Посмотреть задачу`, moves raw evidence behind `Исходные данные`, and preserves return navigation. The governed inspection remains in the `Задачи` shell context, presents the four gate concepts in owner language with canonical evidence on demand, and permits `Перепроверить состояние` only when the live action flags, execution state, and all four gate states prove the exact waiting/non-consequential boundary. It creates no decision-supply, approval, authority, canonical-mutation, or external-effect control.
+PR `#7`, merged as `2f1bf8f341c1a779805586e9f239c4442a65d96b`, makes the focused task a dedicated Russian-first detail state, reduces the ordinary task card to `Посмотреть задачу`, moves raw evidence behind `Исходные данные`, preserves return navigation, and keeps the governed inspection in the `Задачи` shell context. The governed page presents the four gate concepts in owner language with canonical evidence on demand and permits `Перепроверить состояние` only when the current waiting/non-consequential boundary is proved. It creates no decision-supply, approval, authority, canonical-mutation, or external-effect control.
 
-Focused frontend tests cover the task/detail journey, Russian-first governed presentation, technical evidence, safe preflight, flag-drift fail-closed behavior, unavailable source handling, and task navigation. This is repository evidence only: F08 still requires review, merge, governed deployment, and a real owner recheck.
+Exact reviewed head `d2949821347fc3078757303d5858a67dfdd7e23b` passed Productive Workspace CI and Reference Python full CI before merge. The local checkout could not collect one Python test path because `arvectum_os_ref` was absent from that local import path; this was not used as a waiver because the repository CI contours completed successfully on the exact reviewed head.
+
+Repository merge is not owner usability acceptance. F08 remains open until the selected Mac is governed-updated to the exact current canonical release carrying `p9.11.4`, runtime/readiness/assets/launcher are verified, and the owner repeats the urgent-task journey.
 
 ## Adjacent-route audit
 
 The read-only F08 audit found no additional task-journey change required outside this repair:
 
-1. `/work` embeds the repaired task projection alongside product contexts; no independent owner-flow regression was changed in this candidate.
+1. `/work` embeds the repaired task projection alongside product contexts; no independent owner-flow regression was changed in this repair.
 2. `/information` still presents raw result kind, semantic role, authority mode, health state, and source state in its existing discovery/evidence surface. This is outside the focused task-to-governed repair and should be assessed as separate discovery UX work if owner evidence identifies it as friction.
 3. `/copilot` keeps source roles, freshness, model details, and authority boundaries visible to preserve the existing grounded-answer/evidence boundary. No F08 change is admitted there.
 4. `/system` remains an explicitly diagnostic and technical surface. The governed destination was removed because the governed inspection is part of the Tasks journey, not Settings.
 
-F07 is successful only in its bounded Home/navigation/branding scope. F08 remains the material downstream usability blocker until that owner recheck. P9.11 remains `Current`; R32 remains locked; P9.12 has not started; M9 remains open.
+F07 is successful only in its bounded Home/navigation/branding scope. F08 remains the material downstream usability blocker until the post-deploy owner recheck. P9.11 remains `Current`; R32 remains locked; P9.12 has not started; M9 remains open.
