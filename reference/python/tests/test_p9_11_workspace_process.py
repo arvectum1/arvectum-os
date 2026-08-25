@@ -151,7 +151,7 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
         kill.assert_not_called()
 
     def test_stop_revalidates_stale_process_before_signalling(self):
-        stale = {"state": process.STALE_KNOWN_EXACT, "pid": 7, "release_sha": "a" * 40}
+        stale = {"state": process.STALE_KNOWN_EXACT, "pid": 7, "release_sha": "a" * 40, "proof_mode": "DIRECT_OS_PROOF", "process_start_identity": "start"}
         with (
             mock.patch.object(process, "status", side_effect=[stale, stale, {"state": process.NOT_RUNNING}]),
             mock.patch.object(process.os, "kill") as kill,
@@ -162,10 +162,20 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
         self.assertEqual(observed["state"], process.NOT_RUNNING)
 
     def test_stop_does_not_signal_when_identity_changes(self):
-        before = {"state": process.STALE_KNOWN_EXACT, "pid": 7, "release_sha": "a" * 40}
-        after = {"state": process.STALE_KNOWN_EXACT, "pid": 8, "release_sha": "a" * 40}
+        before = {"state": process.STALE_KNOWN_EXACT, "pid": 7, "release_sha": "a" * 40, "proof_mode": "DIRECT_OS_PROOF"}
+        after = {"state": process.STALE_KNOWN_EXACT, "pid": 8, "release_sha": "a" * 40, "proof_mode": "DIRECT_OS_PROOF"}
         with (
             mock.patch.object(process, "status", side_effect=[before, after]),
+            mock.patch.object(process.os, "kill") as kill,
+            self.assertRaises(process.WorkspaceProcessError),
+        ):
+            process.stop_for_update(pathlib.Path("/tmp/runtime"))
+        kill.assert_not_called()
+
+    def test_stop_refuses_known_state_without_proof_mode(self):
+        stale = {"state": process.STALE_KNOWN_EXACT, "pid": 7, "release_sha": "a" * 40}
+        with (
+            mock.patch.object(process, "status", return_value=stale),
             mock.patch.object(process.os, "kill") as kill,
             self.assertRaises(process.WorkspaceProcessError),
         ):

@@ -13,6 +13,7 @@ import os
 import re
 import shlex
 import signal
+import stat
 import subprocess
 import sys
 import tempfile
@@ -160,7 +161,11 @@ def _process_identity(command: str, cwd: Path | None, python: Path, entrypoint: 
 
 def _managed_proof(root: Path, pid: int, release: str, python: Path, entrypoint: Path, source: Path) -> bool:
     path = root / "run/workspace-process.json"
-    if path.is_symlink() or not path.is_file():
+    try:
+        details = path.stat(follow_symlinks=False)
+    except FileNotFoundError:
+        return False
+    if path.is_symlink() or not stat.S_ISREG(details.st_mode) or details.st_uid != os.geteuid() or details.st_mode & 0o077:
         return False
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -179,6 +184,42 @@ def _managed_proof(root: Path, pid: int, release: str, python: Path, entrypoint:
         and payload.get("bind") == f"{HOST}:{PORT}"
         and payload.get("observed_process_start_identity") == identity
     )
+
+
+def _invalidate_matching_metadata(root: Path, pid: int, release: str, start_identity: str) -> None:
+    path = root / "run/workspace-process.json"
+    try:
+        details = path.stat(follow_symlinks=False)
+        if path.is_symlink() or not stat.S_ISREG(details.st_mode):
+            return
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, OSError, json.JSONDecodeError):
+        return
+    if (
+        payload.get("schema") == PROCESS_SCHEMA
+        and payload.get("managed_by") == "p9_11_workspace_process"
+        and payload.get("pid") == pid
+        and payload.get("release_sha") == release
+        and payload.get("observed_process_start_identity") == start_identity
+    ):
+        path.unlink()
+
+
+def _cleanup_own_spawn(process: subprocess.Popen[Any], start_identity: str | None, root: Path, release: str) -> None:
+    if process.poll() is not None:
+        return
+    if start_identity is None:
+        process.terminate()
+    elif _process_start_identity(process.pid) == start_identity:
+        os.kill(process.pid, signal.SIGTERM)
+    else:
+        return
+    try:
+        process.wait(timeout=5)
+    except subprocess.TimeoutExpired as exc:
+        raise WorkspaceProcessError("new Workspace process did not stop gracefully") from exc
+    if start_identity is not None:
+        _invalidate_matching_metadata(root, process.pid, release, start_identity)
 
 
 def _fetch(path: str) -> bytes:
@@ -240,7 +281,7 @@ def status(root: Path) -> dict[str, Any]:
     if proof_mode == "NONE":
         return {"state": UNKNOWN, "current_release": current, "pid": pid, "release_sha": release, "proof_mode": proof_mode, "reason": "exact invocation provenance is unavailable"}
     state = CURRENT_EXACT if release == current else STALE_KNOWN_EXACT
-    return {"state": state, "current_release": current, "release_sha": release, "pid": pid, "listener_command": listener_command, "proof_mode": proof_mode}
+    return {"state": state, "current_release": current, "release_sha": release, "pid": pid, "listener_command": listener_command, "proof_mode": proof_mode, "process_start_identity": _process_start_identity(pid)}
 
 
 def _require_p702_health(root: Path, release: str) -> None:
@@ -304,12 +345,12 @@ def start(root: Path) -> dict[str, Any]:
     stderr.close()
     start_identity = _process_start_identity(process.pid)
     if start_identity is None:
+        _cleanup_own_spawn(process, None, root, release)
         raise WorkspaceProcessError("new Workspace process has no observable start identity")
     try:
         _write_process_metadata(root, release, process.pid, start_identity)
     except Exception:
-        if _process_start_identity(process.pid) == start_identity:
-            os.kill(process.pid, signal.SIGTERM)
+        _cleanup_own_spawn(process, start_identity, root, release)
         raise
     deadline = time.monotonic() + MAX_WAIT_SECONDS
     while time.monotonic() < deadline:
@@ -319,12 +360,7 @@ def start(root: Path) -> dict[str, Any]:
         if process.poll() is not None:
             break
         time.sleep(POLL_SECONDS)
-    if process.poll() is None and _process_start_identity(process.pid) == start_identity:
-        os.kill(process.pid, signal.SIGTERM)
-        try:
-            process.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            pass
+    _cleanup_own_spawn(process, start_identity, root, release)
     raise WorkspaceProcessError("exact Workspace process did not become ready")
 
 
@@ -333,7 +369,7 @@ def stop_for_update(root: Path) -> dict[str, Any]:
     before = status(root)
     if before["state"] == NOT_RUNNING:
         return before
-    if before["state"] not in {CURRENT_EXACT, STALE_KNOWN_EXACT}:
+    if before["state"] not in {CURRENT_EXACT, STALE_KNOWN_EXACT} or before.get("proof_mode") not in {"DIRECT_OS_PROOF", "MANAGED_SPAWN_PROOF"}:
         raise WorkspaceProcessError("Workspace stop refused: listener is UNKNOWN")
     pid = int(before["pid"])
     revalidated = status(root)
@@ -343,9 +379,7 @@ def stop_for_update(root: Path) -> dict[str, Any]:
     deadline = time.monotonic() + MAX_WAIT_SECONDS
     while time.monotonic() < deadline:
         if status(root)["state"] == NOT_RUNNING:
-            metadata = root / "run/workspace-process.json"
-            if metadata.is_file() and not metadata.is_symlink():
-                metadata.unlink()
+            _invalidate_matching_metadata(root, pid, before["release_sha"], str(before.get("process_start_identity", "")))
             _atomic_json(root / "run/workspace-last-stop.json", {
                 "schema": STOP_SCHEMA,
                 "classification": "non-canonical operational telemetry",
