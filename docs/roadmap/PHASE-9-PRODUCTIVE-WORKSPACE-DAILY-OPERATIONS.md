@@ -96,7 +96,7 @@ Focused F04 validation: `44 passed`; shell syntax and Python compilation PASS.
 
 ### F05 — exact-release live Workspace listener continuity
 
-Canonical evidence: [`P9.11-F05 — Workspace listener live-state observation`](../reviews/P9.11-F05-workspace-listener-live-state.md).
+Canonical evidence: [`P9.11-F05 — Workspace listener live-state observation`](../reviews/P9-11-F05-workspace-listener-live-state.md).
 
 The first governed p9.11.2 deployment successfully installed runtime `fdde2cde9b06722cff9716b9f580bb46692c7dcd`, but historical PID `30686` continued to serve `7dc7ceff986df41c1cd8be8668d51280c871e677` / Workspace `p9.11.1`. PR `#3` merged strict exact-process proof, managed spawn provenance, PID-reuse protection, P7.06 Workspace lifecycle reconciliation and launcher `CURRENT_EXACT` readiness.
 
