@@ -1,9 +1,9 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.4`
+Version: `2.95.5`
 Created: `2026-08-07`
-Updated: `2026-08-24`
+Updated: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `governance`
 
@@ -15,15 +15,15 @@ Roadmap status does not itself change Platform Capability lifecycle, Product Con
 
 ## 2. Version note
 
-Version `2.95.4` preserves the `2.95.3` real operating-state record and adds the F05 Case-C disposition: PID `30686` remains `UNKNOWN` because original venv invocation provenance cannot be reconstructed. No retrospective provenance or automatic signal is permitted; future helper-created Workspace processes carry managed spawn provenance bound to OS process-start identity. PR #3, selected-Mac reconciliation and owner recheck remain pending.
+Version `2.95.5` records PR `#3` as merged canonical implementation through merge commit `0958b97661d51281b069820fd2d1f5ce338a11ec`. The F05 listener-lifecycle repair is now part of canonical code; the last selected-Mac observation still has PID `30686` as `UNKNOWN` / proof `NONE` serving historical `p9.11.1`, and no retrospective provenance or automatic signal is permitted. Governed selected-Mac reconciliation and the real owner recheck remain pending.
 
 The canonical repository for current checkouts and new deployments is `arvectum1/arvectum-os`. Historical `arvectum/arvectum-os` identity is retained only where immutable provenance of already-installed historical releases requires it.
 
-The governed P7.06 transaction `2195aa1b9cecb3fd201798f4a9b59d011e145612c577049dfe85a5f69f48ae69` successfully installed exact runtime `fdde2cde9b06722cff9716b9f580bb46692c7dcd`, containing Productive Workspace `p9.11.2`, internal application contract `11`. The remaining real blocker is `P9.11-F05`: live loopback PID `30686` still serves historical exact release `7dc7ceff986df41c1cd8be8668d51280c871e677` / Workspace `p9.11.1`.
+The governed P7.06 transaction `2195aa1b9cecb3fd201798f4a9b59d011e145612c577049dfe85a5f69f48ae69` successfully installed exact runtime `fdde2cde9b06722cff9716b9f580bb46692c7dcd`, containing Productive Workspace `p9.11.2`, internal application contract `11`. The remaining real P9.11 blocker is operational reconciliation of the selected Mac: the last live observation still has loopback PID `30686` serving historical exact release `7dc7ceff986df41c1cd8be8668d51280c871e677` / Workspace `p9.11.1`.
 
-Canonical observation: [`P9.11-F05 — Workspace listener live-state observation`](../reviews/P9-11-F05-workspace-listener-live-state.md) — `Observed / Repair in review`.
+Canonical observation: [`P9.11-F05 — Workspace listener live-state observation`](../reviews/P9-11-F05-workspace-listener-live-state.md) — `Observed / implementation merged; operational reconciliation pending`.
 
-PR `#3` proposes listener-lifecycle reconciliation but is not canonical implementation state yet. Repository-level review requires stronger exact process identity before any signal, corrected deployment wording/evidence and additional fail-closed lifecycle tests before merge. Therefore `P9.11` remains Current, `R32` remains locked and owner recheck has not occurred.
+PR `#3` passed repository review and Reference Python CI and is merged. The merge itself performed no selected-Mac runtime mutation and therefore does not prove live `CURRENT_EXACT`; `P9.11` remains Current, `R32` remains locked and owner recheck has not occurred.
 
 Lane B is internally complete through prepared `INT-B7`; no additional internal integration-planning task is admitted until an exact real 1С/CRM/СЭД/ЭДО endpoint/deployment/account is available.
 
@@ -58,7 +58,7 @@ This update creates no public/stable API/connector/browser contract, no customer
 
 ## 5. Active Phase 9
 
-Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.4`.
+Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.5`.
 
 | ID | Work item | Status |
 |---|---|---:|
@@ -77,33 +77,28 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — live listener repair + owner recheck pending** |
+| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — selected-Mac reconciliation + owner recheck pending** |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked |
 | P9.12 | Phase 9 / M9 closure review | ⬜ |
 
 ### P9.11 live state
 
-- `p9.11.1`: deployed historical live listener; RU-first/brand repair;
-- `p9.11.2` / app contract `11`: installed in exact current runtime `fdde2cde...`;
+- `p9.11.1`: historical selected-Mac live listener observed before F05 repair;
+- `p9.11.2` / app contract `11`: installed in exact runtime `fdde2cde...` before F05 repair merge;
 - F03 owner-first IA repair: implemented in p9.11.2;
 - F04 canonical repository identity migration: merged; new targets require `arvectum1/arvectum-os`;
-- **F05 live listener continuity:** open; PID `30686` remains on historical p9.11.1;
-- PR #3 repair: open / changes required before merge;
+- **F05 listener-lifecycle implementation:** merged in `0958b97661d51281b069820fd2d1f5ce338a11ec`; strict exact-process proof, managed spawn provenance, PID-reuse protection, P7.06 lifecycle reconciliation and launcher `CURRENT_EXACT` readiness are canonical;
+- **last selected-Mac observation:** PID `30686` remains historical `p9.11.1`, classified `UNKNOWN` / proof `NONE`; it has not been signalled by the repair/review work;
+- governed selected-Mac reconciliation: pending;
 - owner recheck: pending;
 - synthetic owner-session evidence: prohibited.
 
 Current critical sequence:
 
 ```text
-PR #3 material findings
-        ↓
-repair revision + regression evidence
-        ↓
-merge accepted listener-lifecycle repair
-        ↓
 governed selected-Mac reconciliation/update
         ↓
-live Workspace CURRENT_EXACT on p9.11.2
+verify live Workspace CURRENT_EXACT on p9.11.2 / contract 11
         ↓
 real owner recheck / continued daily dogfooding
         ↓
@@ -141,8 +136,8 @@ Preferred first prepared candidate remains a bounded read-only `1С:ERP 2.5` pro
 ## 7. Quality / test state
 
 - merged F04 repository-identity repair: focused P7.06 Python/shell validation `44 passed`; shell syntax and Python compilation PASS;
-- the broad local reference suite on that repair remains blocked by existing macOS `/var` symlink/topology fixture issues (`2 failures`, `62 errors`); no guard was weakened;
-- PR #3 initial repair evidence reports scoped tests/Ruff/shell/compile PASS, but repository-level review identified material issues; those results do not authorize merge until the requested revision is complete;
+- merged F05 PR `#3`: final focused lifecycle/P7.06/P7.02 evidence `72 passed`; historical roadmap guards `4 passed`; GitHub `Reference Python CI` / `Full reference test suite` PASS on exact reviewed head `9474b846d316ed4fb038ce90a11999401b83fcc9`;
+- F05 selected-Mac operational reconciliation has not yet been executed after merge, so no live `CURRENT_EXACT` or owner-recheck PASS is claimed;
 - R32 remains locked and therefore no M9 code-health PASS is claimed.
 
 ## 8. M9 definition
@@ -155,7 +150,7 @@ Parallel integration progress cannot substitute for P9.11 operational evidence.
 
 **Critical path:**
 
-> **P9.11-F05 — revise the open Workspace listener-lifecycle repair to close PR #3 review findings; then merge, reconcile the selected Mac to CURRENT_EXACT p9.11.2 and perform real owner recheck.**
+> **P9.11-F05 — execute the governed selected-Mac reconciliation/update from current canonical `main`, verify the live Workspace as `CURRENT_EXACT` on `p9.11.2` / app contract `11`, then perform the real owner recheck.**
 
 **Lane B:**
 
