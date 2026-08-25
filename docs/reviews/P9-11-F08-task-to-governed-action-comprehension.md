@@ -1,6 +1,6 @@
 # P9.11-F08 — Task-to-Governed Action Comprehension and Actionability
 
-Status: `Owner-task eligibility repair merged / deployment + owner recheck pending`
+Status: `p9.11.5 deployed / real owner recheck pending`
 Date: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform`
@@ -16,7 +16,8 @@ Parent: `P9.11 — Real daily-use dogfooding + friction/backlog closure`
 - PR `#7` merged as `2f1bf8f341c1a779805586e9f239c4442a65d96b` after exact-head Productive Workspace CI and Reference Python CI PASS;
 - p9.11.4 governed deployment, exact assets, `CURRENT_EXACT`, and `MANAGED_SPAWN_PROOF` passed; the real owner recheck failed;
 - PR `#8` merged as `037cd59d7917d52b3ff6aa2dea20dcad22ed484d`; exact reviewed head `dde1102d0892a6c71e7a47de9c3a93fba98c84de` passed Productive Workspace CI and Reference Python CI;
-- canonical Workspace source/release is now `p9.11.5` / app contract `11`;
+- canonical Workspace source/release is `p9.11.5` / app contract `11`;
+- p9.11.5 is now deployed on selected-Mac canonical runtime `03ba2c72fb9460e97b628c4b3dac36ac496cb942`, with exact managed Workspace readiness verified;
 - P9.11 remains `Current`; R32 remains locked.
 
 ## Real owner recheck
@@ -126,7 +127,33 @@ Exact reviewed head `dde1102d0892a6c71e7a47de9c3a93fba98c84de` passed:
 - Reference Python CI full reference test suite;
 - frontend `34 passed`, typecheck, Web Storage guard, production build and `git diff --check` as reported by the implementation task.
 
-This merge creates no product business action, Authorization, Organizational Authority, Data Governance permission, consequential approval, canonical mutation or external effect. It is not owner usability acceptance. F08 remains open until `p9.11.5` is governed-deployed to the selected Mac, exact runtime/readiness/assets/launcher are verified, and the owner rechecks the ordinary Home/Tasks empty state plus the Settings diagnostic boundary.
+This merge creates no product business action, Authorization, Organizational Authority, Data Governance permission, consequential approval, canonical mutation or external effect. It is not owner usability acceptance.
+
+## p9.11.5 selected-Mac deployment readiness
+
+After the F09 lifecycle repair was merged and canonically synchronized, the selected Mac successfully governed-deployed canonical target `03ba2c72fb9460e97b628c4b3dac36ac496cb942` from runtime `dc0e0cff83a9031a3686191b5cf304ee03c2d1eb` with Workspace pre-state `NOT_RUNNING`.
+
+- P7.06 preflight: `PASS`;
+- P7.06 update: `PASS`;
+- transaction: `8d8893f5207cbd52eb67e99abad593f6ce069add3314c95373f081abdcd74ae0`;
+- backup SHA-256: `ee93ae8fd9d4d4f5b8729e8309e3459ef3fbbfbf7995516d15c9ce5f836ce836`;
+- Workspace stop invoked / SIGTERM during deployment: `NO / NO`;
+- runtime after equals canonical target: `YES`;
+- P7.02/P7.05: `HEALTHY`;
+- Workspace before explicit target start: `NOT_RUNNING`;
+- exact managed target start attempts: `1`;
+- Workspace `p9.11.5` / app contract `11`: `CURRENT_EXACT` with `MANAGED_SPAWN_PROOF`;
+- loopback only: `YES`;
+- exact index/assets: `PASS`;
+- UI4 ordinary Home attention: `ABSENT`;
+- UI4 ordinary Tasks attention: `ABSENT`;
+- false HIGH urgency: `ABSENT`;
+- Activity false alert: `ABSENT`;
+- technical diagnostics: `AVAILABLE`;
+- concrete-action diagnostic copy: `PASS`;
+- Desktop launcher: `PASS`.
+
+These are structural/runtime readiness checks, not real owner usability acceptance. F08 is now ready for the required real owner recheck on the deployed p9.11.5 Workspace.
 
 ## Adjacent-route audit
 
@@ -137,4 +164,4 @@ The read-only F08 audit found no additional task-journey change required outside
 3. `/copilot` keeps source roles, freshness, model details, and authority boundaries visible to preserve the existing grounded-answer/evidence boundary. No F08 change is admitted there.
 4. `/system` remains an explicitly diagnostic and technical surface. UI4 is explicitly available there as `Технические проверки`, not as a Task.
 
-F07 is successful only in its bounded Home/navigation/branding scope. F08 remains open pending p9.11.5 selected-Mac deployment and real owner recheck. P9.11 remains `Current`; R32 remains locked; P9.12 has not started; M9 remains open.
+F07 is successful only in its bounded Home/navigation/branding scope. F08 remains open pending the real p9.11.5 owner recheck. P9.11 remains `Current`; R32 remains locked; P9.12 has not started; M9 remains open.
