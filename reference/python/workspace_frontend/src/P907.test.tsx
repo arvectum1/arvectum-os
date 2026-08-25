@@ -77,7 +77,7 @@ describe("P9.07 J5 product composition", () => {
     render(<App />);
     expect(await screen.findByText("ООО «Арвектум»")).toBeTruthy();
 
-    fireEvent.click(screen.getByRole("link", { name: "Work" }));
+    fireEvent.click(screen.getByRole("link", { name: "Tasks" }));
     await waitFor(() => expect(document.activeElement?.id).toBe("workspace-main"));
     window.history.replaceState({}, "", "/products");
     window.dispatchEvent(new PopStateEvent("popstate"));

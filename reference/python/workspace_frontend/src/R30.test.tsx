@@ -248,11 +248,14 @@ describe("R30 M9-alpha integrated J1-J4 ordinary path", () => {
     window.history.replaceState({}, "", "/");
     render(<App />);
 
-    // J1: useful Home + My Work, human reason/source/next step and a real context continuation.
+    // J1: Home is action-first; raw evidence is available only after the owner opens the task.
     expect(await screen.findByRole("heading", { name: "Needs attention" })).toBeTruthy();
-    expect(screen.getByText("Governed preflight is waiting for decision evidence")).toBeTruthy();
-    expect(screen.getByText("ЕИС / zakupki.gov.ru")).toBeTruthy();
-    const executionContext = screen.getByRole("link", { name: "Open execution context" });
+    expect(screen.getByText("Decision needed")).toBeTruthy();
+    expect(screen.queryByText("ЕИС / zakupki.gov.ru")).toBeNull();
+    fireEvent.click(screen.getByRole("link", { name: "Open" }));
+    expect(await screen.findAllByText("Governed preflight is waiting for decision evidence")).not.toHaveLength(0);
+    expect(screen.getAllByText("ЕИС / zakupki.gov.ru")).not.toHaveLength(0);
+    const executionContext = screen.getAllByRole("link", { name: "Open execution context" })[0];
     fireEvent.click(executionContext);
     expect(await screen.findByRole("heading", { name: "EIS document governed execution" })).toBeTruthy();
     await waitFor(() => expect(document.activeElement?.id).toBe("workspace-main"));

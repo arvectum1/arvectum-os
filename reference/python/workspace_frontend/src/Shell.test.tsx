@@ -73,9 +73,9 @@ describe("P9.04 shell", () => {
     expect(screen.getByLabelText("Organization: ООО «Арвектум»")).toBeTruthy();
     expect(screen.getByLabelText("User: Owner operator")).toBeTruthy();
     expect(screen.getByRole("navigation", { name: "Workspace navigation" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Work" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Tasks" })).toBeTruthy();
     expect(await screen.findByRole("heading", { name: "Needs attention" })).toBeTruthy();
-    expect(screen.getByText("Governed preflight is waiting")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "View all" })).toBeTruthy();
+    expect(screen.getByText("Decision needed")).toBeTruthy();
+    expect(screen.getAllByRole("link", { name: "Open tasks" })).not.toHaveLength(0);
   });
 });

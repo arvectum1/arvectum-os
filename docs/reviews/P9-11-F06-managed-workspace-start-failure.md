@@ -1,6 +1,6 @@
 # P9.11-F06 — Managed Workspace Start Failure After Selected-Mac Reconciliation
 
-Status: `Repair merged / operational verification pending`
+Status: `Operationally verified`
 Date: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `governance`
@@ -122,24 +122,22 @@ Two local Python `3.14.7` baseline failures were reproduced unchanged on canonic
 - historical PID `30686`: terminated by the consumed one-time owner decision;
 - no repeated signal is authorized by that decision;
 - F06 repair: merged canonical;
-- selected-Mac runtime: still `6ed9dade96417251d3dd5fc8cb175c7136682b63` until the next governed update;
-- last verified P7.02/P7.05 state on that runtime: healthy;
-- installed Workspace payload: `p9.11.2` / contract `11`;
-- live Workspace: `NOT_RUNNING` in the last selected-Mac observation;
-- no post-merge managed Workspace retry has occurred;
-- Desktop launcher has not yet been refreshed/opened after the repair;
-- owner recheck remains **blocked / not yet executable**;
+- selected-Mac runtime equals canonical `470d4e310973ed873eb71d1bec3cf0985288be6b`;
+- P7.02/P7.05: healthy;
+- Workspace: `CURRENT_EXACT` with `MANAGED_SPAWN_PROOF`;
+- exact live assets: PASS;
+- Desktop launcher: refreshed and opened;
+- the subsequent real owner recheck executed and created F07.
 - P9.11 remains `Current`;
 - R32 remains locked;
 - no synthetic owner-session evidence is permitted.
 
-F06 therefore remains **OPEN operationally**. Repository merge proves the repair is canonical; it does not prove selected-Mac `CURRENT_EXACT` readiness.
+F06 is therefore **operationally verified** in its bounded process-identity scope. It does not make the subsequent F07 owner recheck pass or deploy the unmerged remediation PR.
 
 ## 7. Required next steps
 
-1. governed-update the selected Mac from installed runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63` to the exact current canonical `main`, while the Workspace remains `NOT_RUNNING`;
-2. verify P7.02/P7.05 and exact Workspace payload `p9.11.2` / contract `11` on the new runtime;
-3. start Workspace once through the canonical managed helper;
-4. require `CURRENT_EXACT` with admissible `MANAGED_SPAWN_PROOF` (or genuine `DIRECT_OS_PROOF`) and exact loopback assets;
-5. refresh and open the exact-release Desktop launcher;
-6. stop automation at the real owner recheck and collect actual owner feedback.
+1. complete final review of F07 remediation PR `#6`;
+2. merge and govern-deploy the revised Workspace release;
+3. verify the exact post-deployment runtime, `CURRENT_EXACT` proof, and live assets;
+4. refresh/open the exact-release Desktop launcher;
+5. stop automation at the next real owner recheck and collect actual feedback.

@@ -31,7 +31,7 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
             (source / "workspace_frontend/dist").mkdir(parents=True)
             (source / "workspace_frontend/dist/index.html").touch()
             (source / "workspace_app").mkdir()
-            (source / "workspace_app/release.json").write_text(json.dumps({"release_id": "p9.11.2", "app_api_contract": 11}))
+            (source / "workspace_app/release.json").write_text(json.dumps({"release_id": "p9.11.3", "app_api_contract": 11}))
         return root.resolve()
 
     def _status(self, root: pathlib.Path, listener_release: str):
@@ -202,10 +202,10 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
     def test_process_metadata_uses_release_payload_beside_workspace_source(self):
         root = self._root("current", "current")
         release = root / "releases/current/source/reference/python"
-        (release / "workspace_app/release.json").write_text(json.dumps({"release_id": "p9.11.2", "app_api_contract": 11}))
+        (release / "workspace_app/release.json").write_text(json.dumps({"release_id": "p9.11.3", "app_api_contract": 11}))
         process._write_process_metadata(root, "current", 123, "start")
         payload = json.loads((root / "run/workspace-process.json").read_text())
-        self.assertEqual(payload["workspace_release"], "p9.11.2")
+        self.assertEqual(payload["workspace_release"], "p9.11.3")
         self.assertEqual(payload["requested_python"], str(root / "venvs/current/bin/python"))
         self.assertEqual(payload["observed_process_start_identity"], "start")
 
@@ -290,7 +290,7 @@ class F06SpaceSafeProcessIdentityTests(unittest.TestCase):
         (source / "workspace_frontend/dist/index.html").touch()
         (source / "workspace_app").mkdir()
         (source / "workspace_app/release.json").write_text(
-            json.dumps({"release_id": "p9.11.2", "app_api_contract": 11})
+            json.dumps({"release_id": "p9.11.3", "app_api_contract": 11})
         )
         return root.resolve()
 
@@ -516,7 +516,7 @@ class StartToStatusRegressionTests(unittest.TestCase):
         (source / "workspace_frontend/dist/index.html").touch()
         (source / "workspace_app").mkdir()
         (source / "workspace_app/release.json").write_text(
-            json.dumps({"release_id": "p9.11.2", "app_api_contract": 11})
+            json.dumps({"release_id": "p9.11.3", "app_api_contract": 11})
         )
         root = root.resolve()
         source = root / "releases" / release / "source/reference/python"

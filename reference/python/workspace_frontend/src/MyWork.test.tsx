@@ -131,11 +131,11 @@ describe("P9.04 My Work with R30 integration", () => {
 
     expect(await screen.findByRole("heading", { name: "Needs attention" })).toBeTruthy();
     expect(screen.getByText(/This queue is non-authoritative/)).toBeTruthy();
-    expect(screen.getByText("External outcome is uncertain")).toBeTruthy();
-    expect(screen.getByText("Reconciliation is required before any retry.")).toBeTruthy();
-    expect(screen.getAllByText("Scenario evidence").length).toBeGreaterThan(0);
+    expect(screen.queryByText("External outcome is uncertain")).toBeNull();
+    expect(screen.getByText("High urgency")).toBeTruthy();
+    expect(screen.queryByText("high urgency")).toBeNull();
     expect(screen.queryByRole("button", { name: /approve|retry/i })).toBeNull();
-    expect(screen.getAllByRole("link", { name: "Inspect reason" })[0].getAttribute("href")).toMatch(/^\/my-work\?focus=/);
+    expect(screen.getAllByRole("link", { name: "Open" })[0].getAttribute("href")).toMatch(/^\/my-work\?focus=/);
     const contextLinks = screen.getAllByRole("link", { name: "Open execution context" });
     expect(contextLinks).toHaveLength(1);
     expect(contextLinks[0].getAttribute("href")).toBe("/governed");
@@ -147,11 +147,16 @@ describe("P9.04 My Work with R30 integration", () => {
     render(<MyWork />);
 
     await screen.findByRole("heading", { name: "Needs attention" });
-    fireEvent.change(screen.getByLabelText("Work state"), { target: { value: "reconciliation-required" } });
+    fireEvent.change(screen.getByLabelText("Work state"), { target: { value: "decision-required" } });
     expect(screen.getByText("1 visible item")).toBeTruthy();
+    expect(screen.getByText("Governed preflight is waiting")).toBeTruthy();
+    expect(screen.queryByText("External outcome is uncertain")).toBeNull();
+
+    window.history.replaceState({}, "", "/my-work?mode=scenario");
+    render(<MyWork />);
+    expect(await screen.findByRole("heading", { name: "Test scenarios" })).toBeTruthy();
     expect(screen.getByText("External outcome is uncertain")).toBeTruthy();
-    expect(screen.queryByText("Informational note")).toBeNull();
-    expect(screen.queryByRole("link", { name: "Open execution context" })).toBeNull();
+    expect(screen.getAllByText("Test scenario").length).toBeGreaterThan(0);
   });
 
   it("shows stale projection health without presenting stale queue items as current", async () => {

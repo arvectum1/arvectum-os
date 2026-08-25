@@ -31,7 +31,7 @@ export function Activity() {
 
   const entries = useMemo(() => {
     if (state.kind !== "ready") return [];
-    const attention = state.work.items.map((item: AttentionItem) => ({
+    const attention = state.work.items.filter((item) => item.evidence_mode === "live").map((item: AttentionItem) => ({
       id: `attention-${item.id}`,
       observedAt: item.observed_at ?? state.work.generated_at,
       label: item.group === "recent-outcome" ? text("Зафиксированный результат", "Observed outcome") : item.group === "informational" ? text("Информация", "Observed information") : text("Сигнал внимания", "Attention signal"),

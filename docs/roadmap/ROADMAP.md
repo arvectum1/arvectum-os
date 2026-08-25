@@ -15,11 +15,11 @@ Roadmap status does not itself change Platform Capability lifecycle, Product Con
 
 ## 2. Version note
 
-Version `2.95.9` records P9.11-F07, a bounded owner-first Workspace usability repair. The default screen now gives Russian-first product identity, current priorities, and clear next actions; primary navigation uses owner-facing plain-language labels; the canonical Arvectum SVG replaces the placeholder letter mark. This repository change is not selected-Mac runtime, launcher, or owner-recheck evidence.
+Version `2.95.9` records the real F07 owner recheck as `FAIL` and the bounded remediation under PR `#6`. The screenshot reviewed a deployed Workspace from canonical runtime `470d4e310973ed873eb71d1bec3cf0985288be6b`, not PR `#6`; it found that Home still obscured the owner’s next action and mixed scenario evidence with ordinary work. PR `#6` is not deployed and requires final review before a later real owner recheck.
 
-F06 remains **OPEN operationally**. The selected Mac still runs exact runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63`, Workspace `p9.11.2` / app contract `11` was last observed `NOT_RUNNING`, no post-merge managed Workspace retry has occurred, and the Desktop launcher has not yet been refreshed/opened after the repair. Repository merge is not selected-Mac readiness evidence.
+F06 is **operationally verified** in its bounded scope: selected-Mac runtime equals canonical `470d4e310973ed873eb71d1bec3cf0985288be6b`; P7.02/P7.05 are healthy; Workspace reached `CURRENT_EXACT` with `MANAGED_SPAWN_PROOF`; exact live assets passed; and the Desktop launcher was refreshed/opened. This does not make the unmerged PR `#6` deployed or make F07 pass.
 
-Canonical evidence: [`P9.11-F06 — Managed Workspace Start Failure After Selected-Mac Reconciliation`](../reviews/P9-11-F06-managed-workspace-start-failure.md) — `Repair merged / operational verification pending`.
+Canonical evidence: [`P9.11-F06 — Managed Workspace Start Failure After Selected-Mac Reconciliation`](../reviews/P9-11-F06-managed-workspace-start-failure.md) — `Operationally verified`.
 
 The earlier F05 operational reconciliation succeeded: the exact one-time owner decision for historical PID `30686` was consumed with one graceful `SIGTERM`; PID `30686` exited and port `8769` became free; P7.06 transaction `215cb1390708bd4a0e72b567cf9060e4a84173147af618a064c464ca31640ff0` then updated the selected Mac to runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63`; P7.02/P7.05 were healthy; no product/external effect replay occurred.
 
@@ -27,7 +27,7 @@ The canonical repository for current checkouts and new deployments is `arvectum1
 
 The one-time owner decision `DECISION-2026-08-25-P9-11-F05-ONE-TIME-LEGACY-WORKSPACE-TERMINATION` is consumed. It is not reusable for another PID or another signal attempt. Normal `UNKNOWN` Workspace listeners remain fail-closed and unsignallable without a separate exact owner decision.
 
-`P9.11` remains Current, `R32` remains locked, and owner recheck remains blocked until the exact post-merge selected-Mac runtime reaches live `CURRENT_EXACT` and the Desktop launcher flow opens.
+`P9.11` remains Current and `R32` remains locked. The next owner recheck is pending final review, merge, governed deployment, and launch of the revised `p9.11.3` Workspace.
 
 Lane B is internally complete through prepared `INT-B7`; no additional internal integration-planning task is admitted until an exact real 1С/CRM/СЭД/ЭДО endpoint/deployment/account is available.
 
@@ -62,7 +62,7 @@ This update creates no public/stable API/connector/browser contract, no customer
 
 ## 5. Active Phase 9
 
-Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.7`.
+Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.8`.
 
 | ID | Work item | Status |
 |---|---|---:|
@@ -81,40 +81,37 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F06 operational prerequisite and F07 owner recheck pending** |
+| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F06 verified; F07 owner recheck failed, remediation under review** |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked |
 | P9.12 | Phase 9 / M9 closure review | ⬜ |
 
 ### P9.11 live state
 
-- F03 owner-first IA repair remains implemented in Workspace `p9.11.2`;
+- F03 owner-first IA repair remains implemented in deployed Workspace `p9.11.2`;
 - F04 canonical repository identity migration is merged;
 - F05 listener-lifecycle implementation is merged in `0958b97661d51281b069820fd2d1f5ce338a11ec`;
 - F05 selected-Mac operational reconciliation succeeded: historical PID `30686` exited after the single approved `SIGTERM`, port `8769` was freed, and the authorization is consumed;
 - P7.06 transaction `215cb1390708bd4a0e72b567cf9060e4a84173147af618a064c464ca31640ff0` updated the selected Mac successfully to runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63`; last verified P7.02/P7.05 state there was healthy;
-- installed Workspace payload remains `p9.11.2` / app contract `11`;
+- F06 operational verification reached runtime `470d4e310973ed873eb71d1bec3cf0985288be6b`, `CURRENT_EXACT`, `MANAGED_SPAWN_PROOF`, exact live assets PASS, and refreshed/opened launcher;
 - F06 real failed start: PID `52092` reached Uvicorn startup but helper identity recognition rejected the healthy path-with-spaces command before managed proof, then gracefully cleaned up its own child;
 - **F06 implementation repair:** PR `#4` merged at `3b4d2b2be4a095ff04e5703b36b3ef189c3d4057`; exact executable paths containing whitespace are space-safe, managed provenance remains strict, failed-child cleanup/readiness diagnostics are hardened;
-- **F07 owner-first UX repair:** Russian-first landing orientation, plain-language navigation/helper copy, clear work/search/Arvectum AI next actions, and canonical SVG branding are implemented; real owner recheck remains pending;
-- selected Mac has not yet been updated to the post-merge canonical runtime and no post-merge Workspace start has occurred;
-- last live Workspace state: `NOT_RUNNING`;
-- owner recheck: blocked / pending until Workspace reaches `CURRENT_EXACT` and the exact-release launcher flow opens;
+- **F07 real owner recheck:** FAIL on a screenshot of deployed canonical `470d…`, not PR `#6`; owner could not identify what to do, scenario fixtures looked live, raw technical evidence leaked on Home, actions were secondary, and branding was unacceptable;
+- **F07 remediation:** PR `#6` revises Home to live-only action-first presentation and advances the unmerged Workspace release to `p9.11.3` / contract `11`;
+- owner recheck: pending after final PR review, merge, governed deployment, and launcher refresh/open;
 - synthetic owner-session evidence: prohibited.
 
 Current critical sequence:
 
 ```text
-governed P7.06 update selected Mac from 6ed9dade... to current canonical main
+complete final review of F07 remediation PR #6
         ↓
-verify P7.02/P7.05 + Workspace p9.11.2 / contract 11
+merge and govern-deploy exact Workspace p9.11.3 / contract 11
         ↓
-one managed Workspace start through canonical helper
-        ↓
-verify CURRENT_EXACT + admissible proof + exact loopback assets
+verify P7.02/P7.05, CURRENT_EXACT, admissible proof, and exact live assets
         ↓
 refresh/open exact-release Desktop launcher
         ↓
-real owner recheck / continued daily dogfooding
+real owner recheck
         ↓
 friction backlog closure
         ↓
@@ -166,7 +163,7 @@ Parallel integration progress cannot substitute for P9.11 operational evidence.
 
 **Critical path:**
 
-> **P9.11-F06 — governed-update the selected Mac from installed runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63` to the exact current canonical `main` while Workspace remains `NOT_RUNNING`; verify P7.02/P7.05 and Workspace `p9.11.2` / contract `11`; perform one managed Workspace start and require `CURRENT_EXACT` with admissible proof and exact loopback assets; then refresh/open the exact-release Desktop launcher and stop at the real owner recheck.**
+> **P9.11-F07 — complete final review of the owner-first UX remediation in PR `#6`; after merge, govern-deploy the exact release, verify exact runtime/readiness/launcher evidence, then stop at the next real owner recheck. F06 is operationally verified; F07 owner recheck failed; P9.11 remains Current and R32 remains locked.**
 
 **Lane B:**
 

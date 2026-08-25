@@ -1,14 +1,14 @@
 # Arvectum OS Phase 9 — Productive Workspace & Daily Operations
 
 Status: `Active`
-Version: `1.13.7`
+Version: `1.13.8`
 Created: `2026-08-21`
 Updated: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `product_contract` and `governance`
 Parent roadmap: [`ROADMAP.md`](ROADMAP.md)
 
-Current disposition: F05 implementation and selected-Mac runtime reconciliation are complete within their exact scope. PR `#4` merged the F06 space-safe Workspace process-identity repair through `3b4d2b2be4a095ff04e5703b36b3ef189c3d4057`. The selected Mac has not yet been governed-updated from runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63` to the post-merge canonical target, and no post-merge managed Workspace retry has occurred. P9.11 remains Current, R32 locked, P9.12 not started and M9 open.
+Current disposition: F06 is operationally verified on canonical runtime `470d4e310973ed873eb71d1bec3cf0985288be6b`. The subsequent real F07 owner recheck failed on the deployed UI; PR `#6` contains a bounded remediation and is not deployed. P9.11 remains Current, R32 locked, P9.12 not started and M9 open.
 Milestone: `M9 — Daily-use organizational workbench`
 Intermediate milestone: `M9-alpha — Usable Internal Workspace — Achieved / PASS`
 Architecture baseline: Constitution `1.2.0`; RFC-0001 through RFC-0008 `Accepted 1.0.0`; ADR-0001 `Accepted`
@@ -54,7 +54,7 @@ The legacy P4/P7 browser surfaces remain diagnostic/reference/recovery evidence.
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS | non-authoritative activity UX |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS | company-level composition |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS | product/AI boundaries PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F06 repair merged; selected-Mac verification pending** | real owner sessions + material friction closure |
+| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F06 verified; F07 remediation under review** | real owner sessions + material friction closure |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked | pre-closure hardening PASS |
 | P9.12 | Phase 9 / M9 closure review | ⬜ | exact-scope M9 closure |
 
@@ -132,26 +132,24 @@ PR `#4` merged the bounded repair through `3b4d2b2be4a095ff04e5703b36b3ef189c3d4
 
 Pre-merge validation included exact `Application Support` paths, real start-to-real-status managed provenance, PID reuse, historical unproven-process fail-closed behavior and GitHub full Reference Python CI PASS on reviewed head `99d4d1a130885c6a399e3077f4ac15a113d67a98`.
 
-F06 remains **OPEN operationally**. The selected Mac still runs runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63`, Workspace was last observed `NOT_RUNNING`, no post-merge managed retry has occurred, and the Desktop launcher has not yet been refreshed/opened after the repair.
+F06 is **operationally verified**: runtime equals canonical `470d4e310973ed873eb71d1bec3cf0985288be6b`; P7.02/P7.05 are healthy; Workspace reached `CURRENT_EXACT` with `MANAGED_SPAWN_PROOF`; exact live assets passed; and the Desktop launcher was refreshed/opened.
 
 ### F07 — first-glance orientation and Russian-first UX repair
 
 Canonical evidence: [`P9.11-F07 — Owner-first Workspace UX repair`](../reviews/P9-11-F07-owner-first-workspace-ux-repair.md).
 
-The bounded Workspace repair makes the default screen explain where the owner is, what currently needs attention, and which next action is available. It adds Russian-first `Главная`, `Работа`, and `Источники` navigation, concise work/search/Arvectum AI routes, simplified owner-facing helper copy, and the canonical Arvectum SVG in place of the placeholder `AV` mark.
+The bounded Workspace repair makes the default screen action-first. It adds Russian-first `Главная`, `Задачи`, `Документы`, `Arvectum AI`, and `Настройки` navigation, concise task/search/Arvectum AI routes, live-only Home work, detail-only provenance, and the exact owner-provided Block SVG.
 
-F07 changes presentation only. It creates no selected-Mac runtime evidence, managed-start result, launcher evidence, or synthetic owner-session claim. Its owner recheck remains pending after the F06 operational prerequisite.
+The subsequent real owner recheck failed on a screenshot of that deployed `470d…` Workspace: the next action was unclear, the large welcome hero displaced useful information, scenario fixtures looked like live work, raw technical evidence leaked into Home, actions looked secondary, and branding was unacceptable. This evidence does not prove the unmerged PR `#6`, which is the bounded remediation under review. P9.11 remains Current and R32 remains locked.
 
 ## 7. Current critical path
 
 ```text
-governed P7.06 update selected Mac from 6ed9dade... to current canonical main
+complete final review of F07 remediation PR #6
         ↓
-verify P7.02/P7.05 + Workspace p9.11.2 / contract 11
+merge and govern-deploy exact Workspace p9.11.3 / contract 11
         ↓
-start Workspace once through canonical managed helper
-        ↓
-require CURRENT_EXACT + admissible proof + exact loopback assets
+verify P7.02/P7.05, CURRENT_EXACT, admissible proof, and exact live assets
         ↓
 refresh/open exact-release Desktop launcher
         ↓
@@ -199,6 +197,6 @@ Phase 9 does not by itself establish public SaaS, customer Production, universal
 
 ## 11. Current canonical action
 
-> **P9.11-F06 — governed-update the selected Mac from installed runtime `6ed9dade96417251d3dd5fc8cb175c7136682b63` to the exact current canonical `main` while Workspace is `NOT_RUNNING`; then perform one managed Workspace start, require `CURRENT_EXACT` with admissible proof and exact loopback assets, refresh/open the exact-release Desktop launcher, and stop at the real owner recheck.**
+> **P9.11-F07 — complete final review of owner-first UX remediation in PR `#6`; after merge, govern-deploy the exact release, verify exact runtime/readiness/launcher evidence, then stop at the next real owner recheck. F06 is operationally verified; F07 owner recheck failed; P9.11 remains Current and R32 remains locked.**
 
 R32 remains locked until P9.11 real-session evidence and friction closure criteria are met.

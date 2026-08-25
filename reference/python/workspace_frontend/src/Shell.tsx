@@ -29,21 +29,16 @@ function navigateTo(href: string) {
 function Today() {
   const { text } = useWorkspaceLanguage();
   return <>
-    <section className="hero home-hero" aria-labelledby="today-title">
-      <div className="hero-signal" aria-hidden="true"><span /><span /><span /></div>
+    <section className="home-intro" aria-labelledby="today-title">
       <p className="eyebrow">{text("Arvectum OS · Рабочее пространство", "Arvectum OS · Workspace")}</p>
-      <h1 id="today-title">{text("Добро пожаловать", "Welcome")}</h1>
-      <p>{text("Всё, что требует вашего внимания — в одном месте. Начните с работы, найдите нужный контекст или спросите Arvectum.", "Everything that needs your attention — in one place. Start with work, find context, or ask Arvectum.")}</p>
+      <h1 id="today-title">{text("Что делать сейчас", "What to do now")}</h1>
+    </section>
+    <section className="home-actions" aria-label={text("Основные действия", "Primary actions")}>
+      <a href="/work" onClick={(event) => { event.preventDefault(); navigateTo("/work"); }}>{text("Открыть задачи", "Open tasks")}</a>
+      <a href="/information" onClick={(event) => { event.preventDefault(); navigateTo("/information"); }}>{text("Найти документ", "Find a document")}</a>
+      <a href="/copilot" onClick={(event) => { event.preventDefault(); navigateTo("/copilot"); }}>{text("Спросить Arvectum", "Ask Arvectum")}</a>
     </section>
     <MyWork embedded />
-    <section className="quick-actions" aria-labelledby="quick-actions-title">
-      <h2 id="quick-actions-title">{text("Что сделать дальше", "What to do next")}</h2>
-      <div className="status-grid">
-        <article><strong>{text("Работа и задачи", "Work and tasks")}</strong><p>{text("Посмотреть очередь задач и продуктовые контексты.", "Review the task queue and product contexts.")}</p><a href="/work" onClick={(event) => { event.preventDefault(); navigateTo("/work"); }}>{text("Открыть", "Open")}</a></article>
-        <article><strong>{text("Поиск и документы", "Search and documents")}</strong><p>{text("Найти документ, запись или знание по запросу.", "Find a document, record, or knowledge by query.")}</p><a href="/information" onClick={(event) => { event.preventDefault(); navigateTo("/information"); }}>{text("Найти", "Find")}</a></article>
-        <article><strong>{text("Спросить Arvectum", "Ask Arvectum")}</strong><p>{text("Задайте вопрос и получите ответ с источниками.", "Ask a question and get an answer backed by sources.")}</p><a href="/copilot" onClick={(event) => { event.preventDefault(); navigateTo("/copilot"); }}>{text("Задать вопрос", "Ask")}</a></article>
-      </div>
-    </section>
   </>;
 }
 
