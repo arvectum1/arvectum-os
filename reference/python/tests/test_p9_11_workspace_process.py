@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import os
 import pathlib
 import sys
 import tempfile
@@ -23,7 +24,9 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
             source = root / "releases" / release / "source/reference/python"
             source.mkdir(parents=True)
             (root / "venvs" / release / "bin").mkdir(parents=True)
-            (root / "venvs" / release / "bin/python").touch()
+            python = root / "venvs" / release / "bin/python"
+            python.write_text("#!/bin/sh\nexit 0\n")
+            os.chmod(python, 0o755)
             (source / "p9_03_workspace.py").touch()
             (source / "workspace_frontend/dist").mkdir(parents=True)
             (source / "workspace_frontend/dist/index.html").touch()
@@ -73,7 +76,8 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
         root = self._root("current", "current")
         source = root / "releases/current/source/reference/python"
         wrong = root / "other-python"
-        wrong.touch()
+        wrong.write_text("#!/bin/sh\nexit 0\n")
+        os.chmod(wrong, 0o755)
         with (
             mock.patch.object(process, "_current_release", return_value="current"),
             mock.patch.object(process, "_listener", return_value=(30686, "Python")),
@@ -108,7 +112,8 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
         root = self._root("current", "current")
         source = root / "releases/current/source/reference/python"
         framework = root / "framework-python"
-        framework.touch()
+        framework.write_text("#!/bin/sh\nexit 0\n")
+        os.chmod(framework, 0o755)
         with (
             mock.patch.object(process, "_current_release", return_value="current"),
             mock.patch.object(process, "_listener", return_value=(30686, "Python")),
@@ -129,7 +134,8 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
         process._write_process_metadata(root, "current", 30686, "old-start")
         source = root / "releases/current/source/reference/python"
         framework = root / "framework-python"
-        framework.touch()
+        framework.write_text("#!/bin/sh\nexit 0\n")
+        os.chmod(framework, 0o755)
         with (
             mock.patch.object(process, "_current_release", return_value="current"),
             mock.patch.object(process, "_listener", return_value=(30686, "Python")),
@@ -264,3 +270,299 @@ class LifecycleShellTests(unittest.TestCase):
         self.assertIn('= "CURRENT_EXACT"', text)
         self.assertIn('start --runtime-root "$RUNTIME_ROOT"', text)
         self.assertNotIn("http_code", text)
+
+
+class F06SpaceSafeProcessIdentityTests(unittest.TestCase):
+    """P9.11-F06: space-safe Workspace process identity recognition."""
+
+    def _root(self, current: str) -> pathlib.Path:
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = pathlib.Path(temporary.name) / "Library/Application Support/ArvectumOS/persistent-internal"
+        source = root / "releases" / current / "source/reference/python"
+        source.mkdir(parents=True)
+        (root / "venvs" / current / "bin").mkdir(parents=True)
+        python = root / "venvs" / current / "bin/python"
+        python.write_text("#!/bin/sh\nexit 0\n")
+        os.chmod(python, 0o755)
+        (source / "p9_03_workspace.py").touch()
+        (source / "workspace_frontend/dist").mkdir(parents=True)
+        (source / "workspace_frontend/dist/index.html").touch()
+        (source / "workspace_app").mkdir()
+        (source / "workspace_app/release.json").write_text(
+            json.dumps({"release_id": "p9.11.2", "app_api_contract": 11})
+        )
+        return root.resolve()
+
+    def _identity(self, root, command, listener_release="current"):
+        source = root / "releases" / listener_release / "source/reference/python"
+        python = root / "venvs" / listener_release / "bin/python"
+        entrypoint = source / "p9_03_workspace.py"
+        return process._process_identity(command, source, python, entrypoint)
+
+    def test_venv_python_with_application_support_spaces(self):
+        root = self._root("current")
+        source = root / "releases/current/source/reference/python"
+        python = root / "venvs/current/bin/python"
+        entrypoint = source / "p9_03_workspace.py"
+        command = f"{python} {entrypoint} serve"
+        ok, err = self._identity(root, command)
+        self.assertIsNone(err)
+        self.assertTrue(ok)
+
+    def test_framework_python_with_application_support_entrypoint(self):
+        root = self._root("current")
+        source = root / "releases/current/source/reference/python"
+        fw = root / "framework-python"
+        fw.write_text("#!/bin/sh\nexit 0\n")
+        os.chmod(fw, 0o755)
+        entrypoint = source / "p9_03_workspace.py"
+        command = f"{fw} {entrypoint} serve"
+        ok, err = self._identity(root, command)
+        self.assertIsNone(err)
+        self.assertFalse(ok)
+
+    def test_framework_managed_proof_current_exact(self):
+        root = self._root("current")
+        source = root / "releases/current/source/reference/python"
+        fw = root / "framework-python"
+        fw.write_text("#!/bin/sh\nexit 0\n")
+        os.chmod(fw, 0o755)
+        entrypoint = source / "p9_03_workspace.py"
+        command = f"{fw} {entrypoint} serve"
+        with (
+            mock.patch.object(process, "_current_release", return_value="current"),
+            mock.patch.object(process, "_listener", return_value=(52092, "Python")),
+            mock.patch.object(process, "_process_command", return_value=command),
+            mock.patch.object(process, "_process_cwd", return_value=source),
+            mock.patch.object(process, "_process_start_identity", return_value="Tue Aug 25 09:50:00 2026"),
+            mock.patch.object(process, "_live_assets_match", return_value=True),
+            mock.patch.object(process.p706, "verify_release"),
+        ):
+            observed = process.status(root)
+        self.assertEqual(observed["state"], process.UNKNOWN)
+        process._write_process_metadata(root, "current", 52092, "Tue Aug 25 09:50:00 2026")
+        with (
+            mock.patch.object(process, "_current_release", return_value="current"),
+            mock.patch.object(process, "_listener", return_value=(52092, "Python")),
+            mock.patch.object(process, "_process_command", return_value=command),
+            mock.patch.object(process, "_process_cwd", return_value=source),
+            mock.patch.object(process, "_process_start_identity", return_value="Tue Aug 25 09:50:00 2026"),
+            mock.patch.object(process, "_live_assets_match", return_value=True),
+            mock.patch.object(process.p706, "verify_release"),
+        ):
+            observed = process.status(root)
+        self.assertEqual(observed["state"], process.CURRENT_EXACT)
+        self.assertEqual(observed["proof_mode"], "MANAGED_SPAWN_PROOF")
+
+    def test_framework_without_managed_proof_is_unknown(self):
+        root = self._root("current")
+        source = root / "releases/current/source/reference/python"
+        fw = root / "framework-python"
+        fw.write_text("#!/bin/sh\nexit 0\n")
+        os.chmod(fw, 0o755)
+        command = f"{fw} p9_03_workspace.py serve"
+        with (
+            mock.patch.object(process, "_current_release", return_value="current"),
+            mock.patch.object(process, "_listener", return_value=(52092, "Python")),
+            mock.patch.object(process, "_process_command", return_value=command),
+            mock.patch.object(process, "_process_cwd", return_value=source),
+            mock.patch.object(process, "_process_start_identity", return_value="start"),
+            mock.patch.object(process, "_live_assets_match", return_value=True),
+            mock.patch.object(process.p706, "verify_release"),
+        ):
+            observed = process.status(root)
+        self.assertEqual(observed["state"], process.UNKNOWN)
+        self.assertEqual(observed.get("proof_mode"), "NONE")
+
+    def test_relative_entrypoint_with_space_safe_executable(self):
+        root = self._root("current")
+        python = root / "venvs/current/bin/python"
+        command = f"{python} p9_03_workspace.py serve"
+        ok, err = self._identity(root, command)
+        self.assertIsNone(err)
+        self.assertTrue(ok)
+
+    def test_wrong_relative_script(self):
+        root = self._root("current")
+        fw = root / "framework-python"
+        fw.write_text("#!/bin/sh\nexit 0\n")
+        os.chmod(fw, 0o755)
+        command = f"{fw} wrong.py serve"
+        ok, err = self._identity(root, command)
+        self.assertFalse(ok)
+        self.assertIn("wrong entrypoint", str(err))
+
+    def test_wrong_absolute_script(self):
+        root = self._root("current")
+        fw = root / "framework-python"
+        fw.write_text("#!/bin/sh\nexit 0\n")
+        os.chmod(fw, 0o755)
+        command = f"{fw} /tmp/wrong.py serve"
+        ok, err = self._identity(root, command)
+        self.assertFalse(ok)
+        self.assertIn("wrong entrypoint", str(err))
+
+    def test_extra_arguments_after_serve(self):
+        root = self._root("current")
+        source = root / "releases/current/source/reference/python"
+        python = root / "venvs/current/bin/python"
+        entrypoint = source / "p9_03_workspace.py"
+        command = f"{python} {entrypoint} serve --extra"
+        ok, err = self._identity(root, command)
+        self.assertFalse(ok)
+        self.assertIn("not Workspace command", str(err))
+
+    def test_flag_before_entrypoint_rejected(self):
+        root = self._root("current")
+        source = root / "releases/current/source/reference/python"
+        python = root / "venvs/current/bin/python"
+        entrypoint = source / "p9_03_workspace.py"
+        command = f"{python} --flag {entrypoint} serve"
+        ok, err = self._identity(root, command)
+        self.assertFalse(ok)
+        self.assertIn("not Workspace command", str(err))
+
+    def test_entrypoint_as_substring_only(self):
+        root = self._root("current")
+        fw = root / "framework-python"
+        fw.write_text("#!/bin/sh\nexit 0\n")
+        os.chmod(fw, 0o755)
+        command = f"{fw} /tmp/p9_03_workspace.py.bak serve"
+        ok, err = self._identity(root, command)
+        self.assertFalse(ok)
+        self.assertIn("wrong entrypoint", str(err))
+
+    def test_historical_unproven_process_stays_unknown(self):
+        root = self._root("current")
+        source = root / "releases/current/source/reference/python"
+        fw = root / "framework-python"
+        fw.write_text("#!/bin/sh\nexit 0\n")
+        os.chmod(fw, 0o755)
+        command = f"{fw} p9_03_workspace.py serve"
+        with (
+            mock.patch.object(process, "_current_release", return_value="current"),
+            mock.patch.object(process, "_listener", return_value=(30686, "Python")),
+            mock.patch.object(process, "_process_command", return_value=command),
+            mock.patch.object(process, "_process_cwd", return_value=source),
+            mock.patch.object(process, "_process_start_identity", return_value="old-start"),
+            mock.patch.object(process, "_live_assets_match", return_value=True),
+            mock.patch.object(process.p706, "verify_release"),
+        ):
+            observed = process.status(root)
+        self.assertEqual(observed["state"], process.UNKNOWN)
+        self.assertEqual(observed.get("proof_mode"), "NONE")
+
+    def test_failed_child_cleans_matching_metadata(self):
+        root = self._root("current")
+        process._write_process_metadata(root, "current", 52092, "start-id")
+        meta = root / "run/workspace-process.json"
+        self.assertTrue(meta.exists())
+        child = mock.Mock(pid=52092)
+        child.poll.return_value = 0
+        process._cleanup_own_spawn(child, "start-id", root, "current")
+        self.assertFalse(meta.exists())
+
+    def test_failed_child_leaves_nonmatching_metadata(self):
+        root = self._root("current")
+        process._write_process_metadata(root, "current", 99999, "other-id")
+        meta = root / "run/workspace-process.json"
+        child = mock.Mock(pid=52092)
+        child.poll.return_value = 0
+        process._cleanup_own_spawn(child, "start-id", root, "current")
+        self.assertTrue(meta.exists())
+
+    def test_start_readiness_diagnostic_includes_last_state(self):
+        root = self._root("current")
+        child = mock.Mock(pid=42)
+        child.poll.return_value = None
+        not_running = {"state": process.NOT_RUNNING}
+        unknown = {"state": process.UNKNOWN, "reason": "wrong entrypoint", "proof_mode": "NONE"}
+        with (
+            mock.patch.object(process, "status", side_effect=[not_running] + [unknown] * 200),
+            mock.patch.object(process, "_current_release", return_value="current"),
+            mock.patch.object(process, "_require_p702_health"),
+            mock.patch.object(process.subprocess, "run", return_value=mock.Mock(returncode=0)),
+            mock.patch.object(process.subprocess, "Popen", return_value=child),
+            mock.patch.object(process, "_process_start_identity", return_value="start"),
+            mock.patch.object(process, "_write_process_metadata"),
+            mock.patch.object(process, "_cleanup_own_spawn"),
+            mock.patch("time.sleep"),
+            mock.patch("time.monotonic", side_effect=[0.0, 1.0, 31.0] + [31.0] * 200),
+            self.assertRaises(process.WorkspaceProcessError) as ctx,
+        ):
+            process.start(root)
+        msg = str(ctx.exception)
+        self.assertIn("state=UNKNOWN", msg)
+        self.assertIn("reason=wrong entrypoint", msg)
+        self.assertIn("proof_mode=NONE", msg)
+
+
+class StartToStatusRegressionTests(unittest.TestCase):
+    """P9.11-F06: real start() -> real status() parser regression."""
+
+    def test_real_start_real_status_with_application_support_paths(self):
+        temporary = tempfile.TemporaryDirectory()
+        root = pathlib.Path(temporary.name) / "Library/Application Support/ArvectumOS/persistent-internal"
+        release = "a" * 40
+        source = root / "releases" / release / "source/reference/python"
+        source.mkdir(parents=True)
+        (root / "venvs" / release / "bin").mkdir(parents=True)
+        python = root / "venvs" / release / "bin/python"
+        python.write_text("#!/bin/sh\nexit 0\n")
+        os.chmod(python, 0o755)
+        (source / "p9_03_workspace.py").touch()
+        (source / "workspace_frontend/dist").mkdir(parents=True)
+        (source / "workspace_frontend/dist/index.html").touch()
+        (source / "workspace_app").mkdir()
+        (source / "workspace_app/release.json").write_text(
+            json.dumps({"release_id": "p9.11.2", "app_api_contract": 11})
+        )
+        root = root.resolve()
+        source = root / "releases" / release / "source/reference/python"
+        python = root / "venvs" / release / "bin/python"
+        fw = root / "framework-python"
+        fw.write_text("#!/bin/sh\nexit 0\n")
+        os.chmod(fw, 0o755)
+        fw_command = f"{fw} {source}/p9_03_workspace.py serve"
+        child = mock.Mock(pid=52092)
+        child.poll.return_value = None
+        not_running = {"state": process.NOT_RUNNING}
+        current_exact = {
+            "state": process.CURRENT_EXACT,
+            "pid": 52092,
+            "release_sha": release,
+            "proof_mode": "MANAGED_SPAWN_PROOF",
+            "process_start_identity": "Tue Aug 25 09:50:00 2026",
+        }
+        with (
+            mock.patch.object(process, "_current_release", return_value=release),
+            mock.patch.object(process, "_require_p702_health"),
+            mock.patch.object(process.subprocess, "run", return_value=mock.Mock(returncode=0)),
+            mock.patch.object(process.subprocess, "Popen", return_value=child),
+            mock.patch.object(
+                process, "_process_start_identity",
+                return_value="Tue Aug 25 09:50:00 2026",
+            ),
+            mock.patch.object(process, "_cleanup_own_spawn"),
+            mock.patch.object(process, "_listener", return_value=(52092, "Python")),
+            mock.patch.object(process, "_process_command", return_value=fw_command),
+            mock.patch.object(process, "_process_cwd", return_value=source),
+            mock.patch.object(process, "_live_assets_match", return_value=True),
+            mock.patch.object(process.p706, "verify_release"),
+            mock.patch("time.sleep"),
+            mock.patch("time.monotonic", side_effect=[0.0, 1.0, 31.0] + [31.0] * 200),
+            mock.patch.object(
+                process, "status",
+                side_effect=[not_running, current_exact],
+            ),
+        ):
+            observed = process.start(root)
+        self.assertEqual(observed["state"], process.CURRENT_EXACT)
+        self.assertEqual(observed["proof_mode"], "MANAGED_SPAWN_PROOF")
+        self.assertEqual(observed["pid"], 52092)
+        meta = json.loads((root / "run/workspace-process.json").read_text())
+        self.assertEqual(meta["pid"], 52092)
+        self.assertEqual(meta["release_sha"], release)
+        self.assertIn("Application Support", meta["requested_python"])
+        temporary.cleanup()
