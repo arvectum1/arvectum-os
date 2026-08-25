@@ -172,6 +172,17 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
             process.stop_for_update(pathlib.Path("/tmp/runtime"))
         kill.assert_not_called()
 
+    def test_stop_does_not_signal_when_start_identity_changes(self):
+        before = {"state": process.STALE_KNOWN_EXACT, "pid": 7, "release_sha": "a" * 40, "proof_mode": "DIRECT_OS_PROOF", "process_start_identity": "A"}
+        after = {**before, "process_start_identity": "B"}
+        with (
+            mock.patch.object(process, "status", side_effect=[before, after]),
+            mock.patch.object(process.os, "kill") as kill,
+            self.assertRaises(process.WorkspaceProcessError),
+        ):
+            process.stop_for_update(pathlib.Path("/tmp/runtime"))
+        kill.assert_not_called()
+
     def test_stop_refuses_known_state_without_proof_mode(self):
         stale = {"state": process.STALE_KNOWN_EXACT, "pid": 7, "release_sha": "a" * 40}
         with (
@@ -191,6 +202,45 @@ class WorkspaceProcessStatusTests(unittest.TestCase):
         self.assertEqual(payload["workspace_release"], "p9.11.2")
         self.assertEqual(payload["requested_python"], str(root / "venvs/current/bin/python"))
         self.assertEqual(payload["observed_process_start_identity"], "start")
+
+    def test_start_uses_exact_argv_cwd_and_check_before_popen(self):
+        root = self._root("current", "current")
+        source = root / "releases/current/source/reference/python"
+        python = root / "venvs/current/bin/python"
+        entrypoint = source / "p9_03_workspace.py"
+        ready = {"state": process.CURRENT_EXACT, "pid": 42, "release_sha": "current", "proof_mode": "MANAGED_SPAWN_PROOF", "process_start_identity": "start"}
+        child = mock.Mock(pid=42)
+        child.poll.return_value = None
+        with (
+            mock.patch.object(process, "status", side_effect=[{"state": process.NOT_RUNNING}, ready]),
+            mock.patch.object(process, "_current_release", return_value="current"),
+            mock.patch.object(process, "_require_p702_health"),
+            mock.patch.object(process.subprocess, "run", return_value=mock.Mock(returncode=0)) as check,
+            mock.patch.object(process.subprocess, "Popen", return_value=child) as popen,
+            mock.patch.object(process, "_process_start_identity", return_value="start"),
+            mock.patch.object(process, "_write_process_metadata"),
+        ):
+            observed = process.start(root)
+        self.assertEqual(observed["proof_mode"], "MANAGED_SPAWN_PROOF")
+        self.assertEqual(check.call_args.args[0], [str(python), str(entrypoint), "check"])
+        self.assertEqual(popen.call_args.args[0], [str(python), str(entrypoint), "serve"])
+        self.assertEqual(popen.call_args.kwargs["cwd"], source)
+
+    def test_start_missing_identity_terminates_only_own_child(self):
+        root = self._root("current", "current")
+        child = mock.Mock(pid=42)
+        child.poll.return_value = None
+        with (
+            mock.patch.object(process, "status", return_value={"state": process.NOT_RUNNING}),
+            mock.patch.object(process, "_current_release", return_value="current"),
+            mock.patch.object(process, "_require_p702_health"),
+            mock.patch.object(process.subprocess, "run", return_value=mock.Mock(returncode=0)),
+            mock.patch.object(process.subprocess, "Popen", return_value=child),
+            mock.patch.object(process, "_process_start_identity", return_value=None),
+            self.assertRaises(process.WorkspaceProcessError),
+        ):
+            process.start(root)
+        child.terminate.assert_called_once_with()
 
 
 class LifecycleShellTests(unittest.TestCase):

@@ -372,14 +372,17 @@ def stop_for_update(root: Path) -> dict[str, Any]:
     if before["state"] not in {CURRENT_EXACT, STALE_KNOWN_EXACT} or before.get("proof_mode") not in {"DIRECT_OS_PROOF", "MANAGED_SPAWN_PROOF"}:
         raise WorkspaceProcessError("Workspace stop refused: listener is UNKNOWN")
     pid = int(before["pid"])
+    start_identity = before.get("process_start_identity")
+    if not isinstance(start_identity, str) or not start_identity:
+        raise WorkspaceProcessError("Workspace stop refused: process start identity is unavailable")
     revalidated = status(root)
-    if revalidated.get("state") != before["state"] or revalidated.get("pid") != pid or revalidated.get("release_sha") != before.get("release_sha") or revalidated.get("proof_mode") != before.get("proof_mode"):
+    if revalidated.get("state") != before["state"] or revalidated.get("pid") != pid or revalidated.get("release_sha") != before.get("release_sha") or revalidated.get("proof_mode") != before.get("proof_mode") or revalidated.get("process_start_identity") != start_identity:
         raise WorkspaceProcessError("Workspace stop refused: process identity changed")
     os.kill(pid, signal.SIGTERM)
     deadline = time.monotonic() + MAX_WAIT_SECONDS
     while time.monotonic() < deadline:
         if status(root)["state"] == NOT_RUNNING:
-            _invalidate_matching_metadata(root, pid, before["release_sha"], str(before.get("process_start_identity", "")))
+            _invalidate_matching_metadata(root, pid, before["release_sha"], start_identity)
             _atomic_json(root / "run/workspace-last-stop.json", {
                 "schema": STOP_SCHEMA,
                 "classification": "non-canonical operational telemetry",
