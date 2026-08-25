@@ -82,7 +82,7 @@ describe("P9.11 owner-first Workspace", () => {
     expect(screen.getByRole("link", { name: "Tasks" }).getAttribute("aria-current")).toBe("page");
     unmount();
 
-    window.history.replaceState({}, "", "/governed");
+    window.history.replaceState({}, "", "/governed?focus=11111111111111111111");
     render(<LanguageProvider initialLanguage="en"><Shell context={context} onLogout={() => undefined} /></LanguageProvider>);
     expect(screen.getByRole("link", { name: "Settings" }).getAttribute("aria-current")).toBe("page");
   });

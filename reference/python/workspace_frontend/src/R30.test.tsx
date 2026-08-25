@@ -267,7 +267,7 @@ describe("R30 M9-alpha integrated J1-J4 ordinary path", () => {
       expect(screen.getByText(gate)).toBeTruthy();
     }
     fireEvent.click(screen.getByRole("button", { name: "Re-check status" }));
-    expect(await screen.findByText(/Nothing changed\. Required decisions remain unconfirmed/)).toBeTruthy();
+    expect(await screen.findByText(/Nothing changed\. Readiness conditions remain unconfirmed/)).toBeTruthy();
 
     const post = requests.find((request) => request.path === "/api/app/v1/governed/preflight" && request.method === "POST");
     expect(post).toBeTruthy();

@@ -30,7 +30,8 @@ describe("P9.11 F08 governed diagnostics", () => {
     renderRu();
     expect(await screen.findByRole("heading", { name: "Проверка готовности управляемого выполнения" })).toBeTruthy();
     expect(screen.getByText("Сейчас конкретное действие не запрошено.")).toBeTruthy();
-    expect(screen.getByText(/а не список ваших задач/)).toBeTruthy();
+    expect(screen.getByText(/а не перечень действий для владельца/)).toBeTruthy();
+    expect(screen.queryByText(/задач/i)).toBeNull();
     for (const label of ["Доступ к действию", "Полномочия организации", "Разрешение на использование данных", "Финальное подтверждение действия"]) expect(screen.getByText(label)).toBeTruthy();
     expect(screen.queryByRole("heading", { name: "EIS document governed execution" })).toBeNull();
     expect(screen.getByText("Техническое основание").closest("details")?.open).toBe(false);
@@ -51,9 +52,20 @@ describe("P9.11 F08 governed diagnostics", () => {
     fireEvent.click(screen.getByRole("button", { name: "Перепроверить состояние" }));
     expect(await screen.findByText("Проверка завершена")).toBeTruthy();
     expect(screen.getByText(/Ничего не изменено/)).toBeTruthy();
+    expect(screen.getByText(/Конкретное действие не запрошено и не выполнялось/)).toBeTruthy();
+    expect(screen.queryByText(/Задача остаётся остановленной/)).toBeNull();
     expect(screen.queryByRole("button", { name: /одобрить|разрешить|делегировать/i })).toBeNull();
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(fetchMock.mock.calls[1][1]?.method).toBe("POST");
+  });
+
+  it("ignores stale task focus and returns to Settings diagnostics", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(projection), { status: 200, headers: { "Content-Type": "application/json" } })));
+    window.history.replaceState({}, "", "/governed?focus=11111111111111111111");
+    renderRu();
+    expect(await screen.findByRole("heading", { name: "Проверка готовности управляемого выполнения" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Назад к настройкам" }).getAttribute("href")).toBe("/system");
+    expect(screen.queryByRole("link", { name: "Назад к задаче" })).toBeNull();
   });
 
   it("fails closed when any action safety flag drifts", async () => {
