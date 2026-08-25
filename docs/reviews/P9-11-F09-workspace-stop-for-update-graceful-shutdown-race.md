@@ -1,6 +1,6 @@
 # P9.11-F09 — Workspace Stop-for-Update Graceful-Shutdown Race
 
-Status: `Repair merged / operational verification pending`
+Status: `Resolved in bounded scope / operationally restored; live post-SIGTERM path not re-exercised`
 Date: `2026-08-25`
 Owner: `ООО «Арвектум»`
 Task classification: `platform / operational lifecycle`
@@ -12,7 +12,7 @@ Parent: `P9.11 — Real daily-use dogfooding + friction/backlog closure`
 - RFC-0001 through RFC-0008 — `Accepted 1.0.0`;
 - F06 remains operationally verified in its bounded exact-process identity scope;
 - F07 remains bounded owner-recheck PASS;
-- F08 p9.11.5 semantic repair is merged, but deployment and real owner recheck remain pending;
+- F08 p9.11.5 semantic repair is merged and deployed; real owner recheck remains pending;
 - R32 remains locked.
 
 ## Real Failed Deployment
@@ -46,17 +46,42 @@ If a future trusted Workspace stop fails before target activation, P7.06 records
 - merge commit on canonical `main`: `8d10059c8b45abfd679891a0442bca3073a36dcc`;
 - selected-Mac runtime mutation during repair/review: `NO`.
 
+## Post-Merge Selected-Mac Restoration Evidence
+
+The selected Mac then performed one governed deployment from the safe post-failure state where Workspace was already `NOT_RUNNING`.
+
+- canonical target: `03ba2c72fb9460e97b628c4b3dac36ac496cb942`;
+- source runtime: `dc0e0cff83a9031a3686191b5cf304ee03c2d1eb`;
+- Workspace pre-state: `NOT_RUNNING`;
+- P7.06 preflight: `PASS`;
+- P7.06 update: `PASS`;
+- transaction: `8d8893f5207cbd52eb67e99abad593f6ce069add3314c95373f081abdcd74ae0`;
+- backup SHA-256: `ee93ae8fd9d4d4f5b8729e8309e3459ef3fbbfbf7995516d15c9ce5f836ce836`;
+- Workspace stop invocation during deployment: `NO`;
+- SIGTERM during deployment: `NO`;
+- resulting runtime equals canonical target: `YES`;
+- P7.02/P7.05: `HEALTHY`;
+- Workspace remained `NOT_RUNNING` until an explicit managed start through the exact target helper;
+- managed target start attempts: `1`;
+- Workspace `p9.11.5` / app contract `11` reached `CURRENT_EXACT` with `MANAGED_SPAWN_PROOF`;
+- listener remained loopback-only;
+- exact live index/assets: `PASS`;
+- Desktop launcher: `PASS`.
+
+This establishes successful operational restoration and exact target deployment after the failed historical update. It does **not** prove that the real selected-Mac post-SIGTERM race was re-exercised after the repair, because the source Workspace was intentionally `NOT_RUNNING` before this deployment. The repaired post-SIGTERM branch remains covered by the exact repository regression suite and should receive natural live confirmation on a future ordinary update from a running exact Workspace rather than through an artificial mutation solely to manufacture evidence.
+
 ## Acceptance Evidence
 
 - Full status/HTTP/assets verification remains mandatory before `SIGTERM`.
-- No HTTP or asset status call occurs after `SIGTERM`.
+- No HTTP or asset status call occurs after `SIGTERM` in the repaired helper.
 - Original PID exit and port release are both required.
 - PID reuse and foreign listener states fail closed without signaling another process.
 - Exactly one `SIGTERM`; no `SIGKILL`.
 - Future pre-activation stop failures preserve signal uncertainty rather than claiming a signal occurred.
 - Workspace app release remains `p9.11.5`; app API remains `11`.
 - No Workspace owner-task eligibility or F08 UI semantics change is admitted.
+- Selected-Mac canonical runtime and exact managed Workspace service were operationally restored without retrying the historical failed transition or replaying product/external effects.
 
 ## Disposition
 
-The bounded F09 repository repair is merged canonical, but F09 is not yet operationally verified on the selected Mac. The next governed action is to deploy the exact current canonical `main` from the existing `NOT_RUNNING` Workspace state. Because no Workspace is running before that deployment, the repaired stop path is not exercised by the transition itself; after exact runtime/P7.02/P7.05/assets verification, the target Workspace must be started exactly once through the target release helper and reach `CURRENT_EXACT` with admissible proof. That deployment resumes the F08 real owner recheck. F08 remains open; P9.11 remains Current; R32 remains locked.
+F09 no longer blocks F08. The bounded defect is resolved in code, guarded by regression tests, merged, and the selected Mac has been operationally restored to exact canonical runtime `03ba2c72fb9460e97b628c4b3dac36ac496cb942` with Workspace `p9.11.5` `CURRENT_EXACT`. The exact real post-SIGTERM path was not re-exercised in this recovery deployment and that limitation remains explicit; natural verification may be recorded during a future ordinary update from a running exact Workspace. The current critical path returns to the real F08 owner recheck. P9.11 remains Current; R32 remains locked.
