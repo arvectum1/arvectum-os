@@ -28,7 +28,9 @@ Observed owner feedback:
 3. `Открыть` and `Открыть выполнение` are visually crowded and their semantic difference is not understandable;
 4. `Открыть выполнение` leads to a governed page dominated by internal terminology and English source/proof text rather than a plain-language explanation of what is blocked and what the owner can do;
 5. the visually primary `Run governed preflight` button looks consequential, but the interface does not explain in plain Russian what it does or whether it is safe;
-6. the owner therefore cannot confidently progress from the apparently urgent task despite the Home page itself being understandable.
+6. the governed route is classified by the shell as the fallback `system` group, so `Настройки` becomes the active top-level navigation item during a task journey, which further breaks orientation;
+7. on long governed pages the desktop sidebar scrolls out with the document rather than acting as a stable orientation anchor;
+8. the owner therefore cannot confidently progress from the apparently urgent task despite the Home page itself being understandable.
 
 ## Repository evidence
 
@@ -39,6 +41,8 @@ The current task projection creates the live preflight item as `WAITING_INPUT` /
 - next step: inspect blockers and supply independently governed decision evidence through a governed-action flow `when available`.
 
 The current My Work detail presents those raw values directly. When a focused item is open, the ordinary queue is also rendered below it; the list-level `Открыть` link can therefore navigate to the same focused URL and produce no visible transition.
+
+The current shell groups `/governed` into the fallback `system` navigation bucket, so a route entered from an urgent task highlights `Настройки` rather than preserving task context.
 
 The current governed projection hard-codes English presentation copy and exact RFC-0005 gate names/bases. Its preflight action is explicitly bounded:
 
@@ -73,12 +77,15 @@ The bounded F08 repair must improve presentation without manufacturing authority
    - Russian-first owner summary at the top: what is stopped, why it is stopped, and whether anything is happening externally now;
    - translate the four fixed domain-neutral RFC-0005 gate concepts into plain Russian presentation while preserving the exact canonical gate names/bases on demand;
    - raw status codes, validation strings, provenance and English source evidence move under expandable technical/source details;
-   - do not alter gate semantics or infer approval from UI state.
+   - do not alter gate semantics or infer approval from UI state;
+   - preserve task orientation: governed inspection reached from a task must remain in the `Задачи` owner context rather than unexpectedly highlighting `Настройки`;
+   - on desktop, keep primary navigation available while scrolling long detail/governed pages.
 
 4. **Preflight action**
    - rename owner-facing action to a truthful plain-language label such as `Перепроверить состояние`;
    - directly beside/before it state: this only re-checks the four conditions and records local non-canonical evidence; it does **not** change the document, does not call an external effect, does not grant authority and does not approve anything;
    - visually distinguish this safe diagnostic re-check from a real consequential action;
+   - render the positive `безопасная проверка` explanation only when the live projection explicitly proves `consequential=false`, `canonical_mutation_requested=false`, `external_effect_requested=false` and `authority_provided=false`; if those characteristics drift, fail closed and do not present the action as safe;
    - after execution, present the result in plain Russian, including that nothing was changed and which decisions remain unresolved.
 
 5. **No fake resolution path**
@@ -95,7 +102,8 @@ A real owner should be able to answer, without reading internal English text:
 - whether the available re-check button is safe;
 - what the button will and will not do;
 - whether the task can actually be resolved inside Workspace today;
-- where to return after inspection.
+- where to return after inspection;
+- why the top-level navigation still indicates that they are working with a task rather than editing Settings.
 
 No repository test or simulated click substitutes for that real owner recheck.
 
