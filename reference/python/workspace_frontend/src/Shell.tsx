@@ -3,6 +3,7 @@ import { Copilot } from "./Copilot";
 import { Discovery } from "./Discovery";
 import { Dogfooding } from "./Dogfooding";
 import { Governed } from "./Governed";
+import { Guide } from "./Guide";
 import { MyWork } from "./MyWork";
 import { ObjectDetail } from "./ObjectDetail";
 import { Organization } from "./Organization";
@@ -14,7 +15,7 @@ import { navigationLabels, useWorkspaceLanguage } from "./i18n";
 import type { NavigationItem, WorkspaceContext } from "./types";
 
 function groupForPath(path: string): string {
-  if (path === "/" || path === "/today") return "today";
+  if (path === "/" || path === "/today" || path === "/guide") return "today";
   if (path === "/work" || path === "/my-work" || path === "/products" || path.startsWith("/products/")) return "work";
   if (path === "/information" || path === "/search" || path === "/records" || path === "/documents" || path === "/knowledge" || path.startsWith("/objects/")) return "information";
   if (path === "/copilot") return "copilot";
@@ -32,11 +33,16 @@ function Today() {
     <section className="home-intro" aria-labelledby="today-title">
       <p className="eyebrow">{text("Arvectum OS · Рабочее пространство", "Arvectum OS · Workspace")}</p>
       <h1 id="today-title">{text("Что делать сейчас", "What to do now")}</h1>
+      <p>{text(
+        "Если текущих задач нет, используйте поиск по доступным документам, задайте вопрос Arvectum AI или откройте руководство по возможностям Workspace.",
+        "If there are no current tasks, search available documents, ask Arvectum AI, or open the Workspace capability guide.",
+      )}</p>
     </section>
     <section className="home-actions" aria-label={text("Основные действия", "Primary actions")}>
       <a href="/work" onClick={(event) => { event.preventDefault(); navigateTo("/work"); }}>{text("Открыть задачи", "Open tasks")}</a>
       <a href="/information" onClick={(event) => { event.preventDefault(); navigateTo("/information"); }}>{text("Найти документ", "Find a document")}</a>
       <a href="/copilot" onClick={(event) => { event.preventDefault(); navigateTo("/copilot"); }}>{text("Спросить Arvectum", "Ask Arvectum")}</a>
+      <a href="/guide" onClick={(event) => { event.preventDefault(); navigateTo("/guide"); }}>{text("Открыть руководство", "Open guide")}</a>
     </section>
     <MyWork embedded />
   </>;
@@ -64,6 +70,7 @@ export function Shell({ context, onLogout }: { context: WorkspaceContext; onLogo
   else if (currentPath === "/activity") content = <Activity />;
   else if (currentPath === "/governed") content = <Governed csrfToken={context.session.csrf_token} />;
   else if (currentPath === "/dogfooding") content = <Dogfooding csrfToken={context.session.csrf_token} />;
+  else if (currentPath === "/guide") content = <Guide release={context.release.id} />;
   else if (activeId === "today") content = <Today />;
   else if (activeId === "work") content = <Work />;
   else if (activeId === "information") content = <Discovery />;
@@ -75,7 +82,9 @@ export function Shell({ context, onLogout }: { context: WorkspaceContext; onLogo
     <aside className="sidebar" aria-label={text("Навигация Arvectum OS", "Workspace navigation")}>
       <div className="brand" aria-label="Arvectum OS"><img src={arvectumLogo} className="brand-logo" alt="Arvectum" /><span className="brand-product">OS</span></div>
       <nav aria-label={text("Навигация Arvectum OS", "Workspace navigation")}><ul>{context.navigation.map((item) => <li key={item.id}><a href={item.href} onClick={navigate(item)} aria-current={item.id === active.id ? "page" : undefined}><span>{navLabel(item)}</span></a></li>)}</ul></nav>
-      <div className="sidebar-controls"><div className="language-switch" role="group" aria-label={text("Язык интерфейса", "Interface language")}><button type="button" className={language === "ru" ? "active" : ""} aria-pressed={language === "ru"} onClick={() => setLanguage("ru")}>RU</button><button type="button" className={language === "en" ? "active" : ""} aria-pressed={language === "en"} onClick={() => setLanguage("en")}>EN</button></div><div className="sidebar-footnote">{text("Внутреннее рабочее пространство", "Internal workspace")} · {context.release.id}</div></div>
+      <div className="sidebar-controls">
+        <a href="/guide" onClick={(event) => { event.preventDefault(); navigateTo("/guide"); }}>{text("Руководство", "Guide")}</a>
+        <div className="language-switch" role="group" aria-label={text("Язык интерфейса", "Interface language")}><button type="button" className={language === "ru" ? "active" : ""} aria-pressed={language === "ru"} onClick={() => setLanguage("ru")}>RU</button><button type="button" className={language === "en" ? "active" : ""} aria-pressed={language === "en"} onClick={() => setLanguage("en")}>EN</button></div><div className="sidebar-footnote">{text("Внутреннее рабочее пространство", "Internal workspace")} · {context.release.id}</div></div>
     </aside>
     <div className="workspace-column">
       <header className="topbar">
