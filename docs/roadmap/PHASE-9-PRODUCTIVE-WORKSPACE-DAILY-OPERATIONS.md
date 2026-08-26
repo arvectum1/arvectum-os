@@ -1,14 +1,14 @@
 # Arvectum OS Phase 9 — Productive Workspace & Daily Operations
 
 Status: `Active`
-Version: `1.13.23`
+Version: `1.13.24`
 Created: `2026-08-21`
 Updated: `2026-08-27`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `product_contract` and `governance`
 Parent roadmap: [`ROADMAP.md`](ROADMAP.md)
 
-Current disposition: F11A and F11B now have bounded real-owner PASS. F11B recheck #3 accepted the p9.11.9 cache-backed portfolio as usable; remaining layout polish is minor/non-blocking. F11A attempt #2 on governed-deployed `p9.11.10` completed the real staged template → generated `TransientOutput` → release-bound download → Word-open journey with expected formatting and substituted text. A Word trust/provenance prompt remains minor/non-blocking and is not bypassed. Product Contract remains `Provisional 0.1.0`; canonical asset admission remains unavailable. P9.11 real-session/material-friction closure criteria are satisfied, so P9.11 is Complete / PASS and R32 is Current.
+Current disposition: P9.11 is Complete / PASS from bounded real-owner F11A/F11B evidence. R32 is now Complete / PASS: permanent read-only code-health/supply-chain audit, deterministic inventory, bounded validation refactors, exact R32 audit `33022403675`, Productive Workspace CI `33022720889`, Reference Python CI `33022720900`, explicit disposition of all six residual high-complexity review signals, canonical PR `#21` merge `f7de13c6cf71dd0546ba5a4f253899133511100e`, and successful GitVerse mirror `33022864556`. `P9.12` is Current. Phase 9 / M9 remains Active pending its separate exact-scope closure review; Product Contract/lifecycle/authority/canonical-admission boundaries are unchanged.
 Milestone: `M9 — Daily-use organizational workbench`
 Intermediate milestone: `M9-alpha — Usable Internal Workspace — Achieved / PASS`
 Architecture baseline: Constitution `1.2.0`; RFC-0001 through RFC-0008 `Accepted 1.0.0`; ADR-0001 `Accepted`
@@ -55,8 +55,8 @@ The legacy P4/P7 browser surfaces remain diagnostic/reference/recovery evidence.
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS | company-level composition |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS | product/AI boundaries PASS |
 | P9.11 | Real daily-use dogfooding + friction/backlog closure | 🟩 Complete / PASS — F11A/F11B bounded owner PASS | real owner sessions + material friction closure |
-| **R32** | **M9 Productive Workspace Hardening + Milestone Code Health Gate** | **🟨 Current** | pre-closure hardening PASS |
-| P9.12 | Phase 9 / M9 closure review | ⬜ | exact-scope M9 closure |
+| R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | 🟩 Complete / PASS | pre-closure hardening PASS |
+| **P9.12** | **Phase 9 / M9 closure review** | **🟨 Current** | exact-scope M9 closure |
 
 ## 4. Accepted application architecture
 
@@ -242,6 +242,6 @@ Phase 9 does not by itself establish public SaaS, customer Production, universal
 
 ## 11. Current canonical action
 
-> **R32 — M9 Productive Workspace Hardening + Milestone Code Health Gate. P9.11 is Complete / PASS from real owner sessions and material-friction disposition. Preserve all existing security, authority, provenance, Product Contract and no-canonical-admission boundaries while performing the pre-closure hardening/code-health review.**
+> **P9.12 — Phase 9 / M9 closure review. R32 is Complete / PASS. Re-evaluate all M9 exit criteria against canonical evidence and preserve all existing security, authority, provenance, Product Contract, lifecycle and no-canonical-admission boundaries; do not claim M9 closure until P9.12 itself passes.**
 
 The deferred F08 real task-detail → governed-action journey remains a natural future recheck when a genuine actionable task appears; it is not a blocker for R32 and must not be satisfied with synthetic owner work.
