@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.20`
+Version: `2.95.21`
 Created: `2026-08-07`
 Updated: `2026-08-26`
 Owner: `ООО «Арвектум»`
@@ -15,7 +15,7 @@ Roadmap status does not itself change Platform Capability lifecycle, Product Con
 
 ## 2. Version note
 
-Version `2.95.20` records F10A deployment and technical smoke PASS. PR #10 merged the built-in Workspace guidance and organizational asset intake gap review. Workspace p9.11.6 / app contract 11 has been governed-deployed to the selected Mac via P7.06; P7.02/P7.05 healthy; process CURRENT_EXACT with MANAGED_SPAWN_PROOF; loopback-only; exact assets PASS. The built-in Russian-first guide is accessible at `/guide`. Technical smoke check PASS. F10A owner recheck remains PENDING — owner must visually review the live guide. F10B (architecture/Product Contract boundary check) is complete: general organizational asset intake is NOT implemented and NOT PASS. F10C is not started. F07/F08/F09 remain in their previously recorded bounded scopes. P9.11 remains Current; R32 remains locked.
+Version `2.95.21` records F10A bounded owner PASS and the P9.11-F11 implementation milestone. The owner confirmed the live `/guide` is understandable but that the Workspace remained empty, which closed F10A only in guide-understandability scope and created the F11 material findings. The Arvectum Company ↔ Productive Workspace Product Contract is now `Provisional 0.1.0`. PR #12 implements the bounded F11A staged Company-material/version/provenance + exact-version transient DOCX journey and the F11B read-only canonical-roadmap portfolio projection. Workspace advances to `p9.11.7` / app contract `11`. Exact code/release head `352f49372753f43a387808ebf67d1b0997594406` passed Productive Workspace CI `32980578877` and Reference Python CI `32980578955`. F11A canonical asset admission remains unavailable; F11A/F11B owner usefulness validation remains pending until governed deployment and real owner journeys. P9.11 remains Current; R32 remains locked.
 
 The live `p9.11.3` Workspace was reviewed by the owner before the F08 sequence: the Home page is understandable and visually acceptable, the top-level navigation is clear, and the owner-provided Arvectum Block logo is accepted in that bounded presentation scope. F07 is therefore closed only for Home/navigation/branding.
 
@@ -28,13 +28,14 @@ Canonical evidence:
 - [`P9.11-F07 — Owner-first Workspace UX repair`](../reviews/P9-11-F07-owner-first-workspace-ux-repair.md) — `Owner recheck PASS in bounded Home/navigation/branding scope`;
 - [`P9.11-F08 — Task-to-Governed Action Comprehension and Actionability`](../reviews/P9-11-F08-task-to-governed-action-comprehension.md) — `Resolved in bounded owner-task eligibility scope / real-task journey awaits natural evidence`;
 - [`P9.11-F09 — Workspace Stop-for-Update Graceful-Shutdown Race`](../reviews/P9-11-F09-workspace-stop-for-update-graceful-shutdown-race.md) — `Resolved in bounded scope / operationally restored; live post-SIGTERM path not re-exercised`;
-- [`P9.11-F10 — Workspace Guidance and Organizational Asset Intake Gap`](../reviews/P9-11-F10-workspace-guidance-and-organizational-asset-intake-gap.md) — `F10A deployed p9.11.6 / owner recheck pending; F10B boundary check complete / asset intake NOT implemented`.
+- [`P9.11-F10 — Workspace Guidance and Organizational Asset Intake Gap`](../reviews/P9-11-F10-workspace-guidance-and-organizational-asset-intake-gap.md) — `F10A bounded owner PASS for guide understandability; F10B/F10C superseded into F11 material findings`;
+- [`P9.11-F11 — Материалы компании и единый портфель проектов`](../reviews/P9-11-F11-company-materials-and-project-portfolio.md) — `Product Contract Provisional 0.1.0; p9.11.7 technical implementation ready; real owner validation pending`.
 
 F06 remains **operationally verified** in its bounded process-identity scope. F08 does not reopen F05/F06 and does not authorize any new effect, authority grant or decision path.
 
 The earlier F05 one-time owner decision for historical PID `30686` remains consumed and non-reusable. Normal `UNKNOWN` Workspace listeners remain fail-closed and unsignallable without a separate exact owner decision.
 
-`P9.11` remains Current and `R32` remains locked. The next canonical action is real owner recheck of the built-in guide at `/guide` on the live p9.11.6 Workspace. No synthetic task is admitted. When the first genuine actionable owner task appears, its task-detail → governed-action journey must be rechecked as natural evidence. Other material friction found during ordinary use is handled through the normal P9.11 finding/backlog loop.
+`P9.11` remains Current and `R32` remains locked. The next canonical action is governed P7.06 deployment of exact merged `p9.11.7`, followed by real owner F11A and F11B journeys. F11A validation uses real Company materials/templates and a real transient standard-document output; F11B validation uses live source-backed project cards and explicit reconciliation/unavailable states. No synthetic owner-session evidence or canonical asset-admission claim is admitted. The first naturally occurring genuine actionable task still rechecks the deferred F08 task-detail → governed-action journey when it appears.
 
 Lane B is internally complete through prepared `INT-B7`; no additional internal integration-planning task is admitted until an exact real 1С/CRM/СЭД/ЭДО endpoint/deployment/account is available.
 
@@ -69,7 +70,7 @@ This update creates no public/stable API/connector/browser contract, no customer
 
 ## 5. Active Phase 9
 
-Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.18`.
+Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.19`.
 
 | ID | Work item | Status |
 |---|---|---:|
@@ -88,7 +89,7 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F10A deployed p9.11.6 / owner recheck pending; F07/F08 bounded owner PASS; F09 bounded restoration** |
+| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F10A bounded owner PASS; F11 p9.11.7 technically ready for governed deploy; owner validation pending** |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked |
 | P9.12 | Phase 9 / M9 closure review | ⬜ |
 
@@ -110,9 +111,9 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 - **F10A PR #10** merged at `43f2bffde14073809cb228731a594a2fcb9707fb`; built-in Russian-first Workspace guide at `/guide`; release `p9.11.6` / app contract `11`;
 - **F10A p9.11.6 governed deployment:** P7.06 update PASS transaction `bd87b195d2f27e7bc83114d505e995fdfff124dd97e4962455e12fb4969b3dd6`; P7.02/P7.05 healthy; exact Workspace process `CURRENT_EXACT` / `MANAGED_SPAWN_PROOF` on `127.0.0.1:8769`; loopback-only; exact index/assets PASS;
 - **F10A technical smoke:** sidebar «Руководство», home «Открыть руководство», `/guide` heading «Что здесь можно делать», sections «Что работает сейчас» / «Чего пока нет», release `p9.11.6` visible, navigation links present, Russian default, no Authorization/Authority/Knowledge claims — PASS;
-- **F10A owner recheck:** PENDING — owner must visually review the live guide;
-- **F10B architecture/Product Contract boundary check:** complete; general organizational asset intake (logo, brandbook, .pptx, .docx, email templates, arbitrary source files) is NOT implemented; NOT PASS;
-- **F10C:** not started;
+- **F10A owner recheck:** bounded PASS for guide understandability; owner feedback: `руководство есть, оно понятное. но пока система пустая, работать не с чем.`;
+- **F11 Product Contract:** `Provisional 0.1.0`, owner-approved for bounded implementation/real validation only;
+- **F11A/F11B p9.11.7 implementation:** technically ready; staged material/version/provenance + exact-version Transient Output and read-only canonical-roadmap portfolio projection implemented; owner validation pending; canonical asset admission unavailable;
 - repository inspection confirms the current preflight is non-consequential (`canonical_mutation_requested=false`, `external_effect_requested=false`, authority/approval not provided) and only records minimized local non-canonical proof evidence;
 - no product business action, Authorization, Organizational Authority, Data Governance permission or Consequential Approval was invented by the F10 sequence;
 - synthetic owner-session evidence: prohibited.
@@ -120,11 +121,11 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 Current critical sequence:
 
 ```text
-real owner recheck of built-in guide at /guide on p9.11.6
+governed P7.06 deploy exact merged p9.11.7
         ↓
-first genuine actionable owner task, when naturally present → recheck task-detail / governed-action journey
+real owner F11A materials/template/transient-document journey + F11B project-portfolio journey
         ↓
-disposition any recurring material friction
+disposition any material owner friction; retain deferred natural F08 task journey
         ↓
 R32
         ↓

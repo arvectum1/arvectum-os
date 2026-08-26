@@ -1,7 +1,7 @@
 # P9.11-F11 — Материалы компании и единый портфель проектов
 
 Status: `Implementation technically ready / owner validation pending`
-Version: `0.3.0`
+Version: `0.4.0`
 Created: `2026-08-26`
 Updated: `2026-08-26`
 Owner: `ООО «Арвектум»`
@@ -158,7 +158,7 @@ Source frontend проходил typecheck/tests/Web Storage guard/build, но c
 
 Final technical evidence на normal read-only workflow:
 
-- Productive Workspace CI run `32975210959` — **PASS**:
+- Productive Workspace CI run `32980578877` on exact final code/release head `352f49372753f43a387808ebf67d1b0997594406` — **PASS**:
   - BFF security/context tests — PASS;
   - frontend typecheck — PASS;
   - frontend tests — PASS;
@@ -166,11 +166,17 @@ Final technical evidence на normal read-only workflow:
   - production build — PASS;
   - committed `dist` reproducibility — PASS;
   - release-pinned asset boundary — PASS.
-- Reference Python CI run `32975210906` — **PASS**.
+- Reference Python CI run `32980578955` on the same exact code/release head — **PASS**.
 
-Material objections after iteration 5: **none for merge/deploy of the bounded Provisional slice**.
+Material objections after iteration 6: **none for merge/deploy of the bounded Provisional slice**.
 
 Functional review не является owner-usefulness PASS, Stable Product Contract promotion, canonical asset admission, authority grant или operational-readiness approval.
+
+### Iteration 6 — final project-binding UX reconciliation
+
+Найдено: F11 portfolio intentionally includes platform identity `OS`, while the first Company material-binding backend accepts only Company/product identities `COMPANY | PORT-*`. The material form initially reused every portfolio card and therefore offered `OS`, producing a visible option that the server correctly rejected.
+
+Исправлено минимально: backend scope не расширялся на platform identity; F11A project selector filters to `COMPANY | PORT-*`. Exact final frontend bundle was rebuilt reproducibly and normal read-only CI passed.
 
 ## 6. Acceptance state
 
