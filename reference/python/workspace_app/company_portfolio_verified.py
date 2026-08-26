@@ -44,7 +44,11 @@ def _parse_utc(value: object) -> datetime | None:
 
 
 def _secure_dir(path: Path) -> None:
+    if path.exists() and (path.is_symlink() or not path.is_dir()):
+        raise CompanyPortfolioError("portfolio cache directory must be a real directory")
     path.mkdir(parents=True, exist_ok=True)
+    if path.is_symlink() or not path.is_dir():
+        raise CompanyPortfolioError("portfolio cache directory must be a real directory")
     try:
         os.chmod(path, 0o700)
     except OSError as exc:
@@ -305,7 +309,13 @@ class VerifiedRuntimeCompanyPortfolioProvider(RuntimeCompanyPortfolioProvider):
 
         if self._complete_source_refresh(payload):
             if self.cache is not None:
-                self.cache.save(access, payload)
+                try:
+                    self.cache.save(access, payload)
+                except CompanyPortfolioError:
+                    # The cache is a non-canonical availability optimization only.
+                    # A cache persistence failure must not hide a successfully verified
+                    # live External Reference projection from the authorized owner.
+                    pass
             return payload
 
         return self._merge_stale_fallback(payload, cached)
