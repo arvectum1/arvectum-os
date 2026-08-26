@@ -11,7 +11,36 @@ import { useWorkspaceLanguage } from "./i18n";
 import "./CompanyWorkspace.css";
 
 const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+const PPTX = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
 const MAX_FILE_BYTES = 8 * 1024 * 1024;
+const ACCEPTED_FILE_TYPES = ".docx,.pptx,.pdf,.png,.jpg,.jpeg,.webp,.txt,.md";
+const ALLOWED_MEDIA_TYPES = new Set([
+  DOCX,
+  PPTX,
+  "application/pdf",
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "text/plain",
+  "text/markdown",
+]);
+
+function declaredMediaType(file: File): string | null {
+  if (ALLOWED_MEDIA_TYPES.has(file.type)) return file.type;
+  const extension = file.name.toLowerCase().split(".").pop() ?? "";
+  const byExtension: Record<string, string> = {
+    docx: DOCX,
+    pptx: PPTX,
+    pdf: "application/pdf",
+    png: "image/png",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    webp: "image/webp",
+    txt: "text/plain",
+    md: "text/markdown",
+  };
+  return byExtension[extension] ?? null;
+}
 
 type State =
   | { kind: "loading" }
@@ -73,6 +102,11 @@ export function CompanyMaterials({ csrfToken }: { csrfToken: string }) {
       setMessage(text("Выберите файл до 8 MiB.", "Choose a file up to 8 MiB."));
       return;
     }
+    const mediaType = declaredMediaType(file);
+    if (!mediaType) {
+      setMessage(text("Этот тип файла не входит в безопасный F11A allowlist.", "This file type is outside the safe F11A allowlist."));
+      return;
+    }
     setBusy(true);
     try {
       const existing = String(data.get("material_id") ?? "").trim();
@@ -80,7 +114,7 @@ export function CompanyMaterials({ csrfToken }: { csrfToken: string }) {
         ...(existing ? { material_id: existing } : {}),
         project_id: String(data.get("project_id") ?? "COMPANY"),
         filename: file.name,
-        media_type: file.type || "application/octet-stream",
+        media_type: mediaType,
         semantic_role: String(data.get("semantic_role") ?? ""),
         classification: String(data.get("classification") ?? ""),
         purpose: String(data.get("purpose") ?? ""),
@@ -131,10 +165,10 @@ export function CompanyMaterials({ csrfToken }: { csrfToken: string }) {
   if (state.kind === "error") return <section className="company-page" role="alert"><p className="eyebrow">F11A · Provisional 0.1.0</p><h1>{text("Материалы компании недоступны", "Company materials unavailable")}</h1><code>{state.code}</code><div><button type="button" onClick={() => void refresh()}>{text("Повторить", "Retry")}</button></div></section>;
 
   return <section className="company-page" aria-labelledby="company-materials-title">
-    <header className="company-page-head"><p className="eyebrow">F11A · Product Contract Provisional 0.1.0</p><h1 id="company-materials-title">{text("Материалы компании", "Company materials")}</h1><p>{text("Здесь можно загрузить логотип, брендбук, исходник или шаблон, сохранить его точные staged-версии и использовать DOCX-шаблон для генерации документа.", "Upload a logo, brandbook, source, or template, preserve exact staged versions, and use an exact DOCX template version to generate a document.")}</p><p className="boundary-note"><strong>{text("Граница F11A:", "F11A boundary:")}</strong> {state.data.governance.reason} {text("Загрузка не выдаёт Authorization или Organizational Authority; generated Artifact остаётся Transient Output и не становится validated Knowledge.", "Upload grants neither Authorization nor Organizational Authority; a generated Artifact remains a Transient Output and does not become validated Knowledge.")}</p></header>
+    <header className="company-page-head"><p className="eyebrow">F11A · Product Contract Provisional 0.1.0</p><h1 id="company-materials-title">{text("Материалы компании", "Company materials")}</h1><p>{text("Здесь можно загрузить логотип, брендбук, исходник или шаблон, сохранить его точные staged-версии и использовать DOCX-шаблон для генерации документа.", "Upload a logo, brandbook, source, or template, preserve exact staged versions, and use an exact DOCX template version to generate a document.")}</p><p>{text("Первый безопасный allowlist: DOCX, PPTX, PDF, PNG, JPEG, WebP, TXT и MD. Фактическое содержимое проверяет сервер; SVG, macro-enabled Office и произвольные opaque-файлы сейчас отклоняются.", "Initial safe allowlist: DOCX, PPTX, PDF, PNG, JPEG, WebP, TXT, and MD. The server validates actual content; SVG, macro-enabled Office, and arbitrary opaque files are currently rejected.")}</p><p className="boundary-note"><strong>{text("Граница F11A:", "F11A boundary:")}</strong> {state.data.governance.reason} {text("Загрузка не выдаёт Authorization или Organizational Authority; generated Artifact остаётся Transient Output и не становится validated Knowledge.", "Upload grants neither Authorization nor Organizational Authority; a generated Artifact remains a Transient Output and does not become validated Knowledge.")}</p></header>
 
     <div className="company-two-column">
-      <form className="company-form" onSubmit={(event) => void submitStage(event)}><h2>{text("Добавить материал или новую версию", "Add material or a new version")}</h2><label>{text("Новая версия существующего материала", "New version of existing material")}<select name="material_id" defaultValue=""><option value="">{text("Новый материал", "New material")}</option>{latest.map((version) => <option key={version.material_id} value={version.material_id}>{version.filename} · {version.material_id}</option>)}</select></label><label>{text("Проект", "Project")}<select name="project_id" defaultValue="COMPANY"><option value="COMPANY">{text("Компания в целом", "Company-wide")}</option>{projectOptions.map((project) => <option key={project.id} value={project.id}>{project.id} · {project.label}</option>)}</select></label><label>{text("Файл", "File")}<input name="file" type="file" required /></label><label>{text("Семантическая роль", "Semantic role")}<input name="semantic_role" required maxLength={96} placeholder="document-template / brandbook / logo / source" /></label><label>{text("Классификация", "Classification")}<input name="classification" required maxLength={96} defaultValue="internal" /></label><label>{text("Назначение", "Purpose")}<input name="purpose" required maxLength={240} /></label><label>{text("Права использования", "Rights")}<input name="rights" required maxLength={240} defaultValue="company-internal-use" /></label><label>{text("Retention rule", "Retention rule")}<input name="retention_rule" required maxLength={240} defaultValue="until-replaced-or-explicit-deletion" /></label><button type="submit" disabled={busy}>{busy ? text("Сохраняем…", "Saving…") : text("Сохранить staged-версию", "Save staged version")}</button></form>
+      <form className="company-form" onSubmit={(event) => void submitStage(event)}><h2>{text("Добавить материал или новую версию", "Add material or a new version")}</h2><label>{text("Новая версия существующего материала", "New version of existing material")}<select name="material_id" defaultValue=""><option value="">{text("Новый материал", "New material")}</option>{latest.map((version) => <option key={version.material_id} value={version.material_id}>{version.filename} · {version.material_id}</option>)}</select></label><label>{text("Проект", "Project")}<select name="project_id" defaultValue="COMPANY"><option value="COMPANY">{text("Компания в целом", "Company-wide")}</option>{projectOptions.map((project) => <option key={project.id} value={project.id}>{project.id} · {project.label}</option>)}</select></label><label>{text("Файл", "File")}<input name="file" type="file" accept={ACCEPTED_FILE_TYPES} required /></label><label>{text("Семантическая роль", "Semantic role")}<input name="semantic_role" required maxLength={96} placeholder="document-template / brandbook / logo / source" /></label><label>{text("Классификация", "Classification")}<input name="classification" required maxLength={96} defaultValue="internal" /></label><label>{text("Назначение", "Purpose")}<input name="purpose" required maxLength={240} /></label><label>{text("Права использования", "Rights")}<input name="rights" required maxLength={240} defaultValue="company-internal-use" /></label><label>{text("Retention rule", "Retention rule")}<input name="retention_rule" required maxLength={240} defaultValue="until-replaced-or-explicit-deletion" /></label><button type="submit" disabled={busy}>{busy ? text("Сохраняем…", "Saving…") : text("Сохранить staged-версию", "Save staged version")}</button></form>
 
       <form className="company-form" onSubmit={(event) => void submitGenerate(event)}><h2>{text("Создать DOCX по шаблону", "Generate DOCX from template")}</h2><p>{text("В DOCX-шаблоне используйте цельные placeholders {{TITLE}}, {{BODY}}, {{DATE}}. Можно использовать один или несколько.", "Use contiguous placeholders {{TITLE}}, {{BODY}}, {{DATE}} in the DOCX template. One or more may be used.")}</p><label>{text("Точная версия шаблона", "Exact template version")}<select name="source_version" required defaultValue=""><option value="" disabled>{text("Выберите версию", "Choose version")}</option>{docxVersions.map((version) => <option key={version.version_id} value={`${version.material_id}::${version.version_id}`}>{version.filename} · {version.version_id}</option>)}</select></label><label>{text("Заголовок", "Title")}<input name="title" required maxLength={320} /></label><label>{text("Текст", "Body")}<textarea name="body" required maxLength={6000} rows={9} /></label><label>{text("Дата", "Date")}<input name="date" required maxLength={80} defaultValue={new Date().toLocaleDateString("ru-RU")} /></label><button type="submit" disabled={busy || docxVersions.length === 0}>{text("Создать transient DOCX", "Generate transient DOCX")}</button>{docxVersions.length === 0 ? <p className="boundary-note">{text("Сначала загрузите DOCX-шаблон.", "Upload a DOCX template first.")}</p> : null}{generated ? <div className="company-output"><strong>Transient Output</strong><p><code>{generated.output.output_id}</code></p><p>{text("Source version", "Source version")}: <code>{generated.output.source_version_id}</code></p><a href={generated.output.download_href}>{text("Скачать DOCX", "Download DOCX")}</a></div> : null}</form>
     </div>
