@@ -12,6 +12,7 @@ on:
 
 # TEMPORARY branch-only materialization for PR #15. This permission and the
 # materialization step must be removed before merge; final CI stays read-only.
+# Re-triggered after the final F11 owner-usability regression assertions.
 permissions:
   contents: write
 
