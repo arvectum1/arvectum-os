@@ -10,11 +10,8 @@ on:
       - ".github/workflows/workspace-app-ci.yml"
   workflow_dispatch:
 
-# TEMPORARY branch-only materialization for PR #15. This permission and the
-# materialization step must be removed before merge; final CI stays read-only.
-# Re-triggered after the final F11 owner-usability regression assertions.
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: workspace-app-ci-${{ github.workflow }}-${{ github.ref }}
@@ -29,10 +26,8 @@ jobs:
       run:
         working-directory: reference/python
     steps:
-      - name: Check out exact PR head for one-shot dist materialization
+      - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -54,10 +49,8 @@ jobs:
       run:
         working-directory: reference/python/workspace_frontend
     steps:
-      - name: Check out exact PR head for one-shot dist materialization
+      - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -74,24 +67,8 @@ jobs:
         run: npm run guard:web-storage
       - name: Rebuild production assets
         run: npm run build
+      - name: Require committed lock and production assets to be reproducible
+        run: git diff --exit-code -- package-lock.json dist
       - name: Verify release-pinned production asset boundary
         working-directory: reference/python
         run: python -c 'from pathlib import Path; from workspace_app.assets import verify_frontend_assets; from workspace_app.release import load_release; print(verify_frontend_assets(Path("workspace_frontend"), load_release()))'
-      - name: Materialize reproducible dist once on PR branch
-        working-directory: .
-        shell: bash
-        run: |
-          set -euo pipefail
-          if git diff --quiet -- reference/python/workspace_frontend/package-lock.json reference/python/workspace_frontend/dist; then
-            echo "dist already reproducible"
-            exit 0
-          fi
-          git config user.name "arvectum-ci"
-          git config user.email "actions@users.noreply.github.com"
-          git add -- reference/python/workspace_frontend/dist
-          if ! git diff --cached --quiet -- reference/python/workspace_frontend/package-lock.json; then
-            echo "package-lock changed unexpectedly" >&2
-            exit 1
-          fi
-          git commit -m "build(workspace): materialize p9.11.8 production assets"
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
