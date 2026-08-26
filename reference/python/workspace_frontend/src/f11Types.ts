@@ -13,7 +13,7 @@ export type CompanyProjectCard = {
   label: string;
   kind: string;
   disposition: string;
-  repository: string;
+  repository: string | null;
   roadmap_path: string | null;
   execution_targets: string[];
   authority_mode: "External Reference";
