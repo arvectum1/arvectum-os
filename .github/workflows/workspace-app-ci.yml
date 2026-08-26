@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: workspace-app-ci-${{ github.workflow }}-${{ github.ref }}
@@ -49,10 +49,8 @@ jobs:
       run:
         working-directory: reference/python/workspace_frontend
     steps:
-      - name: Check out exact PR head for one-shot roadmap synchronization
+      - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -74,63 +72,3 @@ jobs:
       - name: Verify release-pinned production asset boundary
         working-directory: reference/python
         run: python -c 'from pathlib import Path; from workspace_app.assets import verify_frontend_assets; from workspace_app.release import load_release; print(verify_frontend_assets(Path("workspace_frontend"), load_release()))'
-      - name: Synchronize F11 canonical roadmap and review once
-        if: github.event_name == 'pull_request' && github.head_ref == 'work/p9-11-f11-implementation'
-        working-directory: ${{ github.workspace }}
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import re
-
-          roadmap = Path('docs/roadmap/ROADMAP.md')
-          text = roadmap.read_text(encoding='utf-8')
-          text = text.replace('Version: `2.95.20`', 'Version: `2.95.21`', 1)
-          old = '''Version `2.95.20` records F10A deployment and technical smoke PASS. PR #10 merged the built-in Workspace guidance and organizational asset intake gap review. Workspace p9.11.6 / app contract 11 has been governed-deployed to the selected Mac via P7.06; P7.02/P7.05 healthy; process CURRENT_EXACT with MANAGED_SPAWN_PROOF; loopback-only; exact assets PASS. The built-in Russian-first guide is accessible at `/guide`. Technical smoke check PASS. F10A owner recheck remains PENDING — owner must visually review the live guide. F10B (architecture/Product Contract boundary check) is complete: general organizational asset intake is NOT implemented and NOT PASS. F10C is not started. F07/F08/F09 remain in their previously recorded bounded scopes. P9.11 remains Current; R32 remains locked.'''
-          new = '''Version `2.95.21` records F10A bounded owner PASS and the P9.11-F11 implementation milestone. The owner confirmed the live `/guide` is understandable but that the Workspace remained empty, which closed F10A only in guide-understandability scope and created the F11 material findings. The Arvectum Company ↔ Productive Workspace Product Contract is now `Provisional 0.1.0`. PR #12 implements the bounded F11A staged Company-material/version/provenance + exact-version transient DOCX journey and the F11B read-only canonical-roadmap portfolio projection. Workspace advances to `p9.11.7` / app contract `11`. Exact code/release head `352f49372753f43a387808ebf67d1b0997594406` passed Productive Workspace CI `32980578877` and Reference Python CI `32980578955`. F11A canonical asset admission remains unavailable; F11A/F11B owner usefulness validation remains pending until governed deployment and real owner journeys. P9.11 remains Current; R32 remains locked.'''
-          if old not in text:
-              raise SystemExit('ROADMAP version note anchor missing')
-          text = text.replace(old, new, 1)
-          text = text.replace('Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.18`.', 'Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.19`.', 1)
-          text = text.replace('| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F10A deployed p9.11.6 / owner recheck pending; F07/F08 bounded owner PASS; F09 bounded restoration** |', '| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F10A bounded owner PASS; F11 p9.11.7 technically ready for governed deploy; owner validation pending** |', 1)
-          text = text.replace('- [`P9.11-F10 — Workspace Guidance and Organizational Asset Intake Gap`](../reviews/P9-11-F10-workspace-guidance-and-organizational-asset-intake-gap.md) — `F10A deployed p9.11.6 / owner recheck pending; F10B boundary check complete / asset intake NOT implemented`.', '- [`P9.11-F10 — Workspace Guidance and Organizational Asset Intake Gap`](../reviews/P9-11-F10-workspace-guidance-and-organizational-asset-intake-gap.md) — `F10A bounded owner PASS for guide understandability; F10B/F10C superseded into F11 material findings`;\n- [`P9.11-F11 — Материалы компании и единый портфель проектов`](../reviews/P9-11-F11-company-materials-and-project-portfolio.md) — `Product Contract Provisional 0.1.0; p9.11.7 technical implementation ready; real owner validation pending`.', 1)
-          text = re.sub(r'`P9\.11` remains Current and `R32` remains locked\. The next canonical action is real owner recheck of the built-in guide at `/guide` on the live p9\.11\.6 Workspace\..*?Other material friction found during ordinary use is handled through the normal P9\.11 finding/backlog loop\.', '`P9.11` remains Current and `R32` remains locked. The next canonical action is governed P7.06 deployment of exact merged `p9.11.7`, followed by real owner F11A and F11B journeys. F11A validation uses real Company materials/templates and a real transient standard-document output; F11B validation uses live source-backed project cards and explicit reconciliation/unavailable states. No synthetic owner-session evidence or canonical asset-admission claim is admitted. The first naturally occurring genuine actionable task still rechecks the deferred F08 task-detail → governed-action journey when it appears.', text, count=1, flags=re.S)
-          text = re.sub(r'- \*\*F10A owner recheck:\*\* PENDING.*?- \*\*F10C:\*\* not started;', '- **F10A owner recheck:** bounded PASS for guide understandability; owner feedback: `руководство есть, оно понятное. но пока система пустая, работать не с чем.`;\n- **F11 Product Contract:** `Provisional 0.1.0`, owner-approved for bounded implementation/real validation only;\n- **F11A/F11B p9.11.7 implementation:** technically ready; staged material/version/provenance + exact-version Transient Output and read-only canonical-roadmap portfolio projection implemented; owner validation pending; canonical asset admission unavailable;', text, count=1, flags=re.S)
-          text = re.sub(r'Current critical sequence:\n\n```text\n.*?```', 'Current critical sequence:\n\n```text\ngoverned P7.06 deploy exact merged p9.11.7\n        ↓\nreal owner F11A materials/template/transient-document journey + F11B project-portfolio journey\n        ↓\ndisposition any material owner friction; retain deferred natural F08 task journey\n        ↓\nR32\n        ↓\nP9.12 / M9\n```', text, count=1, flags=re.S)
-          roadmap.write_text(text, encoding='utf-8')
-
-          phase = Path('docs/roadmap/PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md')
-          text = phase.read_text(encoding='utf-8')
-          text = text.replace('Version: `1.13.18`', 'Version: `1.13.19`', 1)
-          text = re.sub(r'Current disposition:.*?\nMilestone:', 'Current disposition: F10A has bounded owner PASS for guide understandability. The same real owner session established F11: the Workspace needed real Company materials/templates and a single read-only current-project portfolio. The F11 Product Contract is `Provisional 0.1.0`. Workspace `p9.11.7` now has technically ready F11A staged Company material/version/provenance + exact-version Transient Output generation and F11B source-backed read-only project portfolio projection. Exact code/release head `352f49372753f43a387808ebf67d1b0997594406` passed Productive Workspace CI `32980578877` and Reference Python CI `32980578955`. Governed deployment and real owner F11A/F11B validation remain pending. Canonical asset admission is not implemented. P9.11 remains Current; R32 remains locked, P9.12 not started and M9 open.\nMilestone:', text, count=1, flags=re.S)
-          text = text.replace('| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F07/F08 bounded owner PASS; F09 bounded restoration; ordinary dogfooding** |', '| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F10A bounded owner PASS; F11 p9.11.7 technically ready; deploy/owner validation pending** |', 1)
-          marker = '## 7. Current critical path\n'
-          if '### F11 — Company materials and project portfolio' not in text:
-              addition = '''### F10 — Workspace guidance and organizational asset intake gap\n\nThe live `p9.11.6` guide passed bounded owner recheck for understandability. Owner feedback: `руководство есть, оно понятное. но пока система пустая, работать не с чем.` F10A therefore remains PASS only in guide-understandability scope; the missing organizational-material and practical-work surfaces became F11 rather than being silently treated as completed F10B/F10C.\n\n### F11 — Company materials and project portfolio\n\nCanonical evidence: [`P9.11-F11 — Материалы компании и единый портфель проектов`](../reviews/P9-11-F11-company-materials-and-project-portfolio.md).\n\nThe owner-approved Product Contract is `Provisional 0.1.0`. Workspace `p9.11.7` implements two bounded Company-specific journeys without promoting them to Stable Product Contract or Active Platform Capability:\n\n- **F11A:** owner-local `StagedNonCanonical` Company material intake with Organization/Actor attribution, immutable version lineage, SHA-256/provenance/handling metadata, conservative actual-content allowlist, exact DOCX version selection and generated `TransientOutput`; canonical asset admission remains unavailable.\n- **F11B:** explicit Company project registry plus read-only `External Reference` canonical-roadmap projection with exact repository/path/commit/content SHA-256/freshness and explicit `reconciliation-required` / `unavailable` states; no roadmap write or remote execution path.\n\nExact code/release head `352f49372753f43a387808ebf67d1b0997594406` passed Productive Workspace CI `32980578877` and Reference Python CI `32980578955`. Repository-only evidence is sufficient for technical readiness, not owner usefulness PASS. Next evidence must come from governed deployment and real owner F11A/F11B journeys.\n\n'''
-              if marker not in text:
-                  raise SystemExit('PHASE9 critical-path marker missing')
-              text = text.replace(marker, addition + marker, 1)
-          text = re.sub(r'## 7\. Current critical path\n\n```text\n.*?```', '## 7. Current critical path\n\n```text\ngoverned P7.06 deploy exact merged p9.11.7\n        ↓\nreal owner F11A materials/template/transient-document journey + F11B project-portfolio journey\n        ↓\ndisposition material friction; retain deferred natural F08 task journey\n        ↓\nR32 hardening + M9 Code Health Gate\n        ↓\nP9.12 / M9 closure\n```', text, count=1, flags=re.S)
-          text = re.sub(r'## 11\. Current canonical action\n\n> .*?\n\nR32 remains locked until P9\.11 real-session evidence and friction closure criteria are met\.', '## 11. Current canonical action\n\n> **P9.11 — merge the technically ready F11 `p9.11.7` slice, governed-deploy the exact merged release through P7.06, then perform real owner F11A and F11B validation. F11A must use real Company material/template inputs and preserve generated output as Transient Output by default; F11B must show source-backed or explicit reconciliation/unavailable project states with exact provenance. Do not claim canonical asset admission, Stable Product Contract, Active capability or owner PASS from repository tests alone. The first genuine actionable owner task, when naturally present, still rechecks the deferred F08 task-detail/governed-action journey. P9.11 remains Current and R32 remains locked.**\n\nR32 remains locked until the F11 real owner journeys and any resulting material friction are dispositioned together with the existing P9.11 closure criteria.', text, count=1, flags=re.S)
-          phase.write_text(text, encoding='utf-8')
-
-          review = Path('docs/reviews/P9-11-F11-company-materials-and-project-portfolio.md')
-          text = review.read_text(encoding='utf-8')
-          text = text.replace('Version: `0.3.0`', 'Version: `0.4.0`', 1)
-          text = text.replace('Productive Workspace CI run `32975210959` — **PASS**:', 'Productive Workspace CI run `32980578877` on exact final code/release head `352f49372753f43a387808ebf67d1b0997594406` — **PASS**:', 1)
-          text = text.replace('Reference Python CI run `32975210906` — **PASS**.', 'Reference Python CI run `32980578955` on the same exact code/release head — **PASS**.', 1)
-          insert = '''### Iteration 6 — final project-binding UX reconciliation\n\nНайдено: F11 portfolio intentionally includes platform identity `OS`, while the first Company material-binding backend accepts only Company/product identities `COMPANY | PORT-*`. The material form initially reused every portfolio card and therefore offered `OS`, producing a visible option that the server correctly rejected.\n\nИсправлено минимально: backend scope не расширялся на platform identity; F11A project selector filters to `COMPANY | PORT-*`. Exact final frontend bundle was rebuilt reproducibly and normal read-only CI passed.\n\n'''
-          anchor = '## 6. Acceptance state\n'
-          if '### Iteration 6 — final project-binding UX reconciliation' not in text:
-              if anchor not in text:
-                  raise SystemExit('F11 review acceptance anchor missing')
-              text = text.replace(anchor, insert + anchor, 1)
-          text = text.replace('Material objections after iteration 5: **none for merge/deploy of the bounded Provisional slice**.', 'Material objections after iteration 6: **none for merge/deploy of the bounded Provisional slice**.', 1)
-          review.write_text(text, encoding='utf-8')
-          PY
-          git config user.name "arvectum-ci"
-          git config user.email "actions@users.noreply.github.com"
-          git add docs/roadmap/ROADMAP.md docs/roadmap/PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md docs/reviews/P9-11-F11-company-materials-and-project-portfolio.md
-          if ! git diff --cached --quiet; then
-            git commit -m "roadmap: sync P9.11-F11 p9.11.7 technical readiness"
-            git push origin HEAD:${GITHUB_HEAD_REF}
-          fi
