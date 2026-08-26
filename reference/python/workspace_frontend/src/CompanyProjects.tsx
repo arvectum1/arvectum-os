@@ -6,7 +6,7 @@ import "./CompanyWorkspace.css";
 
 type State =
   | { kind: "loading" }
-  | { kind: "ready"; data: CompanyPortfolioProjection }
+  | { kind: "ready"; data: CompanyPortfolioProjection; refreshing: boolean }
   | { kind: "error"; code: string };
 
 const TARGET_LABELS: Record<string, { ru: string; en: string }> = {
@@ -33,7 +33,9 @@ function ProjectCard({ project }: { project: CompanyProjectCard }) {
       ? text("Требуется reconciliation", "Reconciliation required")
       : project.state === "unavailable"
         ? text("Источник недоступен", "Source unavailable")
-        : text("Статус не указан", "Status not specified")
+        : project.state === "stale-cache"
+          ? text("Последняя известная сводка", "Last known snapshot")
+          : text("Статус не указан", "Status not specified")
   );
   const targetItems = project.execution_targets
     .filter((target) => target !== "unspecified")
@@ -70,8 +72,8 @@ function ProjectCard({ project }: { project: CompanyProjectCard }) {
         <div><dt>{text("Версия roadmap", "Roadmap version")}</dt><dd>{project.roadmap.version ?? "—"}</dd></div>
         <div><dt>{text("Точный commit", "Exact commit")}</dt><dd>{project.source ? <code>{project.source.commit_sha}</code> : "—"}</dd></div>
         <div><dt>{text("SHA-256 содержимого", "Content SHA-256")}</dt><dd>{project.source ? <code>{project.source.content_sha256}</code> : "—"}</dd></div>
-        <div><dt>{text("Получено", "Fetched")}</dt><dd>{project.source?.fetched_at ?? "—"}</dd></div>
-        <div><dt>{text("Свежесть fetch", "Fetch freshness")}</dt><dd>{project.source?.freshness ?? text("не подтверждена", "not established")}</dd></div>
+        <div><dt>{text("Последнее успешное получение", "Last successful fetch")}</dt><dd>{project.source?.fetched_at ?? "—"}</dd></div>
+        <div><dt>{text("Свежесть представления", "Projection freshness")}</dt><dd>{project.source?.freshness ?? text("не подтверждена", "not established")}</dd></div>
       </dl>
     </details>
   </article>;
@@ -80,18 +82,22 @@ function ProjectCard({ project }: { project: CompanyProjectCard }) {
 export function CompanyProjects() {
   const { text } = useWorkspaceLanguage();
   const [state, setState] = useState<State>({ kind: "loading" });
-  const refresh = () => {
-    setState({ kind: "loading" });
-    void loadCompanyPortfolio()
-      .then((data) => setState({ kind: "ready", data }))
+  const refresh = (forceRefresh = false) => {
+    setState((current) => current.kind === "ready" && forceRefresh
+      ? { kind: "ready", data: current.data, refreshing: true }
+      : { kind: "loading" });
+    void loadCompanyPortfolio(forceRefresh)
+      .then((data) => setState({ kind: "ready", data, refreshing: false }))
       .catch((error) => setState({ kind: "error", code: error instanceof Error ? error.message : "COMPANY_PORTFOLIO_UNAVAILABLE" }));
   };
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => { refresh(false); }, []);
 
-  if (state.kind === "loading") return <section className="company-page" aria-live="polite">{text("Читаем канонические дорожные карты…", "Reading canonical roadmaps…")}</section>;
-  if (state.kind === "error") return <section className="company-page" role="alert"><p className="eyebrow">F11B · Provisional 0.1.0</p><h1>{text("Портфель проектов недоступен", "Project portfolio unavailable")}</h1><p>{text("Workspace не подменяет недоступный canonical source данными из чата, памяти модели или технической активности.", "Workspace does not replace an unavailable canonical source with chat, model memory, or technical activity.")}</p><code>{state.code}</code><div><button type="button" onClick={refresh}>{text("Повторить", "Retry")}</button></div></section>;
+  if (state.kind === "loading") return <section className="company-page" aria-live="polite">{text("Читаем сводку проектов…", "Reading project portfolio…")}</section>;
+  if (state.kind === "error") return <section className="company-page" role="alert"><p className="eyebrow">F11B · Provisional 0.1.0</p><h1>{text("Портфель проектов недоступен", "Project portfolio unavailable")}</h1><p>{text("Нет ни доступного канонического источника, ни ранее успешно сохранённой локальной сводки. Workspace не подменяет их данными из чата или памяти модели.", "Neither the canonical source nor a previously successful local snapshot is available. Workspace does not replace them with chat or model memory.")}</p><code>{state.code}</code><div><button type="button" onClick={() => refresh(true)}>{text("Повторить", "Retry")}</button></div></section>;
 
   const sourceBacked = state.data.projects.filter((project) => project.state === "current-source-backed").length;
+  const cached = state.data.projects.filter((project) => project.state === "cached-source-backed").length;
+  const stale = state.data.projects.filter((project) => project.state === "stale-cache").length;
   const reconciliation = state.data.projects.filter((project) => project.state === "reconciliation-required").length;
   const unavailable = state.data.projects.filter((project) => project.state === "unavailable").length;
 
@@ -102,18 +108,20 @@ export function CompanyProjects() {
         <h1 id="company-projects-title">{text("Проекты компании", "Company projects")}</h1>
         <p>{text("Единая read-only сводка: где сейчас каждый проект, что уже сделано, что доступно дальше, какие ветки и блокеры есть и где выполнять работу.", "One read-only view of where each project is, what is complete, what is available next, its branches and blockers, and where the work belongs.")}</p>
       </div>
-      <button type="button" onClick={refresh}>{text("Обновить", "Refresh")}</button>
+      <button type="button" disabled={state.refreshing} onClick={() => refresh(true)}>{state.refreshing ? text("Обновляем…", "Refreshing…") : text("Обновить из источников", "Refresh sources")}</button>
     </header>
 
     <div className="project-portfolio-summary" aria-label={text("Состояние источников", "Source status")}>
-      <span><strong>{sourceBacked}</strong>{text("с актуальным источником", "source-backed")}</span>
+      <span><strong>{sourceBacked}</strong>{text("обновлены сейчас", "freshly fetched")}</span>
+      <span><strong>{cached}</strong>{text("из свежего локального кэша", "from recent local cache")}</span>
+      <span><strong>{stale}</strong>{text("последняя известная сводка", "last known snapshot")}</span>
       <span><strong>{reconciliation}</strong>{text("требуют reconciliation", "need reconciliation")}</span>
-      <span><strong>{unavailable}</strong>{text("недоступны", "unavailable")}</span>
+      <span><strong>{unavailable}</strong>{text("без данных", "without data")}</span>
     </div>
 
     <details className="company-boundary-details">
       <summary>{text("Как читать эту страницу", "How to read this page")}</summary>
-      <p>{text("Workspace ничего не записывает обратно в roadmaps и не подменяет отсутствующие факты данными из чата или памяти. Технический источник и exact SHA спрятаны в каждой карточке под отдельным раскрывающимся блоком.", "Workspace writes nothing back to roadmaps and does not fill missing facts from chat or memory. The exact technical source and SHA are available inside each project under a separate disclosure.")}</p>
+      <p>{text("Обычная навигация использует последнюю успешно полученную non-canonical сводку и не зависит от нового GitHub-запроса при каждом возврате на страницу. Кнопка «Обновить из источников» делает явную попытку перечитать зарегистрированные canonical sources. Если внешний источник временно недоступен, прежняя сводка остаётся видимой и маркируется как последняя известная; она не становится canonical truth. Технический источник и exact SHA спрятаны в каждой карточке.", "Ordinary navigation uses the last successful non-canonical snapshot instead of depending on a new GitHub request every time the page is revisited. Refresh sources explicitly re-reads registered canonical sources. If an external source is temporarily unavailable, the previous snapshot remains visible and is marked as last known; it does not become canonical truth. Exact source and SHA remain available in each card.")}</p>
     </details>
 
     <div className="company-grid">{state.data.projects.map((project) => <ProjectCard project={project} key={project.id} />)}</div>
