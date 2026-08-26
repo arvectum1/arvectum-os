@@ -51,13 +51,7 @@ def install_f11_routes(
     portfolio_provider: RuntimeCompanyPortfolioProvider | None = None,
     materials_store: CompanyMaterialsStore | None = None,
 ) -> FastAPI:
-    """Install F11 routes before the existing SPA catch-all.
-
-    The legacy Workspace security middleware remains the one outer trust boundary.
-    These routes independently re-use the same current session/access resolver and
-    CSRF evidence because those dependencies are intentionally closure-local in
-    the pre-F11 BFF factory.
-    """
+    """Install bounded F11 routes inside the existing same-origin Workspace BFF."""
 
     settings = app.state.settings
     store = app.state.session_store
@@ -67,7 +61,10 @@ def install_f11_routes(
     app.state.company_portfolio_provider = portfolio
     app.state.company_materials_store = materials
 
-    spa_routes = [route for route in app.router.routes if getattr(route, "path", None) == "/{full_path:path}"]
+    # Existing Workspace creates the SPA catch-all before this product boundary is
+    # composed. Temporarily remove exactly that route so API routes remain reachable,
+    # then restore it as the final route. Static /assets remains untouched.
+    spa_routes = [route for route in app.router.routes if getattr(route, "path", None) == "/{path:path}"]
     if len(spa_routes) != 1:
         raise RuntimeError("F11 route installation requires exactly one existing Workspace SPA catch-all")
     spa_route = spa_routes[0]
@@ -153,9 +150,9 @@ def install_f11_routes(
         output_id: str,
         current: tuple[WorkspaceSession, AccessContext] = Depends(authorize_current),
     ) -> FileResponse:
-        _ = current
+        _, access = current
         try:
-            path, manifest = materials.output_path(output_id)
+            path, manifest = materials.output_path(access, output_id)
         except CompanyMaterialUnavailable:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="COMPANY_OUTPUT_UNAVAILABLE") from None
         except CompanyMaterialsError:
