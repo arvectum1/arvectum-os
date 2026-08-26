@@ -1,4 +1,6 @@
 import { Activity } from "./Activity";
+import { CompanyMaterials } from "./CompanyMaterials";
+import { CompanyProjects } from "./CompanyProjects";
 import { Copilot } from "./Copilot";
 import { Discovery } from "./Discovery";
 import { Dogfooding } from "./Dogfooding";
@@ -16,7 +18,7 @@ import type { NavigationItem, WorkspaceContext } from "./types";
 
 function groupForPath(path: string): string {
   if (path === "/" || path === "/today" || path === "/guide") return "today";
-  if (path === "/work" || path === "/my-work" || path === "/products" || path.startsWith("/products/")) return "work";
+  if (path === "/work" || path === "/my-work" || path === "/products" || path.startsWith("/products/") || path === "/projects" || path === "/company-materials") return "work";
   if (path === "/information" || path === "/search" || path === "/records" || path === "/documents" || path === "/knowledge" || path.startsWith("/objects/")) return "information";
   if (path === "/copilot") return "copilot";
   return "system";
@@ -34,12 +36,14 @@ function Today() {
       <p className="eyebrow">{text("Arvectum OS · Рабочее пространство", "Arvectum OS · Workspace")}</p>
       <h1 id="today-title">{text("Что делать сейчас", "What to do now")}</h1>
       <p>{text(
-        "Если текущих задач нет, используйте поиск по доступным документам, задайте вопрос Arvectum AI или откройте руководство по возможностям Workspace.",
-        "If there are no current tasks, search available documents, ask Arvectum AI, or open the Workspace capability guide.",
+        "Если текущих задач нет, откройте проекты компании, материалы и шаблоны, найдите документ, задайте вопрос Arvectum AI или откройте руководство по возможностям Workspace.",
+        "If there are no current tasks, open Company projects, materials and templates, find a document, ask Arvectum AI, or open the Workspace capability guide.",
       )}</p>
     </section>
     <section className="home-actions" aria-label={text("Основные действия", "Primary actions")}>
       <a href="/work" onClick={(event) => { event.preventDefault(); navigateTo("/work"); }}>{text("Открыть задачи", "Open tasks")}</a>
+      <a href="/projects" onClick={(event) => { event.preventDefault(); navigateTo("/projects"); }}>{text("Проекты компании", "Company projects")}</a>
+      <a href="/company-materials" onClick={(event) => { event.preventDefault(); navigateTo("/company-materials"); }}>{text("Материалы компании", "Company materials")}</a>
       <a href="/information" onClick={(event) => { event.preventDefault(); navigateTo("/information"); }}>{text("Найти документ", "Find a document")}</a>
       <a href="/copilot" onClick={(event) => { event.preventDefault(); navigateTo("/copilot"); }}>{text("Спросить Arvectum", "Ask Arvectum")}</a>
       <a href="/guide" onClick={(event) => { event.preventDefault(); navigateTo("/guide"); }}>{text("Открыть руководство", "Open guide")}</a>
@@ -61,6 +65,8 @@ export function Shell({ context, onLogout }: { context: WorkspaceContext; onLogo
   let content: React.ReactNode;
   if (objectId) content = <ObjectDetail objectId={objectId} />;
   else if (currentPath === "/products" || productId) content = <Products productId={productId} />;
+  else if (currentPath === "/projects") content = <CompanyProjects />;
+  else if (currentPath === "/company-materials") content = <CompanyMaterials csrfToken={context.session.csrf_token} />;
   else if (currentPath === "/my-work") content = <MyWork />;
   else if (currentPath === "/search" || currentPath === "/information") content = <Discovery />;
   else if (currentPath === "/records") content = <Discovery kind="record" />;
@@ -83,6 +89,8 @@ export function Shell({ context, onLogout }: { context: WorkspaceContext; onLogo
       <div className="brand" aria-label="Arvectum OS"><img src={arvectumLogo} className="brand-logo" alt="Arvectum" /><span className="brand-product">OS</span></div>
       <nav aria-label={text("Навигация Arvectum OS", "Workspace navigation")}><ul>{context.navigation.map((item) => <li key={item.id}><a href={item.href} onClick={navigate(item)} aria-current={item.id === active.id ? "page" : undefined}><span>{navLabel(item)}</span></a></li>)}</ul></nav>
       <div className="sidebar-controls">
+        <a href="/projects" aria-current={currentPath === "/projects" ? "page" : undefined} onClick={(event) => { event.preventDefault(); navigateTo("/projects"); }}>{text("Проекты компании", "Company projects")}</a>
+        <a href="/company-materials" aria-current={currentPath === "/company-materials" ? "page" : undefined} onClick={(event) => { event.preventDefault(); navigateTo("/company-materials"); }}>{text("Материалы компании", "Company materials")}</a>
         <a href="/guide" onClick={(event) => { event.preventDefault(); navigateTo("/guide"); }}>{text("Руководство", "Guide")}</a>
         <div className="language-switch" role="group" aria-label={text("Язык интерфейса", "Interface language")}><button type="button" className={language === "ru" ? "active" : ""} aria-pressed={language === "ru"} onClick={() => setLanguage("ru")}>RU</button><button type="button" className={language === "en" ? "active" : ""} aria-pressed={language === "en"} onClick={() => setLanguage("en")}>EN</button></div><div className="sidebar-footnote">{text("Внутреннее рабочее пространство", "Internal workspace")} · {context.release.id}</div></div>
     </aside>

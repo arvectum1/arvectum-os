@@ -1,14 +1,14 @@
 # Arvectum OS Phase 9 — Productive Workspace & Daily Operations
 
 Status: `Active`
-Version: `1.13.18`
+Version: `1.13.19`
 Created: `2026-08-21`
 Updated: `2026-08-26`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `product_contract` and `governance`
 Parent roadmap: [`ROADMAP.md`](ROADMAP.md)
 
-Current disposition: F06 remains operationally verified. F07 remains owner-rechecked PASS only in its bounded Home/navigation/branding scope. F08 p9.11.5 semantic repair is merged and deployed on selected-Mac runtime `03ba2c72fb9460e97b628c4b3dac36ac496cb942`; exact runtime/assets, P7.02/P7.05, one managed target Workspace start, `CURRENT_EXACT`, `MANAGED_SPAWN_PROOF`, loopback-only serving and launcher verification all passed. The real p9.11.5 owner recheck now gives a bounded PASS for the false-task/owner-task eligibility defect: the Workspace is clean and no fabricated task remains. Because no genuine actionable owner task currently exists, the real task-detail → governed-action journey remains unevidenced until natural work produces one; no synthetic task is admitted. F09 remains resolved in bounded scope, with its repaired live post-SIGTERM branch not re-exercised. P9.11 returns to ordinary real-use dogfooding; R32 remains locked, P9.12 not started and M9 open.
+Current disposition: F10A has bounded owner PASS for guide understandability. The same real owner session established F11: the Workspace needed real Company materials/templates and a single read-only current-project portfolio. The F11 Product Contract is `Provisional 0.1.0`. Workspace `p9.11.7` now has technically ready F11A staged Company material/version/provenance + exact-version Transient Output generation and F11B source-backed read-only project portfolio projection. Exact code/release head `352f49372753f43a387808ebf67d1b0997594406` passed Productive Workspace CI `32980578877` and Reference Python CI `32980578955`. Governed deployment and real owner F11A/F11B validation remain pending. Canonical asset admission is not implemented. P9.11 remains Current; R32 remains locked, P9.12 not started and M9 open.
 Milestone: `M9 — Daily-use organizational workbench`
 Intermediate milestone: `M9-alpha — Usable Internal Workspace — Achieved / PASS`
 Architecture baseline: Constitution `1.2.0`; RFC-0001 through RFC-0008 `Accepted 1.0.0`; ADR-0001 `Accepted`
@@ -54,7 +54,7 @@ The legacy P4/P7 browser surfaces remain diagnostic/reference/recovery evidence.
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS | non-authoritative activity UX |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS | company-level composition |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS | product/AI boundaries PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F07/F08 bounded owner PASS; F09 bounded restoration; ordinary dogfooding** | real owner sessions + material friction closure |
+| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F10A bounded owner PASS; F11 p9.11.7 technically ready; deploy/owner validation pending** | real owner sessions + material friction closure |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked | pre-closure hardening PASS |
 | P9.12 | Phase 9 / M9 closure review | ⬜ | exact-scope M9 closure |
 
@@ -182,14 +182,29 @@ The selected Mac then successfully governed-deployed canonical target `03ba2c72f
 
 F09 is therefore **resolved in bounded scope / operationally restored** and no longer blocks P9.11. This recovery did not re-exercise the repaired real post-SIGTERM branch; that limitation remains explicit and is covered by regression tests until a future ordinary update from a running exact Workspace provides natural live confirmation.
 
+### F10 — Workspace guidance and organizational asset intake gap
+
+The live `p9.11.6` guide passed bounded owner recheck for understandability. Owner feedback: `руководство есть, оно понятное. но пока система пустая, работать не с чем.` F10A therefore remains PASS only in guide-understandability scope; the missing organizational-material and practical-work surfaces became F11 rather than being silently treated as completed F10B/F10C.
+
+### F11 — Company materials and project portfolio
+
+Canonical evidence: [`P9.11-F11 — Материалы компании и единый портфель проектов`](../reviews/P9-11-F11-company-materials-and-project-portfolio.md).
+
+The owner-approved Product Contract is `Provisional 0.1.0`. Workspace `p9.11.7` implements two bounded Company-specific journeys without promoting them to Stable Product Contract or Active Platform Capability:
+
+- **F11A:** owner-local `StagedNonCanonical` Company material intake with Organization/Actor attribution, immutable version lineage, SHA-256/provenance/handling metadata, conservative actual-content allowlist, exact DOCX version selection and generated `TransientOutput`; canonical asset admission remains unavailable.
+- **F11B:** explicit Company project registry plus read-only `External Reference` canonical-roadmap projection with exact repository/path/commit/content SHA-256/freshness and explicit `reconciliation-required` / `unavailable` states; no roadmap write or remote execution path.
+
+Exact code/release head `352f49372753f43a387808ebf67d1b0997594406` passed Productive Workspace CI `32980578877` and Reference Python CI `32980578955`. Repository-only evidence is sufficient for technical readiness, not owner usefulness PASS. Next evidence must come from governed deployment and real owner F11A/F11B journeys.
+
 ## 7. Current critical path
 
 ```text
-ordinary real-use Workspace dogfooding across available surfaces
+governed P7.06 deploy exact merged p9.11.7
         ↓
-first genuine actionable owner task, when naturally present → recheck task-detail / governed-action journey
+real owner F11A materials/template/transient-document journey + F11B project-portfolio journey
         ↓
-disposition recurring material friction
+disposition material friction; retain deferred natural F08 task journey
         ↓
 R32 hardening + M9 Code Health Gate
         ↓
@@ -229,6 +244,6 @@ Phase 9 does not by itself establish public SaaS, customer Production, universal
 
 ## 11. Current canonical action
 
-> **P9.11 — continue ordinary real-use dogfooding through the available Workspace surfaces without manufacturing synthetic tasks or owner-session evidence. When the first genuine actionable owner task appears, use it to recheck task meaning, next action and governed-action comprehension as natural evidence for the deferred part of F08. Record any new material friction as a new P9.11 finding and disposition recurring issues before R32. F07/F08 remain bounded owner PASS in their evidenced scopes; F09 remains bounded operational restoration; P9.11 remains Current and R32 remains locked.**
+> **P9.11 — merge the technically ready F11 `p9.11.7` slice, governed-deploy the exact merged release through P7.06, then perform real owner F11A and F11B validation. F11A must use real Company material/template inputs and preserve generated output as Transient Output by default; F11B must show source-backed or explicit reconciliation/unavailable project states with exact provenance. Do not claim canonical asset admission, Stable Product Contract, Active capability or owner PASS from repository tests alone. The first genuine actionable owner task, when naturally present, still rechecks the deferred F08 task-detail/governed-action journey. P9.11 remains Current and R32 remains locked.**
 
-R32 remains locked until P9.11 real-session evidence and friction closure criteria are met.
+R32 remains locked until the F11 real owner journeys and any resulting material friction are dispositioned together with the existing P9.11 closure criteria.

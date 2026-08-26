@@ -8,6 +8,7 @@ from pathlib import Path
 from workspace_app.access import P704AccessResolver, provision_workspace_grant
 from workspace_app.assets import verify_frontend_assets
 from workspace_app.config import WorkspaceSettings
+from workspace_app.f11_routes import install_f11_routes
 from workspace_app.main import create_app
 from workspace_app.release import load_release
 
@@ -24,6 +25,12 @@ def _parser() -> argparse.ArgumentParser:
 
 def _frontend_root() -> Path:
     return Path(__file__).resolve().parent / "workspace_frontend"
+
+
+def build_workspace_app(settings: WorkspaceSettings):
+    """Build one same-origin Workspace app and install bounded F11 product routes."""
+
+    return install_f11_routes(create_app(settings))
 
 
 def main() -> None:
@@ -57,7 +64,7 @@ def main() -> None:
     import uvicorn
 
     uvicorn.run(
-        create_app(settings),
+        build_workspace_app(settings),
         host=settings.bind_host,
         port=settings.bind_port,
         proxy_headers=False,

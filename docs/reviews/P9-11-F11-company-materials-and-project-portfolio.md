@@ -1,211 +1,220 @@
 # P9.11-F11 — Материалы компании и единый портфель проектов
 
-Status: `Owner-approved / Product Contract Provisional 0.1.0 / implementation pending`
-Version: `0.2.0`
+Status: `Implementation technically ready / owner validation pending`
+Version: `0.4.0`
 Created: `2026-08-26`
 Updated: `2026-08-26`
 Owner: `ООО «Арвектум»`
-Task classification: `platform` + `product_contract` with `product_specific` consumers
+Task classification: `platform` + `product_contract` + `product_specific`
 Roadmap work item: `P9.11 — Real daily-use dogfooding + friction/backlog closure`
 Authority baseline: Constitution `1.2.0`; RFC-0001, RFC-0004, RFC-0005, RFC-0006, RFC-0007, RFC-0008 `Accepted 1.0.0`; ADR-0001 `Accepted`
 Predecessor: [`P9.11-F10`](P9-11-F10-workspace-guidance-and-organizational-asset-intake-gap.md)
 Product Contract: [`Provisional 0.1.0`](../contracts/P9-11-F11-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT-PROVISIONAL-v0.1.0.md)
 Owner approval: [`DECISION-2026-08-26-P9-11-F11-PROVISIONAL-APPROVAL`](../governance/decisions/DECISION-2026-08-26-P9-11-F11-PROVISIONAL-APPROVAL.md)
 Transition review: [`P9-11-F11-provisional-transition`](P9-11-F11-provisional-transition.md)
+Workspace release: `p9.11.7`
+App API contract: `11`
 
-## 1. Реальный owner feedback и диспозиция F10A
+## 1. Исходный реальный finding
 
-После governed deployment Workspace `p9.11.6` владелец выполнил реальный визуальный recheck встроенного `/guide` и сообщил:
+После governed deployment Workspace `p9.11.6` владелец выполнил реальный визуальный recheck `/guide` и сообщил:
 
 > `руководство есть, оно понятное. но пока система пустая, работать не с чем.`
 
-Это даёт **bounded owner PASS для F10A** только в scope понятности встроенного руководства: руководство существует, доступно владельцу и понятно объясняет текущие возможности/ограничения Workspace.
+Это зафиксировало bounded owner PASS для F10A и два следующих material findings:
 
-Тот же реальный owner session выявил два следующих material findings:
+1. Workspace не принимал организационные исходники/шаблоны и не позволял получить стандартный документ из точной версии шаблона;
+2. Workspace не показывал единый актуальный read-only статус текущих проектов из их канонических roadmap sources.
 
-1. Workspace не принимает организационные исходники и шаблоны, поэтому из него нельзя собрать стандартный документ ООО «Арвектум» по выбранному проекту;
-2. Workspace не показывает единый актуальный статус дорожных карт текущих проектов и не помогает увидеть завершённое, текущую точку, ветви, разблокированные действия и место их выполнения.
-
-F10A не переоткрывается. F10B/F10C не объявляются завершёнными: их предмет конкретизирован в F11A.
-
-## 2. Разделение F11
-
-F11 выполняется двумя параллельными, но явно разделёнными потоками:
+F11 разделён на:
 
 - **F11A — «Материалы компании + стандартный документ»**;
 - **F11B — «Портфель проектов + синхронизация дорожных карт»**.
 
-Оба потока являются Company-specific использованием Productive Workspace. Arvectum OS предоставляет только domain-neutral механизмы и не становится владельцем брендовых правил, шаблонов ООО «Арвектум», project portfolio semantics или product roadmap truth.
+Product Contract `0.1.0` утверждён владельцем только в lifecycle `Provisional`. Это разрешает bounded implementation и real validation, но не создаёт Stable status, Organizational Authority, operational-readiness approval или Platform Capability promotion.
 
-## 3. F11A — целевой owner journey
+## 2. Реализованный F11A slice
 
-### 3.1 Материалы компании
+Workspace release `p9.11.7` содержит owner-facing `/company-materials` в существующем React SPA и same-origin Python BFF.
 
-В Workspace появляется owner-facing раздел `Материалы компании`, где владелец может:
+Текущий bounded flow позволяет:
 
-1. добавить файл;
-2. выбрать Company-owned роль материала, например `Логотип`, `Брендбук`, `Шаблон документа`, `Шаблон презентации`, `Шаблон письма`, `Организационный источник`, `Другое`;
-3. указать понятное название и при необходимости назначение/описание;
-4. увидеть uploader/Actor, дату приёма, Organization scope, classification, provenance, subject identity и immutable version identity;
-5. открыть конкретную версию, увидеть историю версий и выбрать точную версию для использования;
-6. найти материал через owner-facing discovery;
-7. заменить материал только созданием новой версии, не переписывая историческую версию молча.
+1. принять owner-selected Company material как **`StagedNonCanonical`**;
+2. привязать его к текущему server-resolved Organization и Actor;
+3. зафиксировать stable `MAT-*` subject identity и immutable `MV-*` version identity;
+4. сохранить exact SHA-256 bytes, uploader, received-at, semantic role, classification, purpose, rights, retention rule, project binding и predecessor version;
+5. добавить новую версию без silent rewrite старой;
+6. получить список точных staged versions в текущем Organization scope;
+7. выбрать exact DOCX version и сгенерировать DOCX по bounded placeholders `{{TITLE}}`, `{{BODY}}`, `{{DATE}}`;
+8. получить generated file как **`TransientOutput`** с exact source material/version/hash provenance;
+9. скачать exact transient DOCX только после текущей server-side access revalidation.
 
-Receipt файла не означает автоматического признания его валидированным Knowledge, утверждённым Standard, Policy, решением или authority grant.
+Это **не** является canonical admission. Upload/generation не создают Authorization, Organizational Authority, Consequential Approval, validated Knowledge, Standard, Policy или canonical Document/Artifact.
 
-### 3.2 Создание стандартного документа
+### 2.1 Security / Data Governance first slice
 
-Из `Материалов компании` и/или проекта владелец получает действие `Создать стандартный документ`:
+Server не доверяет filename extension или browser MIME как доказательству типа. Фактические bytes проверяются до staged receipt.
 
-1. выбрать конкретный проект по стабильному Company-owned project identity;
-2. выбрать тип результата;
-3. выбрать точную версию шаблона;
-4. выбрать точные версии логотипа/брендбука/дополнительных источников;
-5. создать preview/draft;
-6. увидеть, какие exact input versions использованы;
-7. получить generated Artifact как **Transient Output по умолчанию**;
-8. после человеческой проверки отдельно сохранить/экспортировать/продвинуть результат допустимым governed путём, если это требуется.
+Первый allowlist:
 
-`Одна кнопка` означает простой owner journey, а не обход provenance, version pinning, authorization, Organizational Authority, Data Governance или Governed Execution.
+- DOCX;
+- PPTX;
+- PDF;
+- PNG;
+- JPEG;
+- WebP;
+- UTF-8 TXT/MD.
 
-### 3.3 Platform / Company boundary
+Fail-closed:
 
-**Platform-owned, domain-neutral:** приём bytes/governed external reference; Organization/Actor attribution; stable subject identity; immutable version identity; digest; provenance/received-at; classification/retention/rights metadata where applicable; version listing/resolution; exact-version selection; discovery; portability/export; RFC-0008 Document/Artifact semantics; RFC-0005 governed canonical admission where consequential canonical state is created.
+- generic `application/octet-stream`;
+- SVG без отдельного sanitizer;
+- macro-bearing OOXML content (`vbaProject.bin`);
+- encrypted/unsafe OOXML archive paths;
+- oversized material/expanded OOXML;
+- declared type, не соответствующий фактическим bytes;
+- cross-Organization manifest/version/output use;
+- symlinked staged metadata/output targets;
+- invalid project/material/version/output identities.
 
-**Company-owned:** роли материалов; правила фирменного стиля; конкретные шаблоны; типы стандартных документов; project binding; правила выбора шаблонов; инструкции генерации и UX; критерии внутреннего утверждения результата.
+Owner-local staged directories получают `0700`, staged blobs/manifests/transient outputs — `0600` на POSIX runtime.
 
-## 4. F11B — единый портфель проектов
+## 3. Реализованный F11B slice
 
-### 4.1 Owner-facing dashboard
+Workspace release `p9.11.7` содержит owner-facing `/projects`.
 
-В Workspace появляется раздел `Проекты` с единообразной карточкой каждого явно зарегистрированного текущего проекта.
+Источник identity/ownership registry — approved Company governance AC-301 плюс Approved Git migration closure, а не автоматическое перечисление GitHub repositories.
 
-Карточка показывает:
+Для source-backed карточки BFF server-side:
 
-- stable project identity и display name;
-- canonical repository/source locator;
-- exact source commit SHA;
-- время последней успешной синхронизации и freshness;
-- phase/milestone, если источник это определяет;
-- что завершено;
-- где проект находится сейчас;
-- текущие/следующие ветви развития;
-- какие действия разблокированы;
-- какие действия заблокированы и чем;
-- где действие должно выполняться, только если это явно определено;
-- provenance на исходный roadmap/status source.
+1. использует только packaged allowlisted repository/path descriptor;
+2. получает exact canonical `main` SHA;
+3. читает roadmap на exact SHA;
+4. нормализует bounded status/current/branches/unlocked/blocked fields adapter-ом;
+5. фиксирует repository, path, exact commit SHA, fetched-at, freshness, adapter;
+6. дополнительно фиксирует **SHA-256 точных UTF-8 roadmap bytes**, использованных для нормализации;
+7. не имеет roadmap write/remote execution path;
+8. не использует chat/model memory как authority.
 
-### 4.2 Execution target vocabulary
+Если repository locator или roadmap source не reconciled, карточка показывает `reconciliation-required`. Если зарегистрированный canonical source недоступен или exact content identity не подтверждён, карточка показывает `unavailable`; статус не подменяется кэшем или памятью модели.
 
-Company-owned presentation vocabulary:
+### 3.1 Registry reconciliation
 
-- `web`;
-- `mac-mini`;
-- `macbook`;
-- `windows-laptop`;
-- `windows-test-laptop`;
-- `linux-test-laptop`;
-- `unspecified`.
+Approved AC-301 сохраняет PORT-001…PORT-007 identities. Approved Git migration closure устанавливает `arvectum1/*` как canonical PRIMARY и содержит девять текущих canonical repositories.
 
-Одно действие может иметь несколько execution targets. Workspace не угадывает target по чату, модели, имени репозитория или названию задачи. При отсутствии явного evidence показывает `Не указано`.
+PORT-005 (`Tender Small-Volume Calculator`) присутствует как Company identity, но `arvectum1/tender-app` фактически отсутствует (`404`) и не входит в approved список девяти canonical repositories. Поэтому F11 registry **не изобретает новый locator и не объединяет PORT-005 с Tender Agent**: repository/roadmap остаются unresolved, карточка — `reconciliation-required`.
 
-### 4.3 Source-of-truth rule
+## 4. Topology / deployment boundary
 
-Dashboard является **derived read-only projection**, а не новой дорожной картой.
+F11 не создаёт второй service/process/listener.
 
-- `arvectum-os` roadmap остаётся authoritative для Arvectum OS sequencing/status;
-- `arvectum-company` roadmap/approved portfolio governance остаются authoritative для Company-level sequencing и PORT identity;
-- product repositories остаются authoritative для product-specific roadmap/status/domain semantics;
-- project chat/model memory не являются roadmap authority;
-- GitHub repository paths are locators, not stable Company project identities.
+`p9_03_workspace.py` собирает существующий Workspace BFF и устанавливает F11 routes **до** существующего SPA catch-all. P7.06 продолжает разворачивать exact immutable `reference/python` release и перезапускает тот же Workspace process через существующий P9.11 process lifecycle.
 
-При конфликте dashboard показывает conflict/stale/unknown и provenance; он не выбирает удобную правду молча.
+Сохраняются:
 
-### 4.4 Registry и неодинаковые roadmap formats
+- loopback-only owner-local Workspace profile;
+- server-side session/access/context;
+- exact release header guard;
+- same-origin BFF;
+- CSRF + Origin protection state-changing F11 routes;
+- no browser credentials;
+- no browser canonical state/Web Storage;
+- exact release-pinned frontend assets.
 
-Первый slice не требует переписывать все project roadmaps в один Markdown layout. Company-owned project registry для каждого admitted project задаёт stable project identity, display name, canonical repository, canonical roadmap/status source descriptor, adapter/export version и optional technical execution constraints source.
+## 5. Functional cross-review
 
-Если canonical roadmap/status source недостаточно определён, карточка показывает `Требуется reconciliation`, а не строится из чатов.
+### Iteration 1 — F11B exact source identity
 
-### 4.5 Sync model первого slice
+Найдено: первоначальный `company_portfolio_verified.py` дублировал provider, но runtime продолжал использовать обычный provider, поэтому content SHA-256 фактически не попадал в live projection.
 
-Минимальный режим: `External Reference` для canonical GitHub sources + rebuildable non-canonical cache/projection.
+Исправлено: hashing boundary сделан композиционным; runtime использует `VerifiedRuntimeCompanyPortfolioProvider`; source-backed карточка без exact content SHA-256 fail-closed в `unavailable`.
 
-Sync получает exact repository/ref/SHA; читает только зарегистрированные canonical source paths; сохраняет SHA/fetched-at/freshness/provenance; не имеет write access; не создаёт задачи и не меняет статусы; fail-visible на source/network/schema/adapter conflict; credentials остаются server-side; cache не становится authority.
+### Iteration 2 — F11A content safety / Organization scope
 
-## 5. Начальный project registry scope
+Найдено: первоначальный intake доверял declared `media_type`, разрешал `application/octet-stream` и unsanitized SVG; manifest/output не были достаточно жёстко bound к Organization.
 
-Источником portfolio identity является approved Company governance, а не автоматический список GitHub repositories.
+Исправлено: actual-byte validation, conservative allowlist, macro/unsafe OOXML rejection, explicit Organization binding/filtering/revalidation, scoped download и owner-only filesystem permissions.
 
-Для первого reconciliation рассматриваются Arvectum Company, Arvectum OS и approved Company portfolio nodes PORT-001…PORT-007 из AC-301. Дополнительные repositories включаются только после Company-owned решения, что это current project.
+### Iteration 3 — Company registry authority
 
-Реальный inventory уже показывает неодинаковую структуру: Arvectum OS и Arvectum Company используют `docs/roadmap/ROADMAP.md`, Proxy Launcher — `docs/ROADMAP.md`; поэтому adapter/source-descriptor layer обязателен.
+Найдено: PORT-005 содержал stale/nonexistent current locator `arvectum1/tender-app`.
 
-## 6. Product Contract gate — RESOLVED FOR PROVISIONAL IMPLEMENTATION
+Исправлено: approved PORT identity сохранена, locator удалён как unresolved; silent merge с Tender Agent не выполняется.
 
-На этапе F10B applicable Arvectum Company Product Contract отсутствовал. В F11 exact Draft `0.1.0` был подготовлен и прошёл functional cross-review.
+### Iteration 4 — CI/runtime integration
 
-Владелец затем явно утвердил exact boundary формулировкой:
+Первый Productive Workspace CI обнаружил две implementation errors:
 
-> `утверждаю Product Contract F11 v0.1.0 в Provisional scope`
+- `test_company_materials.py` случайно зависел от отсутствующего `pytest` в locked Workspace test environment;
+- F11 route installer искал `/ {full_path:path}` вместо фактического `/{path:path}` catch-all.
 
-Approval Record: [`DECISION-2026-08-26-P9-11-F11-PROVISIONAL-APPROVAL`](../governance/decisions/DECISION-2026-08-26-P9-11-F11-PROVISIONAL-APPROVAL.md).
+Исправлено: F11 tests переведены на native `unittest`; route order repaired; BFF regression подтверждает, что F11 API не поглощается SPA.
 
-Lifecycle-current publication: [`Provisional 0.1.0`](../contracts/P9-11-F11-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT-PROVISIONAL-v0.1.0.md).
+### Iteration 5 — release/dist reproducibility
 
-The gate is therefore resolved **only for bounded implementation and real validation within the exact approved scope**. It does not create Stable status, implementation PASS, authority grants, operational readiness or Platform Capability promotion.
+Source frontend проходил typecheck/tests/Web Storage guard/build, но committed `dist` был от `p9.11.6`.
 
-## 7. Acceptance criteria
+Исправлено: release поднят до `p9.11.7`, exact production assets материализованы тем же Node 24 / `npm ci` CI build, затем временный branch-only CI write step удалён. Canonical workflow снова `permissions: contents: read`.
 
-### F11A acceptance
+Final technical evidence на normal read-only workflow:
 
-PASS требует real owner journey на live Workspace:
+- Productive Workspace CI run `32980578877` on exact final code/release head `352f49372753f43a387808ebf67d1b0997594406` — **PASS**:
+  - BFF security/context tests — PASS;
+  - frontend typecheck — PASS;
+  - frontend tests — PASS;
+  - Web Storage guard — PASS;
+  - production build — PASS;
+  - committed `dist` reproducibility — PASS;
+  - release-pinned asset boundary — PASS.
+- Reference Python CI run `32980578955` on the same exact code/release head — **PASS**.
 
-1. загрузить минимум один real Company asset и один real template;
-2. inspect exact version/provenance;
-3. выбрать project + exact template + exact supporting versions;
-4. создать реальный standard document;
-5. inspect exact input provenance; output remains Transient Output by default;
-6. owner confirms practical usefulness.
+Material objections after iteration 6: **none for merge/deploy of the bounded Provisional slice**.
 
-### F11B acceptance
+Functional review не является owner-usefulness PASS, Stable Product Contract promotion, canonical asset admission, authority grant или operational-readiness approval.
 
-PASS требует live owner dashboard с real canonical sources:
+### Iteration 6 — final project-binding UX reconciliation
 
-1. admitted projects показывают canonical status либо explicit reconciliation/error state;
-2. source repo/path/SHA/freshness inspectable;
-3. done/current/branches/unlocked/blocked normalize without replacing source truth;
-4. execution target only from explicit evidence, otherwise `Не указано`;
-5. минимум два heterogeneous roadmap layouts normalize correctly;
-6. source update после sync отражается с новым SHA;
-7. owner confirms dashboard answers where projects are and what can be done next.
+Найдено: F11 portfolio intentionally includes platform identity `OS`, while the first Company material-binding backend accepts only Company/product identities `COMPANY | PORT-*`. The material form initially reused every portfolio card and therefore offered `OS`, producing a visible option that the server correctly rejected.
 
-Repo tests/synthetic fixtures/screenshots alone do not provide owner PASS.
+Исправлено минимально: backend scope не расширялся на platform identity; F11A project selector filters to `COMPANY | PORT-*`. Exact final frontend bundle was rebuilt reproducibly and normal read-only CI passed.
 
-## 8. Security / failure baseline
+## 6. Acceptance state
 
-F11A first slice uses a conservative allowlist. PNG/JPEG/WebP/PDF/DOCX/PPTX/TXT/MD may be admitted only after actual content/type validation. SVG requires safe sanitization/active-content rejection. Generic archives with uncontrolled nested content, executables/scripts/installers and macro-enabled Office formats (`DOCM`, `PPTM`, `XLSM`) are excluded.
+### F11A
 
-DOCX/PPTX being OOXML ZIP containers does not classify them as generic arbitrary archives; they require structural validation as allowed OOXML classes and must fail closed on macro/active/external-content conditions defined by implementation.
+**Technical implementation: ready for governed deploy.**
 
-F11B must never present stale data as current, infer missing status from chat/model memory, expose GitHub credentials to browser code, or obtain write access to canonical roadmaps.
+Owner PASS остаётся pending. Он требует на live Workspace минимум:
 
-## 9. Cross-review
+1. загрузить реальный Company asset;
+2. загрузить реальный DOCX template;
+3. inspect exact staged version/provenance;
+4. выбрать project + exact template version;
+5. создать реальный standard document;
+6. скачать/inspect Transient Output и exact source provenance;
+7. подтвердить практическую полезность либо дать реальный friction feedback.
 
-Iteration 1 resolved design risks around platform leakage, admission vs receipt, transient outputs, active upload content, roadmap authority, stale data, browser credentials, hidden CAP-002/CAP-003 reliance, execution-target authority and exit/portability.
+Canonical asset admission **не реализован и не требуется для bounded staged owner journey**. Если понадобится canonical promotion, она должна идти отдельно через RFC-0005 decisions/gates.
 
-Post-approval iteration 2 rechecked the exact approved boundary against Constitution 1.2.0, RFC-0001/0004/0005/0006/0007/0008 and ADR-0001. The OOXML/archive wording was clarified without expanding approved behavior.
+### F11B
 
-Material objections after iteration 2: **none**.
+**Technical implementation: ready for governed deploy.**
 
-Functional review is not implementation acceptance, owner-usefulness PASS, Product Contract Stable promotion or operational-readiness approval.
+Owner PASS остаётся pending. Он требует live dashboard, который:
 
-## 10. Current disposition
+1. показывает source-backed либо explicit reconciliation/unavailable state;
+2. даёт inspect repository/path/exact SHA/content hash/freshness;
+3. корректно нормализует минимум два heterogeneous roadmap layout;
+4. отражает новый source SHA после refresh;
+5. практически отвечает владельцу, где находятся проекты и что доступно дальше.
 
-- F10A — bounded owner PASS for guide understandability;
+## 7. Current disposition
+
+- F10A — bounded owner PASS;
 - F11 Product Contract — `Provisional 0.1.0`;
-- F11A — implementation admitted, not yet PASS;
-- F11B — implementation admitted, not yet PASS;
+- F11A — **technical implementation ready; owner validation pending; canonical admission unavailable**;
+- F11B — **technical implementation ready; owner validation pending**;
+- Workspace release — `p9.11.7`, app contract `11`;
 - P9.11 — `Current`;
 - R32 — `Locked`;
-- next canonical implementation sequence: `F11A1 → F11A2` and `F11B1 → F11B2`, then governed deploy and real owner validation.
+- следующий canonical action после merge — governed P7.06 deploy exact latest `main`, затем real owner F11A/F11B journeys.
