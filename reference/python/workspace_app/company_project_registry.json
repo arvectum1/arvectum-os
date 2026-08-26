@@ -31,8 +31,8 @@
       "kind": "product",
       "disposition": "continue",
       "repository": "arvectum1/tender-agent",
-      "roadmap_path": null,
-      "adapter": "reconciliation-required",
+      "roadmap_path": "STATUS.md",
+      "adapter": "tender-status-v1",
       "execution_targets": []
     },
     {
@@ -61,7 +61,7 @@
       "kind": "product",
       "disposition": "continue",
       "repository": "arvectum1/creative-test-agent",
-      "roadmap_path": "ROADMAP.md",
+      "roadmap_path": "docs/roadmap/CURRENT.md",
       "adapter": "creative-roadmap-v1",
       "execution_targets": []
     },
