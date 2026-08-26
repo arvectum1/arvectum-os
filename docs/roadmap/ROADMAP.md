@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.22`
+Version: `2.95.23`
 Created: `2026-08-07`
 Updated: `2026-08-26`
 Owner: `ООО «Арвектум»`
@@ -15,7 +15,7 @@ Roadmap status does not itself change Platform Capability lifecycle, Product Con
 
 ## 2. Version note
 
-Version `2.95.22` records successful governed deployment and technical smoke of the merged P9.11-F11 Workspace slice. Canonical `main` remains `ff73db4e0ee9917572654287d4dc74b4a0dea1ff`, Workspace `p9.11.7` / app contract `11`. Owner-supplied selected-Mac evidence records P7.06 transaction `edb403383cf719deb48c76040927bad19f50182d4d8a8a9524d217dafdc4a3a7` PASS, P7.02/P7.05 healthy, `CURRENT_EXACT` / `MANAGED_SPAWN_PROOF`, loopback-only `127.0.0.1:8769`, exact assets/launcher PASS, `/company-materials` technical smoke PASS and `/projects` technical smoke PASS with no deployment friction. This evidence is technical deployment/smoke evidence, not F11A/F11B owner-usefulness PASS. F11A canonical asset admission remains unavailable. The ordinary running-Workspace stop/update/restart also provides natural live PASS evidence for F09's repaired bounded lifecycle path. P9.11 remains Current; R32 remains locked.
+Version `2.95.23` corrects one post-merge wording ambiguity without changing F11 implementation, release or acceptance state. The deployed release-bearing source remains `ff73db4e0ee9917572654287d4dc74b4a0dea1ff`, Workspace `p9.11.7` / app contract `11`; later canonical commits only record deployment/status evidence and do not change `release.json` or Workspace runtime assets. Owner-supplied selected-Mac evidence records P7.06 transaction `edb403383cf719deb48c76040927bad19f50182d4d8a8a9524d217dafdc4a3a7` PASS, P7.02/P7.05 healthy, `CURRENT_EXACT` / `MANAGED_SPAWN_PROOF`, loopback-only `127.0.0.1:8769`, exact assets/launcher PASS, `/company-materials` technical smoke PASS and `/projects` technical smoke PASS with no deployment friction. This evidence is technical deployment/smoke evidence, not F11A/F11B owner-usefulness PASS. F11A canonical asset admission remains unavailable. The ordinary running-Workspace stop/update/restart also provides natural live PASS evidence for F09's repaired bounded lifecycle path. P9.11 remains Current; R32 remains locked.
 
 The live `p9.11.3` Workspace was reviewed by the owner before the F08 sequence: the Home page is understandable and visually acceptable, the top-level navigation is clear, and the owner-provided Arvectum Block logo is accepted in that bounded presentation scope. F07 is therefore closed only for Home/navigation/branding.
 
