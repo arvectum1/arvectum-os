@@ -12,6 +12,8 @@ Authority: RFC-0004 `1.0.0` — `Accepted`
 Architecture baseline: Constitution `1.2.0`; RFC-0001 through RFC-0008 `1.0.0` — `Accepted`; ADR-0001 — `Accepted`
 Product governance references: Arvectum Company Constitution `1.0.0`; AC-301 portfolio identity boundary; AC-305 cross-product dependency / OS-contract reconciliation
 
+> Historical approved Draft. Exact blob identity approved by the owner: `e1b65f4d38779b9b63300aec279f6062acfe3720`. The effective current publication is [`Provisional 0.1.0`](P9-11-F11-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT-PROVISIONAL-v0.1.0.md). This file remains the preserved proposal text and is not the lifecycle-current publication.
+
 ## 1. Purpose and lifecycle
 
 This Draft defines the smallest sufficient Arvectum Company ↔ Arvectum OS Productive Workspace boundary required to address the real owner findings recorded in P9.11-F11:
@@ -494,10 +496,12 @@ This is functional review, not formal Product Contract approval, lifecycle promo
 
 ## 22. Current disposition
 
-- Product Contract: `Draft 0.1.0`;
-- real Company governed reliance: **not admitted yet**;
+- Product Contract proposal: `Draft 0.1.0` preserved by blob SHA `e1b65f4d38779b9b63300aec279f6062acfe3720`;
+- lifecycle-current publication: [`Provisional 0.1.0`](P9-11-F11-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT-PROVISIONAL-v0.1.0.md);
+- owner approval: [`DECISION-2026-08-26-P9-11-F11-PROVISIONAL-APPROVAL`](../governance/decisions/DECISION-2026-08-26-P9-11-F11-PROVISIONAL-APPROVAL.md) — `Approved`;
+- real Company governed reliance: admitted only within the exact Provisional boundary and still subject to applicable RFC-0003/RFC-0005 gates;
 - F10A: bounded owner PASS for guide understandability;
-- F11A/F11B: real owner findings with design boundary prepared;
+- F11A/F11B: implementation admitted, not yet PASS;
 - P9.11 remains `Current`;
 - R32 remains `Locked`;
-- next governed action: exact owner approval/rejection/amendment of this Draft, then canonical transition to `Provisional` before real F11 reliance.
+- next canonical action: implement F11A1/F11A2 and F11B1/F11B2 within the Provisional boundary, then deploy and obtain real owner evidence.
