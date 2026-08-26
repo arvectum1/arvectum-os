@@ -84,7 +84,11 @@ export function CompanyMaterials({ csrfToken }: { csrfToken: string }) {
   useEffect(() => {
     void refresh();
     void loadCompanyPortfolio()
-      .then((portfolio) => setProjectOptions(portfolio.projects.map((project) => ({ id: project.id, label: project.label }))))
+      .then((portfolio) => setProjectOptions(
+        portfolio.projects
+          .filter((project) => project.id.startsWith("PORT-"))
+          .map((project) => ({ id: project.id, label: project.label })),
+      ))
       .catch(() => setProjectOptions([]));
   }, []);
 
