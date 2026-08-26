@@ -15,6 +15,7 @@ from .company_materials import (
     CompanyMaterialsStore,
 )
 from .company_portfolio import CompanyPortfolioError, RuntimeCompanyPortfolioProvider
+from .company_portfolio_verified import VerifiedRuntimeCompanyPortfolioProvider
 from .main import CSRF_HEADER, _identity_key, _security_event
 from .security import WorkspaceSession
 
@@ -56,7 +57,7 @@ def install_f11_routes(
     settings = app.state.settings
     store = app.state.session_store
     resolver = app.state.access_resolver
-    portfolio = portfolio_provider or RuntimeCompanyPortfolioProvider()
+    portfolio = portfolio_provider or VerifiedRuntimeCompanyPortfolioProvider()
     materials = materials_store or CompanyMaterialsStore(Path(settings.runtime_root))
     app.state.company_portfolio_provider = portfolio
     app.state.company_materials_store = materials
