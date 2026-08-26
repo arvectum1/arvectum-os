@@ -7,18 +7,18 @@ Owner: `ООО «Арвектум»`
 Task classification: `product_contract` with `platform`, `product_specific` and `governance`
 Authority: Constitution `1.2.0`; RFC-0001 through RFC-0008 `1.0.0` — `Accepted`; ADR-0001 — `Accepted`
 Owner approval: [`DECISION-2026-08-26-P9-11-F11-PROVISIONAL-APPROVAL`](../governance/decisions/DECISION-2026-08-26-P9-11-F11-PROVISIONAL-APPROVAL.md) — `Approved`
-Approved Draft: [`P9-11-F11-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT`](P9-11-F11-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT.md) — `Draft 0.1.0`
+Approved Draft: [`P9-11-F11-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT`](P9-11-F11-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT.md) — historical approved Draft `0.1.0`
 Approved Draft blob SHA: `e1b65f4d38779b9b63300aec279f6062acfe3720`
 
 ## 1. Provisional publication
 
 This document is the canonical `Provisional 0.1.0` publication of the P9.11-F11 Arvectum Company ↔ Productive Workspace Product Contract.
 
-The owner-approved normative substance is the exact Draft `0.1.0` identified by immutable blob SHA:
+The owner-approved normative substance is the exact historical Draft `0.1.0` identified by immutable blob SHA:
 
 `e1b65f4d38779b9b63300aec279f6062acfe3720`
 
-That Draft is incorporated into this Provisional publication by immutable content reference. No material product/platform boundary semantics are changed by this publication.
+That exact blob is incorporated into this Provisional publication by immutable content reference. The working Draft path now carries a lifecycle pointer for navigation, but the approved normative proposal identity remains the immutable blob above. No material product/platform boundary semantics are changed by this publication.
 
 The independent owner approval is recorded by `DECISION-2026-08-26-P9-11-F11-PROVISIONAL-APPROVAL` and explicitly authorizes the lifecycle transition:
 
@@ -56,14 +56,7 @@ Consequential canonical mutation remains subject to RFC-0005 Governed Execution 
 
 ## 4. Lifecycle meaning
 
-`Provisional` means the exact boundary is admitted for bounded implementation and real validation. It does not mean:
-
-- implementation PASS;
-- owner-usefulness PASS;
-- operational-readiness approval;
-- `Stable` Product Contract status;
-- Active Platform Capability status;
-- broader compatibility/support/conformance commitment.
+`Provisional` means the exact boundary is admitted for bounded implementation and real validation. It does not mean implementation PASS, owner-usefulness PASS, operational-readiness approval, Stable Product Contract status, Active Platform Capability status, or a broader compatibility/support/conformance commitment.
 
 Any material expansion requires a new immutable Product Contract version and new applicable approval evidence.
 
@@ -82,4 +75,4 @@ The next canonical implementation sequence is:
 
 ## 6. Authority of this publication
 
-If wording in the historical Draft describes approval as still pending, this Provisional publication plus the independent Approval Record supersedes only that lifecycle-state wording. The exact approved product/platform boundary, exclusions, acceptance criteria and safety constraints remain those of Draft blob `e1b65f4d38779b9b63300aec279f6062acfe3720`.
+If wording in the historical approved Draft says approval is pending, this Provisional publication plus the independent Approval Record supersedes only that lifecycle-state wording. The exact approved product/platform boundary, exclusions, acceptance criteria and safety constraints remain those of Draft blob `e1b65f4d38779b9b63300aec279f6062acfe3720`.
