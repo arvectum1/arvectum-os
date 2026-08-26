@@ -1,6 +1,6 @@
 # P9.11-F11 — Real owner validation attempt 2
 
-Status: `FAIL / remediation technically verified / deploy + owner recheck pending`
+Status: `FAIL / remediation deployed / owner recheck #3 pending`
 Date: `2026-08-26`
 Owner: `ООО «Арвектум»`
 Task classification: `platform + product_contract + product_specific`
@@ -84,7 +84,7 @@ Technical PASS requires at minimum:
 
 - F11 Product Contract — `Provisional 0.1.0` unchanged;
 - F11A — remediation deployed from attempt #1 / owner validation still pending;
-- F11B — **owner validation attempt #2 FAIL / remediation technically verified / deploy + owner recheck pending**;
+- F11B — **owner validation attempt #2 FAIL / remediation deployed / owner recheck #3 pending**;
 - canonical roadmap sources — remain external authority;
 - local portfolio cache — non-canonical read model only;
 - P9.11 — `Current`;
@@ -113,14 +113,27 @@ Focused implementation safeguards include:
 
 ## 8. Technical verification
 
-Exact implementation/release head before this evidence-only update: `5bf9adbb7f006ca6e7f90c96e84c83f7df651622`.
+Exact reviewed PR head: `52ab60a332000fff70dc9c9d8d8dc43dccc9b4c5`.
 
-- Productive Workspace CI `33005070564`: `PASS`;
-- Reference Python CI `33005070555`: `PASS`;
+- PR #17 release-bearing merge: `ef46d23ffe0c724a86f7f49afd4c71345d42265c`;
+- Workspace: `p9.11.9` / app contract `11`;
+- Productive Workspace CI `33005196234`: `PASS`;
+- Reference Python CI `33005196245`: `PASS`;
 - BFF security/context suite: PASS;
 - frontend typecheck/tests/Web Storage guard: PASS;
 - production build and committed `dist` reproducibility: PASS;
 - release-pinned production asset verification: PASS;
 - temporary write-enabled materialization workflow is absent from the final PR diff; ordinary workflow is restored to `contents: read`.
 
-This establishes technical readiness only. The p9.11.9 repair still requires governed deployment to the selected Mac and a new real owner recheck. F11 owner PASS is not established.
+## 9. Governed deployment and regression smoke
+
+- P7.06 deployment: `PASS`, transaction `1bedb028b38c239f2bb2f3632277444d4e56e9a442efd996180e3b300370054e`;
+- backup: `/Users/master/Library/Application Support/ArvectumOS/persistent-internal/backups/p7-03-backup-20260826T194125Z-eac706c115c5180a.tar.gz`, SHA-256 `057d55c06290dbeb68b9cf2ac37bc6f15c71d1a6997919e19964760c6385ca45`;
+- P7.02/P7.05 healthy; Workspace `CURRENT_EXACT` / `MANAGED_SPAWN_PROOF`; exactly one loopback `127.0.0.1:8769` listener; exact frontend/BFF assets and Desktop launcher PASS;
+- first portfolio load: `current-source-backed` / `fresh-fetch`, writing the owner-local non-canonical cache at `workspace-company-portfolio-cache/530759feedaf8124426cb8ebb4a806b192e8025e909c14ec2866a489be94b915.json`;
+- cached source evidence: commit `0fa36283387f89a8483fd0b4386d3e6cf8f6e7db`, content SHA-256 `ca4772444d34689357629cd867009567b7ccd59ebaf6adb435b9024a210c158c`, initial fetched-at `2026-08-26T19:43:00.550707Z`;
+- three ordinary navigate-away-return requests: `cached-source-backed` / `cached-within-window`, retained the same commit, content hash and fetched-at, with zero unavailable cards each time;
+- explicit refresh: successful `current-source-backed` / `fresh-fetch`; data remained available and refreshed fetched-at was `2026-08-26T19:43:04.997211Z`;
+- no natural GitHub outage occurred and none was manufactured. CI covers the forced `stale-cache` fallback.
+
+This establishes remediation deployment and technical smoke only. Attempt #2 remains `FAIL`; F11B owner recheck #3 and F11A owner validation remain pending. F11 owner PASS is not established.

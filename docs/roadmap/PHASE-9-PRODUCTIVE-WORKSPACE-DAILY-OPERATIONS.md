@@ -1,14 +1,14 @@
 # Arvectum OS Phase 9 — Productive Workspace & Daily Operations
 
 Status: `Active`
-Version: `1.13.21`
+Version: `1.13.22`
 Created: `2026-08-21`
 Updated: `2026-08-26`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `product_contract` and `governance`
 Parent roadmap: [`ROADMAP.md`](ROADMAP.md)
 
-Current disposition: F10A has bounded owner PASS for guide understandability. F11 owner validation attempt #1 is `FAIL`: the F11B portfolio was not visually usable/uniform and F11A Company Materials was not discoverable from normal navigation. PR #15 merged bounded remediation at `3b8044db42c2d029458434c8bd90761d2e720a9d`; live Workspace `p9.11.8` / app contract `11` was governed-deployed by P7.06 transaction `d8588f7c7da5e75e4c64f6a25d512c4311c1dc9554eab8558d3bd83266a998ce`. P7.02/P7.05 are healthy, the Workspace is `CURRENT_EXACT` / `MANAGED_SPAWN_PROOF`, loopback-only exact assets and launcher checks pass, and technical remediation smoke passes. Exact reviewed head `d069abba5a7fb175ad16265abeb3d7d3bd968c90` passed Productive Workspace CI `32995660581` and Reference Python CI `32995661043`. F11A/F11B are remediation deployed / owner recheck pending, not owner PASS. F11A canonical asset admission remains unavailable. P9.11 remains Current; R32 remains locked, P9.12 not started and M9 open.
+Current disposition: F10A has bounded owner PASS for guide understandability. F11 owner validation attempt #2 is `FAIL`: project cards were initially visible, but ordinary navigation return made them all unavailable. F11D-03 root cause was a live GitHub fetch on every revisit without a last-known-good read-model cache. PR #17 merged bounded remediation at `ef46d23ffe0c724a86f7f49afd4c71345d42265c`; Workspace `p9.11.9` / app contract `11` was governed-deployed by P7.06 transaction `1bedb028b38c239f2bb2f3632277444d4e56e9a442efd996180e3b300370054e`. P7.02/P7.05 are healthy, Workspace is `CURRENT_EXACT` / `MANAGED_SPAWN_PROOF`, loopback-only exact assets and launcher checks pass. First source load wrote non-canonical cache; three ordinary revisits were `cached-within-window`, retained identical exact provenance and showed no unavailable cards; explicit refresh succeeded. Reviewed head `52ab60a332000fff70dc9c9d8d8dc43dccc9b4c5` passed Productive Workspace CI `33005196234` and Reference Python CI `33005196245`. F11B is remediation deployed / owner recheck #3 pending; F11A owner validation remains pending; neither is owner PASS. Product Contract remains `Provisional 0.1.0`, canonical asset admission unavailable, P9.11 Current and R32 Locked.
 Milestone: `M9 — Daily-use organizational workbench`
 Intermediate milestone: `M9-alpha — Usable Internal Workspace — Achieved / PASS`
 Architecture baseline: Constitution `1.2.0`; RFC-0001 through RFC-0008 `Accepted 1.0.0`; ADR-0001 `Accepted`
@@ -54,7 +54,7 @@ The legacy P4/P7 browser surfaces remain diagnostic/reference/recovery evidence.
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS | non-authoritative activity UX |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS | company-level composition |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS | product/AI boundaries PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F10A bounded owner PASS; F11 attempt #1 FAIL; p9.11.8 remediation deployed / owner recheck pending** | real owner sessions + material friction closure |
+| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F10A bounded owner PASS; F11 attempt #2 FAIL; p9.11.9 F11D-03 remediation deployed / F11B owner recheck #3 pending** | real owner sessions + material friction closure |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked | pre-closure hardening PASS |
 | P9.12 | Phase 9 / M9 closure review | ⬜ | exact-scope M9 closure |
 
@@ -190,16 +190,16 @@ The live `p9.11.6` guide passed bounded owner recheck for understandability. Own
 
 Canonical evidence: [`P9.11-F11 — Материалы компании и единый портфель проектов`](../reviews/P9-11-F11-company-materials-and-project-portfolio.md).
 
-The owner-approved Product Contract is `Provisional 0.1.0`. F11 owner validation attempt #1 is `FAIL`: F11B was not visually usable/uniform, and F11A Company Materials was not discoverable through normal navigation. The remediation remains inside the same Product Contract and does not promote it to Stable or create an Active Platform Capability:
+The owner-approved Product Contract is `Provisional 0.1.0`. F11 owner validation attempt #2 is `FAIL`: the portfolio was initially visible, but every project card became unavailable after ordinary navigation return. F11D-03 is a bounded read-model stability defect, not a Product Contract expansion or Active Platform Capability:
 
 - **F11A:** owner-local `StagedNonCanonical` Company material intake with Organization/Actor attribution, immutable version lineage, SHA-256/provenance/handling metadata, conservative actual-content allowlist, exact DOCX version selection and generated `TransientOutput`; canonical asset admission remains unavailable.
 - **F11B:** explicit Company project registry plus read-only `External Reference` canonical-roadmap projection with exact repository/path/commit/content SHA-256/freshness and explicit `reconciliation-required` / `unavailable` states; no roadmap write or remote execution path.
 
-PR #15 merged the remediation to canonical `main` at `3b8044db42c2d029458434c8bd90761d2e720a9d`, advancing Workspace to `p9.11.8` / app contract `11`. Final reviewed head `d069abba5a7fb175ad16265abeb3d7d3bd968c90` passed Productive Workspace CI `32995660581` and Reference Python CI `32995661043`.
+F11D-03 root cause was a live GitHub fetch on every revisit with no last-known-good non-canonical cache. PR #17 merged the repair to canonical `main` at `ef46d23ffe0c724a86f7f49afd4c71345d42265c`, advancing Workspace to `p9.11.9` / app contract `11`. Final reviewed head `52ab60a332000fff70dc9c9d8d8dc43dccc9b4c5` passed Productive Workspace CI `33005196234` and Reference Python CI `33005196245`.
 
-The selected Mac governed-deployed exact merged `p9.11.8` through P7.06 transaction `d8588f7c7da5e75e4c64f6a25d512c4311c1dc9554eab8558d3bd83266a998ce`. The pre-update backup is `p7-03-backup-20260826T175516Z-a78ca28c0053fdbe.tar.gz` with SHA-256 `c7ad0c2c75c4db20184f79aad7a03ba4ca40d0bb12ca41a2eb222ab98bee0c92`. P7.02/P7.05 are healthy; Workspace is `CURRENT_EXACT` / `MANAGED_SPAWN_PROOF`; listener is loopback-only; exact frontend/BFF assets and launcher pass. Technical remediation smoke confirms readable vertical/uniform project cards, six owner-facing sections, collapsed technical provenance, Tender Agent `STATUS.md`, Creative Test Agent `docs/roadmap/CURRENT.md`, PORT-005 unresolved, Doors Parser/Data Platform reconciliation-required, source-supported execution labels only, and primary sidebar navigation to and from Company Materials. No roadmap write, remote execution, authority claim, canonical task creation, or canonical asset admission is available.
+The selected Mac governed-deployed exact merged `p9.11.9` through P7.06 transaction `1bedb028b38c239f2bb2f3632277444d4e56e9a442efd996180e3b300370054e`. The pre-update backup is `p7-03-backup-20260826T194125Z-eac706c115c5180a.tar.gz` with SHA-256 `057d55c06290dbeb68b9cf2ac37bc6f15c71d1a6997919e19964760c6385ca45`. P7.02/P7.05 are healthy; Workspace is `CURRENT_EXACT` / `MANAGED_SPAWN_PROOF`; listener is loopback-only; exact frontend/BFF assets and launcher pass. First source load created a non-canonical Organization-scoped cache; three ordinary revisits returned `cached-within-window`, preserved identical exact commit/content-SHA/fetched-at evidence, and showed no unavailable cards. Explicit refresh succeeded. No outage was manufactured; CI covers stale-cache fallback. No roadmap write, remote execution, authority claim, canonical task creation, or canonical asset admission is available.
 
-Repository and technical smoke evidence are sufficient for deployed technical readiness, not owner usefulness PASS. F11A and F11B remain remediation deployed / **OWNER RECHECK PENDING**. Next evidence must come from real owner F11A/F11B journeys.
+Repository and technical smoke evidence are sufficient for deployed technical readiness, not owner usefulness PASS. F11B remains remediation deployed / **OWNER RECHECK #3 PENDING**; F11A owner validation remains pending. Next evidence must come from real owner journeys.
 
 ## 7. Current critical path
 
@@ -246,6 +246,6 @@ Phase 9 does not by itself establish public SaaS, customer Production, universal
 
 ## 11. Current canonical action
 
-> **P9.11 — perform real owner recheck of F11A and F11B on the live p9.11.8 Workspace. Attempt #1 remains FAIL and neither remediation may be claimed as owner PASS. F11A must use real Company asset/template inputs, preserve exact staged provenance and produce a real project-bound standard DOCX as Transient Output by default; staged receipt must not be presented as canonical admission. F11B must be inspected as an owner dashboard and must truthfully answer source-backed/reconciliation project state, current/next work and execution-location evidence where available. Any material friction becomes the next P9.11 finding. The first genuine actionable owner task, when naturally present, still rechecks the deferred F08 task-detail/governed-action journey. P9.11 remains Current and R32 remains locked.**
+> **P9.11 — perform real owner recheck #3 of F11B portfolio navigation stability and F11 usefulness on live p9.11.9. Attempt #2 remains FAIL and deployed remediation is not owner PASS. F11A owner validation remains pending and must retain staged provenance, `StagedNonCanonical`, `TransientOutput`, and unavailable canonical admission. F11B must be inspected across ordinary navigation and truthfully retain source-backed/cached/reconciliation state, current/next work, execution location and exact provenance. Any material friction becomes the next P9.11 finding. P9.11 remains Current and R32 remains Locked.**
 
 R32 remains locked until the F11 real owner journeys and any resulting material friction are dispositioned together with the existing P9.11 closure criteria.
