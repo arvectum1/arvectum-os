@@ -1,11 +1,12 @@
 # P9.11-F11 — Real owner validation attempt 2
 
-Status: `FAIL / remediation in progress`
+Status: `FAIL / remediation implemented / final CI pending`
 Date: `2026-08-26`
 Owner: `ООО «Арвектум»`
 Task classification: `platform + product_contract + product_specific`
 Product Contract: `P9.11-F11 Provisional 0.1.0`
 Observed live Workspace: `p9.11.8` / app contract `11`
+Target remediation release: `p9.11.9` / app contract `11`
 Predecessor evidence: [`P9-11-F11-OWNER-VALIDATION-ATTEMPT-1.md`](P9-11-F11-OWNER-VALIDATION-ATTEMPT-1.md)
 
 ## 1. Real owner evidence
@@ -83,7 +84,7 @@ Technical PASS requires at minimum:
 
 - F11 Product Contract — `Provisional 0.1.0` unchanged;
 - F11A — remediation deployed from attempt #1 / owner validation still pending;
-- F11B — **owner validation attempt #2 FAIL / remediation required**;
+- F11B — **owner validation attempt #2 FAIL / remediation implemented / final CI pending**;
 - canonical roadmap sources — remain external authority;
 - local portfolio cache — non-canonical read model only;
 - P9.11 — `Current`;
@@ -92,3 +93,22 @@ Technical PASS requires at minimum:
 - no Stable Product Contract or Active Platform Capability claim.
 
 The prior F11 functional cross-review reached the seven-iteration ceiling. This is a new real-owner defect finding and bounded implementation repair, not an eighth formal functional cross-review iteration. A focused defect review may still check whether the repair introduces material security, authority, provenance or reliability regressions.
+
+## 7. Implementation evidence before final CI
+
+The repair branch implements the bounded design above and advances Workspace to `p9.11.9` / app contract `11`.
+
+Focused implementation safeguards include:
+
+- cache path is Organization-derived and does not use browser-controlled storage paths;
+- cache files/directories are owner-local and permission-hardened; symlink cache directories/targets are rejected;
+- cache compatibility is checked against the current explicit project registry, repository/path/adapter and exact SHA/hash shapes before reuse;
+- a cache write failure cannot hide a successfully verified live External Reference projection because cache persistence is only an availability optimization;
+- ordinary revisit uses a bounded recent cache window, while explicit refresh forces source retrieval;
+- source failure with prior compatible cache preserves exact prior provenance and marks the card `stale-cache`;
+- source failure without compatible cache remains `unavailable`;
+- frontend preserves visible project data while explicit refresh is in flight;
+- regression tests cover no-refetch ordinary revisit, stale fallback, Organization isolation, cache-write failure, symlink rejection and frontend stale-refresh behavior;
+- a one-shot CI materialization produced the `p9.11.9` production `dist` and restored `.github/workflows/workspace-app-ci.yml` to its ordinary read-only form in the same branch update.
+
+This section is implementation evidence only. Final exact-head CI and real owner recheck remain required before any PASS claim.
