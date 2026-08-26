@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
+from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 from .access import AccessContext
@@ -94,13 +95,26 @@ def _section_headings(markdown: str, section_title: str, *, limit: int = 6) -> l
     return result
 
 
+def _empty_roadmap() -> dict[str, Any]:
+    return {
+        "status": None,
+        "version": None,
+        "source_updated": None,
+        "done": [],
+        "current": [],
+        "branches": [],
+        "unlocked": [],
+        "blocked": [],
+    }
+
+
 @dataclass(frozen=True, slots=True)
 class ProjectDescriptor:
     project_id: str
     label: str
     kind: str
     disposition: str
-    repository: str
+    repository: str | None
     roadmap_path: str | None
     adapter: str
     execution_targets: tuple[str, ...]
@@ -116,11 +130,7 @@ class SourceDocument:
 
 
 class GitHubRoadmapReader:
-    """Server-side read-only GitHub source reader.
-
-    Repository/path values come exclusively from the packaged allowlisted Company
-    registry. Browser input cannot select an arbitrary repository or URL.
-    """
+    """Server-side read-only GitHub source reader over packaged allowlisted descriptors."""
 
     def __init__(self, token: str | None = None, *, timeout_seconds: float = 8.0) -> None:
         self.token = token if token is not None else os.getenv("ARVECTUM_WORKSPACE_GITHUB_TOKEN")
@@ -148,8 +158,8 @@ class GitHubRoadmapReader:
         return payload
 
     def read(self, descriptor: ProjectDescriptor) -> SourceDocument:
-        if not _REPOSITORY_RE.fullmatch(descriptor.repository):
-            raise CompanyPortfolioError("repository outside F11 allowlist contract")
+        if descriptor.repository is None or not _REPOSITORY_RE.fullmatch(descriptor.repository):
+            raise CompanyPortfolioError("canonical repository locator requires reconciliation")
         if descriptor.roadmap_path is None or not _PATH_RE.fullmatch(descriptor.roadmap_path):
             raise CompanyPortfolioError("canonical roadmap source requires reconciliation")
         repository = descriptor.repository
@@ -157,9 +167,8 @@ class GitHubRoadmapReader:
         sha = commit.get("sha")
         if not isinstance(sha, str) or not re.fullmatch(r"[0-9a-f]{40}", sha):
             raise CompanyPortfolioError("canonical source SHA unavailable")
-        source = self._json(
-            f"https://api.github.com/repos/{repository}/contents/{descriptor.roadmap_path}?ref={sha}"
-        )
+        source_path = quote(descriptor.roadmap_path, safe="/")
+        source = self._json(f"https://api.github.com/repos/{repository}/contents/{source_path}?ref={sha}")
         encoded = source.get("content")
         encoding = source.get("encoding")
         if encoding != "base64" or not isinstance(encoded, str):
@@ -254,20 +263,27 @@ class RuntimeCompanyPortfolioProvider:
             targets = tuple(item.get("execution_targets", ()))
             if any(target not in _ALLOWED_TARGETS for target in targets):
                 raise CompanyPortfolioError("Company execution target outside contract")
+            raw_repository = item.get("repository")
+            repository = raw_repository if isinstance(raw_repository, str) and raw_repository else None
+            roadmap_path = item.get("roadmap_path")
+            if repository is not None and not _REPOSITORY_RE.fullmatch(repository):
+                raise CompanyPortfolioError("Company repository locator invalid")
+            if roadmap_path is not None and (not isinstance(roadmap_path, str) or not _PATH_RE.fullmatch(roadmap_path)):
+                raise CompanyPortfolioError("Company roadmap locator invalid")
+            if roadmap_path is not None and repository is None:
+                raise CompanyPortfolioError("Company roadmap cannot exist without a reconciled repository")
             descriptor = ProjectDescriptor(
                 project_id=str(item.get("id", "")),
                 label=str(item.get("label", "")),
                 kind=str(item.get("kind", "")),
                 disposition=str(item.get("disposition", "")),
-                repository=str(item.get("repository", "")),
-                roadmap_path=item.get("roadmap_path"),
+                repository=repository,
+                roadmap_path=roadmap_path,
                 adapter=str(item.get("adapter", "")),
                 execution_targets=targets,
             )
             if not descriptor.project_id or descriptor.project_id in ids or not descriptor.label:
                 raise CompanyPortfolioError("Company project identity invalid")
-            if not _REPOSITORY_RE.fullmatch(descriptor.repository):
-                raise CompanyPortfolioError("Company repository locator invalid")
             ids.add(descriptor.project_id)
             descriptors.append(descriptor)
         return tuple(descriptors), {str(k): str(v) for k, v in authority.items()}
@@ -288,16 +304,13 @@ class RuntimeCompanyPortfolioProvider:
                 "authority_mode": "External Reference",
                 "projection_authority": "non-authoritative",
             }
-            if descriptor.roadmap_path is None:
-                cards.append(
-                    {
-                        **base,
-                        "state": "reconciliation-required",
-                        "message": "Канонический roadmap/status source для этого проекта пока не стандартизирован.",
-                        "source": None,
-                        "roadmap": {"status": None, "version": None, "source_updated": None, "done": [], "current": [], "branches": [], "unlocked": [], "blocked": []},
-                    }
+            if descriptor.repository is None or descriptor.roadmap_path is None:
+                reason = (
+                    "Канонический repository locator требует reconciliation."
+                    if descriptor.repository is None
+                    else "Канонический roadmap/status source для этого проекта пока не стандартизирован."
                 )
+                cards.append({**base, "state": "reconciliation-required", "message": reason, "source": None, "roadmap": _empty_roadmap()})
                 continue
             try:
                 source = self.reader.read(descriptor)
@@ -309,7 +322,7 @@ class RuntimeCompanyPortfolioProvider:
                         "state": "unavailable",
                         "message": "Канонический источник сейчас недоступен; статус не подменяется кэшем или памятью модели.",
                         "source": None,
-                        "roadmap": {"status": None, "version": None, "source_updated": None, "done": [], "current": [], "branches": [], "unlocked": [], "blocked": []},
+                        "roadmap": _empty_roadmap(),
                     }
                 )
                 continue
@@ -352,4 +365,10 @@ class RuntimeCompanyPortfolioProvider:
         }
 
 
-__all__ = ["CompanyPortfolioError", "GitHubRoadmapReader", "RuntimeCompanyPortfolioProvider"]
+__all__ = [
+    "CompanyPortfolioError",
+    "GitHubRoadmapReader",
+    "ProjectDescriptor",
+    "RuntimeCompanyPortfolioProvider",
+    "SourceDocument",
+]
