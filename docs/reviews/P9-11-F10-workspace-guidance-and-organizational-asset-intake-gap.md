@@ -1,194 +1,262 @@
-# P9.11-F10 — Workspace Guidance and Organizational Asset Intake Gap
+# P9.11-F10 — Пробел в руководстве Workspace и приёме организационных материалов
 
-Status: `Observed / remediation required`
-Date: `2026-08-26`
-Owner: `ООО «Арвектум»`
-Task classification: `platform` with `product_contract` / product-owned content boundary
-Parent: `P9.11 — Real daily-use dogfooding + friction/backlog closure`
+Статус: `Исправление выполняется — F10A реализован в рабочей ветке; проверка границы F10B завершена; F10B/F10C не заявлены готовыми`
+Дата: `2026-08-26`
+Владелец: `ООО «Арвектум»`
+Классификация задачи: `platform` с границей `product_contract` / product-owned content
+Родительская задача: `P9.11 — Real daily-use dogfooding + friction/backlog closure`
 
-## Canonical basis
+## 1. Каноническая основа
+
+Проверены и применены:
 
 - Constitution `1.2.0` — `Ratified`, frozen;
-- RFC-0001 through RFC-0008 — `Accepted 1.0.0`;
-- RFC-0004 requires an explicit Product Contract before governed product reliance on shared platform capabilities/history/state;
-- RFC-0007 keeps Memory/Knowledge promotion explicit and prevents AI output from silently becoming validated Knowledge;
-- RFC-0008 defines Document/Artifact architecture, keeps product-specific templates/taxonomies/workflows product-owned by default, and treats generated Artifacts as Transient Outputs by default until explicit governed promotion;
-- ADR-0001 defines the Productive Workspace browser/BFF trust boundary and keeps product-specific browser semantics behind explicit registered/product-contract boundaries;
-- P9.11 remains `Current`; R32 remains locked.
+- RFC-0001…RFC-0008 — `Accepted 1.0.0`;
+- RFC-0004 — до управляемой зависимости продукта от общих platform capabilities, shared history или canonical state требуется явный Product Contract;
+- RFC-0005 — consequential canonical change выполняется через Governed Execution;
+- RFC-0006 — provenance/event semantics не позволяют превращать прикладную телеметрию или локальную запись в каноническое событие по умолчанию;
+- RFC-0007 — Observation, transient output и AI-вывод не становятся validated Knowledge автоматически;
+- RFC-0008 — получение/обработка документа отделены от его канонического допуска; product-specific templates, taxonomies и workflows по умолчанию остаются product-owned; generated Artifact по умолчанию является Transient Output;
+- ADR-0001 — Productive Workspace использует React/TypeScript SPA + same-origin Python BFF; browser/BFF не являются authority/canonical state; Organization scope, Authorization и Data Governance проверяются server-side;
+- P9.11 остаётся `Current`; R32 остаётся закрыт до завершения реального dogfooding.
 
-## Real owner feedback
+Конфликтов с источниками более высокого уровня не обнаружено.
 
-After F08/F09 restoration and bounded owner recheck, the owner can open a clean Workspace but cannot determine what productive work can actually be done there. The owner asked:
+## 2. Реальная обратная связь владельца
+
+После F08/F09 владелец смог открыть чистый Workspace, но не смог понять, какую полезную работу в нём можно выполнять и где находятся соответствующие функции.
+
+Зафиксированный вопрос владельца:
 
 > ну а как пользоваться-то? я могу как-то загрузить туда шаблон презентации, например, или источников для презентации (логотип, брендбук) или шаблоны документов, писем, чтобы они потом делались по одному стандарту? или что я могу там делать и где? может быть стоит прикрутить руководство пользователя?
 
-This is a real P9.11 usability/productivity finding, not a synthetic scenario.
+Это реальный finding P9.11, а не синтетический сценарий.
 
-## Current implemented Workspace capability map
+## 3. Что Workspace фактически умеет до F10
 
-Repository inspection of `reference/python/workspace_app/main.py` and the current frontend establishes the following shipped behavior:
+Проверка `reference/python/workspace_app/main.py` и текущего frontend подтверждает:
 
-- Home routes to Tasks, Information search and Arvectum AI;
-- Work shows current owner attention plus available product contexts;
-- Information / Documents / Knowledge are read-only discovery over already-existing authorized governed source snapshots;
-- Discovery result interaction is `inspect-only` and exposes no consequential action;
-- Arvectum AI accepts a bounded question and produces a source-grounded transient answer over the current authorized Workspace context;
-- System exposes Organization, Activity, Technical checks, Test scenarios and Feedback;
-- current browser-facing writes are limited to session/bootstrap/logout, dogfooding feedback/disposition, Copilot questions and the bounded governed preflight;
-- there is no file upload/import endpoint, multipart handler, document creation endpoint, template creation endpoint or browser UI for adding organizational materials.
+- Главная ведёт к задачам, поиску информации и Arvectum AI;
+- `Задачи` показывают реальную owner-attention и доступные продуктовые контексты;
+- `Документы` / `Информация` / `Знания` дают read-only discovery по уже существующему разрешённому управляемому контексту;
+- открытие найденного объекта остаётся inspect-only и само по себе не создаёт consequential action;
+- Arvectum AI принимает ограниченный вопрос и возвращает source-grounded transient answer по текущему разрешённому контексту;
+- `Настройки` дают доступ к организации, активности, техническим проверкам, тестовым сценариям и обратной связи;
+- browser-facing writes ограничены session/bootstrap/logout, dogfooding feedback/disposition, Copilot questions и bounded governed preflight;
+- endpoint/UI для общего file upload/import, создания документов, шаблонов или произвольного organizational asset intake отсутствует.
 
-Therefore the owner currently cannot, through Productive Workspace:
+Следовательно, до F10 через Productive Workspace нельзя:
 
-- upload a brandbook PDF;
-- upload/store a logo as an organizational brand asset;
-- upload a `.pptx` presentation template;
-- upload a `.docx` document template;
-- define/reuse an email template;
-- add arbitrary source files for future grounded generation;
-- create a presentation/document from selected governed sources and exact template/brand versions.
+- загрузить брендбук PDF;
+- добавить логотип как организационный бренд-материал;
+- загрузить шаблон презентации `.pptx`;
+- загрузить шаблон документа `.docx`;
+- создать и переиспользовать шаблон письма;
+- добавить произвольные source files для будущей grounded generation;
+- создать презентацию/документ из выбранных точных версий source/template/brand inputs.
 
-This is not a hidden or undocumented feature; it is not implemented in the current Workspace contract.
+Это не скрытая функция: её действительно нет в текущем контракте Workspace.
 
-## Finding A — capability discoverability / user guidance
+## 4. Finding A — пользователю непонятны возможности Workspace
 
-Even the implemented read/search/ask/diagnostic capabilities are not explained as a coherent user workflow. The owner should not need repository knowledge to discover what each Workspace section is for.
+Проблема состоит не только в отсутствии новых функций. Уже реализованные возможности не были собраны в понятный owner workflow, поэтому для ответа на вопрос «что здесь делать?» требовалось знание репозитория и архитектуры.
 
-Required direction:
+### Требуемое исправление F10A
 
-1. add a built-in Russian-first `Руководство` / `Что здесь можно делать` surface;
-2. expose it from Home and/or persistent navigation without competing with primary work;
-3. explain each current section in owner language with concrete examples;
-4. clearly distinguish `работает сейчас` from `ещё не реализовано`;
-5. provide contextual help from major routes;
-6. keep the guide release-aware so it does not promise features absent from the exact deployed Workspace release;
-7. do not use README/repository documentation as the ordinary owner's user manual.
+Workspace должен содержать встроенное русскоязычное руководство, которое:
 
-A useful first version should cover at least:
+1. доступно без GitHub, терминала и README;
+2. объясняет назначение основных разделов человеческим языком;
+3. различает `работает сейчас` и `ещё не реализовано`;
+4. показывает, что делать при нормальном пустом состоянии, когда задач нет;
+5. не приписывает AI, поиску или UI организационные полномочия;
+6. показывает точную Workspace release identity, чтобы текст руководства не выглядел обещанием возможностей другой версии;
+7. прямо сообщает об отсутствии общего file/material intake, а не маскирует этот пробел.
 
-- Главная — current attention and primary actions;
-- Задачи — real actionable owner work only;
-- Документы / Информация — search and inspect existing governed context;
-- Arvectum AI — ask grounded questions about available context; answers are transient and not authority;
-- Настройки — organization/activity/diagnostics/test scenarios/feedback;
-- current limitations, including absence of file upload, document/template creation and general-purpose asset intake.
+### Реализация F10A
 
-## Finding B — governed organizational asset intake
+В рабочей ветке F10 добавлено:
 
-The owner's examples are a valid organizational-intelligence use case and fit the accepted architecture, but require a real intake workflow rather than merely more documentation.
+- `reference/python/workspace_frontend/src/Guide.tsx` — встроенная поверхность `Руководство / Что здесь можно делать`;
+- маршрут `/guide` в Productive Workspace;
+- постоянная ссылка `Руководство` в sidebar;
+- действие `Открыть руководство` на Главной;
+- пояснение на Главной, что отсутствие задач является нормальным состоянием и не означает, что Workspace «не работает»;
+- список текущих функций: Главная, Задачи, Документы, Arvectum AI, Настройки;
+- явный раздел `Чего пока нет` с перечислением отсутствующих logo/brandbook/PPTX/DOCX/email/source-file intake возможностей;
+- явное пояснение authority boundary: поиск, экран, кнопка и AI-ответ сами по себе не утверждают решения и не дают новых прав;
+- release-aware вывод `context.release.id`;
+- `Guide.test.tsx` с русскоязычными regression guards;
+- Workspace release повышен с `p9.11.5` до `p9.11.6`; `app_api_contract` остаётся `11`, поскольку новый BFF/API контракт не вводится.
 
-The platform-level mechanism should remain domain-neutral and support bounded local intake of files/materials with, proportionate to the item:
+Английский режим существующего Workspace не удаляется: это было бы регрессией принятого RU/EN интерфейса. Русский остаётся production-default, а весь канонический F10 review и owner-facing первичный текст этой задачи ведутся на русском.
 
-- Organization scope and attributable uploader;
-- content bytes or governed external reference;
-- type/semantic role;
-- classification/purpose/rights/retention metadata where applicable;
-- provenance and received-at metadata;
-- stable logical subject identity where the material becomes a significant Document/Asset;
-- immutable version identity/checkpoint for relied-upon versions;
-- explicit versioning/replacement rather than silent overwrite;
-- search/discovery integration;
-- exact source version selection for downstream generation;
-- export/portability consistent with RFC-0008.
+## 5. Finding B — отсутствует управляемый приём организационных материалов
 
-A minimal owner-facing entry point may be called `Библиотека` or `Материалы компании` rather than exposing Kernel terminology.
+Примеры владельца являются валидным организационным use case, но их нельзя исправить одной кнопкой `Загрузить`.
 
-## Company/product-owned semantics
+Domain-neutral intake-механизм должен как минимум сохранять, пропорционально типу материала:
 
-The following content must not become hard-coded platform-global business semantics:
+- Organization scope;
+- attributable uploader;
+- content bytes либо управляемую external reference;
+- тип/семантическую роль материала;
+- применимые classification/purpose/rights/retention metadata;
+- provenance и received-at;
+- стабильную logical subject identity для значимого Document/Asset;
+- immutable version/checkpoint identity для версии, на которую реально опираются;
+- явную замену/версионирование вместо silent overwrite;
+- поиск/повторное обнаружение;
+- выбор точной source/template version для downstream use;
+- экспорт/portability в соответствии с RFC-0008.
 
-- `логотип ООО «Арвектум»`;
-- brandbook and brand rules;
-- presentation templates;
-- commercial-letter templates;
-- document templates;
+Owner-facing название может быть `Материалы компании` или `Библиотека`; Kernel terminology пользователю не требуется.
+
+## 6. Результат архитектурной и Product Contract проверки F10B
+
+### 6.1 Что может принадлежать платформе
+
+Платформенно допустима только domain-neutral механика, например:
+
+- принять материал в определённой Organization scope;
+- сохранить provenance/version metadata;
+- обеспечить контролируемое обнаружение и точный выбор версии;
+- поддержать governed/external-reference semantics;
+- обеспечить portability и policy enforcement.
+
+Это не даёт платформе права интерпретировать конкретный файл как «правильный логотип Арвектум», «утверждённый коммерческий шаблон» или «обязательный стиль письма».
+
+### 6.2 Что остаётся company/product-owned
+
+Нельзя hard-code как platform-global semantics:
+
+- логотип ООО «Арвектум»;
+- брендбук и брендовые правила;
+- шаблоны презентаций;
+- шаблоны коммерческих писем;
+- шаблоны документов;
 - email templates;
-- approval rules for those templates;
-- brand-specific generation instructions.
+- правила согласования этих материалов;
+- брендовые инструкции для генерации.
 
-These are company/product-owned organizational materials. If Arvectum Company relies on shared Arvectum OS document/artifact/knowledge capabilities or shared canonical history for them, the applicable Product Contract must cover that reliance before governed use under RFC-0004. F10 does not itself create or promote such a Product Contract.
+### 6.3 Product Contract gate
 
-## Desired future owner journey
+В текущем каноническом `arvectum1/arvectum-os` не найден действующий Product Contract, который давал бы Arvectum Company управляемую зависимость от общего organizational asset/document/template history Arvectum OS для перечисленных company-owned материалов.
 
-A truthful target journey is:
+Поэтому F10 **не создаёт молча** такой контракт и **не объявляет** company-specific brand/template semantics платформенной возможностью.
+
+До соответствующего Product Contract нельзя честно заявить F10B `PASS` в формулировке «загрузить реальный материал компании и использовать его через governed/product boundary».
+
+Это архитектурный gate, а не техническая причина откладывать F10A.
+
+## 7. Целевой owner journey после отдельного допуска F10B
 
 ```text
 Материалы компании
     ↓
 Добавить материал
     ↓
-choose file / external reference
+выбрать файл / external reference
     ↓
-classify owner-facing role:
+выбрать понятную роль:
 Источник | Шаблон | Бренд-материал | Стандарт/руководство
     ↓
-review metadata + scope + version
+проверить metadata + scope + version
     ↓
-Save as governed organizational material
+сохранить через разрешённую границу
     ↓
-search / inspect / use in Arvectum AI or a product workflow
+найти / открыть / использовать точную версию
 ```
 
-For generation, a later product-owned workflow may support for example:
+Сам факт поступления файла не должен автоматически означать:
+
+- validated Knowledge;
+- утверждённый стандарт;
+- каноническое решение;
+- Organizational Authority;
+- разрешение на consequential action.
+
+## 8. F10C — template-aware generation
+
+F10C допускается только после реального intake точных source/template versions и соответствующей product/company boundary.
+
+Пример будущего company-owned workflow:
 
 ```text
 Создать презентацию
     ↓
-select exact presentation template version
-select exact logo/brandbook versions
-select source documents / governed context
+выбрать точную версию шаблона
+выбрать точные версии логотипа/брендбука
+выбрать source documents / governed context
     ↓
-AI/tooling generates Artifact
+AI/tooling создаёт Artifact
     ↓
-Artifact remains Transient Output by default
+Artifact остаётся Transient Output по умолчанию
     ↓
-owner reviews
+владелец проверяет результат
     ↓
-explicit save/promote/export as applicable
+явный save/promote/export при наличии соответствующего разрешённого пути
 ```
 
-The same pattern can support documents and email drafts. Generation does not automatically create validated Knowledge, approval, Organizational Authority or a canonical final document.
+F10 не превращает это в speculative universal office automation внутри shared Kernel.
 
-## Remediation decomposition
+## 9. Критерии приёмки
 
-### F10A — Built-in user guide / capability map
+### F10A
 
-Small immediate Workspace UX task.
+F10A считается технически готовым к owner recheck, когда:
 
-Goal: the owner can answer `what can I do here?` and `where do I do it?` without repository/terminal knowledge.
+- `/guide` доступен из обычного Workspace;
+- Главная и sidebar дают очевидный путь к руководству;
+- руководство на русском объясняет текущие возможности, местонахождение функций и ограничения;
+- руководство показывает exact release identity;
+- отсутствие загрузки материалов указано явно;
+- authority-safe semantics не искажены;
+- frontend build/tests/CI проходят.
 
-No backend upload capability is implied by the guide.
+Финальный UX PASS требует короткого реального owner recheck на развёрнутом `p9.11.6`.
 
-### F10B — Organizational Asset Intake boundary and minimal slice
+### F10B
 
-Design and implement the smallest governed local intake slice compatible with RFC-0003/0004/0007/0008 and ADR-0001.
+F10B может получить PASS только когда владелец через Workspace без GitHub/терминала:
 
-First useful file classes should be selected from real owner need, preferably:
+1. добавит хотя бы один реальный организационный материал;
+2. найдёт его снова;
+3. увидит provenance/version information;
+4. использует его через явную разрешённую governed/product boundary.
 
-- brand asset (SVG/PNG);
-- brandbook/reference PDF;
-- presentation template (`.pptx`);
-- document template (`.docx`).
+До прохождения Product Contract gate и реального owner proof этот критерий не считается выполненным.
 
-Do not claim universal format support before exact validation.
+### F10C
 
-### F10C — Template-aware generation
+Нужен реальный end-to-end generated artifact из точных versioned inputs. Repository-only tests и synthetic screenshots не являются owner acceptance.
 
-Only after admitted source/template intake exists.
+## 10. Functional cross-review
 
-A product/company-owned workflow should select exact source and template versions, generate a transient Artifact, preserve derivation provenance and allow explicit owner review/export/promotion.
+### Итерация 1
 
-Do not implement speculative universal office automation inside the shared Kernel.
+Проверены:
 
-## Acceptance direction
+- соответствие Constitution/RFC-0001…0008/ADR-0001;
+- отсутствие нового browser-side authority;
+- отсутствие ложного утверждения о наличии upload/intake;
+- отсутствие hard-coded company brand semantics в platform code;
+- сохранение existing RU/EN behavior при русском production-default;
+- отсутствие нового BFF/API compatibility promise;
+- exact-release semantics.
 
-F10A is acceptable when a real owner can open Workspace and independently identify the useful current capabilities, their locations and their limitations.
+Найдено одно техническое замечание: первоначальный frontend test использовал matcher `toHaveAttribute`, хотя `@testing-library/jest-dom` не входит в зависимости проекта. Тест исправлен на стандартный `getAttribute`, новая зависимость не добавлялась.
 
-F10B is acceptable only when the owner can add at least one admitted real organizational material through Workspace, find it again, inspect provenance/version information, and use it through an explicit governed/product boundary without repository or terminal work.
+После исправления иных material objections на уровне статического functional review не обнаружено.
 
-F10C requires a real end-to-end generated artifact from exact versioned inputs; synthetic screenshots or repository-only tests are not owner acceptance.
+## 11. Диспозиция
 
-## Disposition
+F10 остаётся material finding P9.11, но теперь разделён честно:
 
-F10 is a material P9.11 finding. It does not reopen F07/F08/F09. P9.11 remains Current and R32 remains locked.
+- **F10A — реализован в рабочей ветке и готов к CI + deployed owner recheck**;
+- **F10B — архитектурная/Product Contract проверка завершена; реализация общего intake и owner acceptance ещё не выполнены**;
+- **F10C — не начат и не должен опережать admitted intake + Product Contract boundary**.
 
-Next action: implement F10A as the smallest immediate usability repair while performing the bounded F10B architecture/Product Contract check in parallel. Do not treat the guide as a substitute for the missing asset-intake capability.
+F07/F08/F09 не переоткрываются. P9.11 остаётся `Current`, R32 остаётся locked.
+
+Следующее каноническое действие после merge/CI F10A: развернуть точный `p9.11.6`, провести короткий owner recheck руководства, затем отдельно решить Product Contract/bounded implementation path для F10B без переноса company-specific semantics в платформу.
