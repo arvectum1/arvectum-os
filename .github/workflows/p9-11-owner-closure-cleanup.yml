@@ -1,0 +1,32 @@
+name: P9.11 Owner Closure Cleanup
+
+on:
+  push:
+    branches:
+      - work/p9-11-f11-owner-pass-p9-11-closure
+    paths:
+      - ".github/workflows/p9-11-owner-closure-cleanup.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/p9-11-f11-owner-pass-p9-11-closure
+          fetch-depth: 0
+      - run: python scripts/p9_11_owner_closure_cleanup.py
+      - run: |
+          test ! -e .github/workflows/p9-11-owner-closure-cleanup.yml
+          test ! -e scripts/p9_11_owner_closure_cleanup.py
+          git diff --check
+          git status --short
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "roadmap: reconcile P9.11 closure wording"
+          git push origin HEAD:work/p9-11-f11-owner-pass-p9-11-closure
