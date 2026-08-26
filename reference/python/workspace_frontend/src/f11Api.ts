@@ -25,8 +25,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return await response.json() as T;
 }
 
-export function loadCompanyPortfolio(): Promise<CompanyPortfolioProjection> {
-  return request<CompanyPortfolioProjection>("/api/app/v1/company/portfolio");
+export function loadCompanyPortfolio(forceRefresh = false): Promise<CompanyPortfolioProjection> {
+  return request<CompanyPortfolioProjection>(forceRefresh ? "/api/app/v1/company/portfolio?refresh=true" : "/api/app/v1/company/portfolio");
 }
 
 export function loadCompanyMaterials(): Promise<CompanyMaterialsProjection> {
