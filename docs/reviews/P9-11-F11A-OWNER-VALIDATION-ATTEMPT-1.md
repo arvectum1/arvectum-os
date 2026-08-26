@@ -1,6 +1,6 @@
 # P9.11-F11A — Real owner validation attempt 1
 
-Status: `FAIL / remediation technically implemented / exact-head CI pending`
+Status: `FAIL / remediation technically ready / governed deploy + owner recheck pending`
 Date: `2026-08-26`
 Owner: `ООО «Арвектум»`
 Task classification: `product_specific + product_contract + platform`
@@ -104,7 +104,7 @@ After reviewed CI, reproducible production assets, merge and governed deployment
 
 No F11A owner PASS may be claimed before that recheck succeeds.
 
-## 7. Technical implementation evidence before final exact-head CI
+## 7. Technical implementation and review evidence
 
 The bounded p9.11.10 repair is implemented on PR #19.
 
@@ -126,4 +126,11 @@ Bounded branch-only materialization run `33015000505` then:
 - restored `.github/workflows/workspace-app-ci.yml` to canonical `permissions: contents: read` in the resulting branch head;
 - passed BFF tests, typecheck, frontend tests, Web Storage guard, build, reproducibility and release-pinned asset verification in that materialization run.
 
-The temporary write-enabled workflow is absent from the final branch diff versus `main`. A normal read-only Productive Workspace CI and Reference Python CI are still required on the final human-authored exact head before merge. This is technical readiness evidence only and does not alter the failed owner result.
+The temporary write-enabled workflow is absent from the final branch diff versus `main`.
+
+Final normal read-only CI on exact implementation/release head `3b849e926346240011c010a58085a2cc57fe05f1`:
+
+- Productive Workspace CI `33015126576`: `PASS`;
+- Reference Python CI `33015126605`: `PASS`.
+
+This establishes repository technical readiness for governed deployment of p9.11.10 only. F11A attempt #1 remains `FAIL`; owner recheck is still required and no Product Contract/lifecycle/authority/canonical-admission promotion follows.
