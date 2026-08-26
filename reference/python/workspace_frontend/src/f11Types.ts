@@ -2,6 +2,7 @@ export type CompanyRoadmapSource = {
   repository: string;
   path: string;
   commit_sha: string;
+  content_sha256: string;
   fetched_at: string;
   freshness: string;
   adapter: string;
@@ -57,6 +58,7 @@ export type StagedMaterialVersion = {
   material_id: string;
   version_id: string;
   predecessor_version_id: string | null;
+  organization: string;
   project_id: string;
   filename: string;
   media_type: string;
@@ -84,6 +86,11 @@ export type CompanyMaterialsProjection = {
   schema: "arvectum.workspace.company-materials/1";
   generated_at: string;
   product_contract: { id: "P9.11-F11"; version: "0.1.0"; lifecycle: "Provisional" };
+  scope: {
+    organization_resolved_server_side: true;
+    actor_resolved_server_side: true;
+    cross_organization_access: false;
+  };
   materials: StagedMaterial[];
   governance: {
     state: "StagedNonCanonical";
@@ -100,6 +107,8 @@ export type GeneratedCompanyOutput = {
   output: {
     output_id: string;
     state: "TransientOutput";
+    organization: string;
+    project_id: string;
     created_at: string;
     created_by: string;
     source_material_id: string;
