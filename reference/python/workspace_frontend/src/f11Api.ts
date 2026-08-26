@@ -6,23 +6,41 @@ import type {
 } from "./f11Types";
 
 const RELEASE_ID = __ARVECTUM_WORKSPACE_RELEASE__;
+const RELEASE_HEADER = "X-Arvectum-Workspace-Release";
+
+async function responseError(response: Response): Promise<Error> {
+  let code = `HTTP_${response.status}`;
+  try {
+    const payload = await response.json() as { code?: string; detail?: string };
+    code = payload.code ?? payload.detail ?? code;
+  } catch {
+    // Keep a minimized error when the server did not return JSON.
+  }
+  return new Error(code);
+}
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
-  headers.set("X-Arvectum-Workspace-Release", RELEASE_ID);
+  headers.set(RELEASE_HEADER, RELEASE_ID);
   if (init.body && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
   const response = await fetch(path, { ...init, headers, credentials: "same-origin" });
-  if (!response.ok) {
-    let code = `HTTP_${response.status}`;
-    try {
-      const payload = await response.json() as { code?: string; detail?: string };
-      code = payload.code ?? payload.detail ?? code;
-    } catch {
-      // Keep a minimized error when the server did not return JSON.
-    }
-    throw new Error(code);
-  }
+  if (!response.ok) throw await responseError(response);
   return await response.json() as T;
+}
+
+function downloadFilename(disposition: string | null): string {
+  if (!disposition) return "generated-arvectum-document.docx";
+  const encoded = disposition.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+  if (encoded) {
+    try {
+      return decodeURIComponent(encoded);
+    } catch {
+      // Fall back to the ordinary filename parameter below.
+    }
+  }
+  const quoted = disposition.match(/filename="([^"]+)"/i)?.[1];
+  const plain = disposition.match(/filename=([^;]+)/i)?.[1]?.trim();
+  return quoted ?? plain ?? "generated-arvectum-document.docx";
 }
 
 export function loadCompanyPortfolio(forceRefresh = false): Promise<CompanyPortfolioProjection> {
@@ -65,6 +83,20 @@ export function generateCompanyDocx(
     headers: { "X-Arvectum-CSRF": csrfToken },
     body: JSON.stringify(input),
   });
+}
+
+export async function downloadCompanyOutput(path: string): Promise<{ blob: Blob; filename: string }> {
+  if (!path.startsWith("/api/app/v1/company-materials/outputs/") || !path.endsWith("/download")) {
+    throw new Error("COMPANY_OUTPUT_DOWNLOAD_PATH_INVALID");
+  }
+  const headers = new Headers();
+  headers.set(RELEASE_HEADER, RELEASE_ID);
+  const response = await fetch(path, { headers, credentials: "same-origin" });
+  if (!response.ok) throw await responseError(response);
+  return {
+    blob: await response.blob(),
+    filename: downloadFilename(response.headers.get("Content-Disposition")),
+  };
 }
 
 export async function fileToBase64(file: File): Promise<string> {
