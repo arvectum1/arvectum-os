@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CompanyProjects } from "./CompanyProjects";
 import { LanguageProvider } from "./i18n";
@@ -58,6 +58,17 @@ const portfolio: CompanyPortfolioProjection = {
   }],
 };
 
+const stalePortfolio: CompanyPortfolioProjection = {
+  ...portfolio,
+  generated_at: "2026-08-26T15:05:00Z",
+  projects: [{
+    ...portfolio.projects[0],
+    state: "stale-cache",
+    message: "Канонический источник сейчас недоступен; показана последняя успешно полученная сводка.",
+    source: portfolio.projects[0].source ? { ...portfolio.projects[0].source, freshness: "stale-cache" } : null,
+  }],
+};
+
 const materials: CompanyMaterialsProjection = {
   schema: "arvectum.workspace.company-materials/1",
   generated_at: "2026-08-26T15:00:00Z",
@@ -81,7 +92,7 @@ const materials: CompanyMaterialsProjection = {
 const context: WorkspaceContext = {
   schema: "arvectum.workspace.shell-context/1",
   release: {
-    id: "p9.11.8",
+    id: "p9.11.9",
     app_api_contract: "11",
     classification: "bounded-internal-provisional",
     public_api: false,
@@ -163,5 +174,27 @@ describe("F11 owner usability remediation", () => {
     expect(materialsLink.closest("nav")).toBeTruthy();
     expect(materialsLink.getAttribute("aria-current")).toBe("page");
     expect(screen.getByRole("link", { name: "Задачи" }).getAttribute("aria-current")).toBeNull();
+  });
+
+  it("keeps last-known-good project content visible when explicit source refresh degrades to stale cache", async () => {
+    window.history.replaceState({}, "", "/projects");
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      const payload = url.includes("refresh=true") ? stalePortfolio : portfolio;
+      return new Response(JSON.stringify(payload), { status: 200, headers: { "Content-Type": "application/json" } });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<LanguageProvider initialLanguage="ru"><CompanyProjects /></LanguageProvider>);
+    expect(await screen.findByText("APL-WIN-014 — enforced local gate")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Обновить из источников" }));
+    expect(screen.getByText("APL-WIN-014 — enforced local gate")).toBeTruthy();
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(String(fetchMock.mock.calls[1][0])).toContain("/api/app/v1/company/portfolio?refresh=true");
+    expect(await screen.findByText(/последняя успешно полученная сводка/i)).toBeTruthy();
+    expect(screen.getByText("APL-WIN-014 — enforced local gate")).toBeTruthy();
+    expect(screen.queryByText("Портфель проектов недоступен")).toBeNull();
   });
 });

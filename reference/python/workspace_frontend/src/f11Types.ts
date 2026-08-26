@@ -18,7 +18,7 @@ export type CompanyProjectCard = {
   execution_targets: string[];
   authority_mode: "External Reference";
   projection_authority: "non-authoritative";
-  state: "current-source-backed" | "reconciliation-required" | "unavailable";
+  state: "current-source-backed" | "cached-source-backed" | "stale-cache" | "reconciliation-required" | "unavailable";
   message: string;
   source: CompanyRoadmapSource | null;
   roadmap: {

@@ -33,10 +33,23 @@ class FakeReader:
         return self.hashes.get((repository, path, commit_sha))
 
 
-def _access() -> AccessContext:
+class ToggleReader(FakeReader):
+    def __init__(self, sources: dict[str, str]):
+        super().__init__(sources)
+        self.available = True
+        self.calls = 0
+
+    def read(self, descriptor):  # type: ignore[no-untyped-def]
+        self.calls += 1
+        if not self.available:
+            raise CompanyPortfolioError("simulated canonical source outage")
+        return super().read(descriptor)
+
+
+def _access(*, organization: str = "ООО «Арвектум»") -> AccessContext:
     return AccessContext(
-        organization=Identity("org", "ООО «Арвектум»", "local"),
-        actor=Identity("actor", "owner", "ООО «Арвектум»"),
+        organization=Identity("org", organization, "local"),
+        actor=Identity("actor", "owner", organization),
         principal_kind="human",
         credential_id="credential",
         grant_id="grant",
@@ -214,6 +227,65 @@ class CompanyPortfolioTests(unittest.TestCase):
         self.assertEqual(card["state"], "unavailable")
         self.assertIsNone(card["source"])
         self.assertEqual(card["roadmap"]["current"], [])
+
+    def test_recent_last_known_good_cache_prevents_navigation_from_refetching_github(self) -> None:
+        markdown = """# Roadmap\nСтатус: Active\nТекущее каноническое действие: AC-505 — external evidence wait\n"""
+        reader = ToggleReader({"COMPANY": markdown})
+        provider = VerifiedRuntimeCompanyPortfolioProvider(
+            _registry(self.root),
+            reader=reader,  # type: ignore[arg-type]
+            cache_root=self.root,
+            cache_max_age_seconds=900,
+        )
+
+        first = provider.project(_access())
+        self.assertEqual(first["projects"][0]["state"], "current-source-backed")
+        self.assertEqual(reader.calls, 1)
+
+        reader.available = False
+        second = provider.project(_access())
+        self.assertEqual(reader.calls, 1, "ordinary page revisit must use recent read-model cache instead of GitHub")
+        self.assertEqual(second["projects"][0]["state"], "cached-source-backed")
+        self.assertEqual(second["projects"][0]["roadmap"]["current"], ["AC-505 — external evidence wait"])
+        self.assertEqual(second["projects"][0]["source"]["commit_sha"], "a" * 40)
+        self.assertEqual(second["projects"][0]["source"]["freshness"], "cached-within-window")
+
+    def test_explicit_refresh_failure_keeps_last_known_good_projection_visible_as_stale(self) -> None:
+        markdown = """# Roadmap\nСтатус: Active\nТекущее каноническое действие: AC-505 — external evidence wait\n"""
+        reader = ToggleReader({"COMPANY": markdown})
+        provider = VerifiedRuntimeCompanyPortfolioProvider(
+            _registry(self.root),
+            reader=reader,  # type: ignore[arg-type]
+            cache_root=self.root,
+        )
+        provider.project(_access())
+        reader.available = False
+
+        refreshed = provider.project(_access(), force_refresh=True)
+        company = refreshed["projects"][0]
+        self.assertEqual(reader.calls, 2)
+        self.assertEqual(company["state"], "stale-cache")
+        self.assertEqual(company["roadmap"]["current"], ["AC-505 — external evidence wait"])
+        self.assertEqual(company["source"]["commit_sha"], "a" * 40)
+        self.assertEqual(company["source"]["freshness"], "stale-cache")
+        self.assertIn("последняя успешно полученная", company["message"])
+
+    def test_cache_is_organization_scoped_and_never_crosses_access_context(self) -> None:
+        markdown = "# Roadmap\nСтатус: Active\nТекущее каноническое действие: AC-505 — wait\n"
+        reader = ToggleReader({"COMPANY": markdown})
+        provider = VerifiedRuntimeCompanyPortfolioProvider(
+            _registry(self.root),
+            reader=reader,  # type: ignore[arg-type]
+            cache_root=self.root,
+        )
+        provider.project(_access())
+        reader.available = False
+
+        other = provider.project(_access(organization="Other Org"))
+        company = other["projects"][0]
+        self.assertEqual(company["state"], "unavailable")
+        self.assertEqual(company["roadmap"]["current"], [])
+        self.assertIsNone(company["source"])
 
     def test_owner_focused_adapters_fill_uniform_fields_without_memory_inference(self) -> None:
         sources = {

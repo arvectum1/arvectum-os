@@ -57,7 +57,7 @@ def install_f11_routes(
     settings = app.state.settings
     store = app.state.session_store
     resolver = app.state.access_resolver
-    portfolio = portfolio_provider or VerifiedRuntimeCompanyPortfolioProvider()
+    portfolio = portfolio_provider or VerifiedRuntimeCompanyPortfolioProvider(cache_root=Path(settings.runtime_root))
     materials = materials_store or CompanyMaterialsStore(Path(settings.runtime_root))
     app.state.company_portfolio_provider = portfolio
     app.state.company_materials_store = materials
@@ -100,10 +100,13 @@ def install_f11_routes(
 
     @app.get("/api/app/v1/company/portfolio")
     async def company_portfolio(
+        refresh: bool = False,
         current: tuple[WorkspaceSession, AccessContext] = Depends(authorize_current),
     ) -> dict[str, Any]:
         _, access = current
         try:
+            if isinstance(portfolio, VerifiedRuntimeCompanyPortfolioProvider):
+                return portfolio.project(access, force_refresh=refresh)
             return portfolio.project(access)
         except CompanyPortfolioError:
             raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="COMPANY_PORTFOLIO_UNAVAILABLE") from None
