@@ -70,7 +70,7 @@
       "label": "Tender Small-Volume Calculator",
       "kind": "product-experiment",
       "disposition": "contain",
-      "repository": "arvectum1/tender-app",
+      "repository": null,
       "roadmap_path": null,
       "adapter": "reconciliation-required",
       "execution_targets": []
