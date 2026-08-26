@@ -1,9 +1,9 @@
 # P9.11-F11 — Материалы компании и единый портфель проектов
 
-Status: `Deployed / technical smoke PASS / owner validation pending`
-Version: `0.5.0`
+Status: `Owner validation PASS in bounded F11A/F11B scope / Product Contract remains Provisional`
+Version: `0.6.0`
 Created: `2026-08-26`
-Updated: `2026-08-26`
+Updated: `2026-08-27`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` + `product_contract` + `product_specific`
 Roadmap work item: `P9.11 — Real daily-use dogfooding + friction/backlog closure`
@@ -13,9 +13,9 @@ Product Contract: [`Provisional 0.1.0`](../contracts/P9-11-F11-ARVECTUM-COMPANY-
 Owner approval: [`DECISION-2026-08-26-P9-11-F11-PROVISIONAL-APPROVAL`](../governance/decisions/DECISION-2026-08-26-P9-11-F11-PROVISIONAL-APPROVAL.md)
 Transition review: [`P9-11-F11-provisional-transition`](P9-11-F11-provisional-transition.md)
 Deployment evidence: [`P9-11-F11-LOCAL-DEPLOY-2026-08-26`](P9-11-F11-LOCAL-DEPLOY-2026-08-26.md)
-Workspace release: `p9.11.7`
+Workspace release: `p9.11.10`
 App API contract: `11`
-Merged source: `ff73db4e0ee9917572654287d4dc74b4a0dea1ff`
+Merged source: `470878b8778fbac009d1ae52092879cf50d8f3f1`
 
 ## 1. Исходный реальный finding
 
@@ -221,7 +221,7 @@ Reported technical state:
 
 **Technical implementation: deployed and technical smoke PASS.**
 
-Owner PASS остаётся pending. Он требует на live Workspace минимум:
+Этот критерий был pending до p9.11.10 owner recheck; теперь он закрыт bounded owner PASS. Исторически требовалось минимум:
 
 1. загрузить реальный Company asset;
 2. загрузить реальный DOCX template;
@@ -237,7 +237,7 @@ Canonical asset admission **не реализован и не требуется
 
 **Technical implementation: deployed and technical smoke PASS.**
 
-Owner PASS остаётся pending. Он требует live dashboard, который:
+Этот критерий был pending до owner recheck #3; теперь он закрыт bounded owner PASS. Исторически требовался live dashboard, который:
 
 1. показывает source-backed либо explicit reconciliation/unavailable state;
 2. даёт inspect repository/path/exact SHA/content hash/freshness;
@@ -249,11 +249,23 @@ Owner PASS остаётся pending. Он требует live dashboard, кот�
 
 - F10A — bounded owner PASS;
 - F11 Product Contract — `Provisional 0.1.0`;
-- F11A — **deployed; technical smoke PASS; owner validation pending; canonical admission unavailable**;
-- F11B — **deployed; technical smoke PASS; owner validation pending**;
-- F09 — ordinary running-Workspace stop/update/restart path now has natural live PASS evidence from the F11 deployment, within its existing bounded scope;
-- Workspace release — `p9.11.7`, app contract `11`;
-- deployed selected-Mac runtime/source — `ff73db4e0ee9917572654287d4dc74b4a0dea1ff` according to owner-supplied local evidence;
-- P9.11 — `Current`;
-- R32 — `Locked`;
-- следующий canonical action — real owner F11A and F11B journeys; any material friction becomes the next P9.11 finding.
+- F11A — **bounded owner PASS on live p9.11.10; canonical admission unavailable**;
+- F11B — **bounded owner PASS after p9.11.9 cache-backed stability repair**;
+- F09 — ordinary running-Workspace stop/update/restart path retains natural live PASS evidence from the F11 deployment, within its existing bounded scope;
+- Workspace release — `p9.11.10`, app contract `11`;
+- deployed selected-Mac runtime/source — `470878b8778fbac009d1ae52092879cf50d8f3f1` according to owner-supplied local evidence;
+- Product Contract — `Provisional 0.1.0` unchanged;
+- F11 owner-usefulness acceptance — **PASS in bounded F11A/F11B scope**;
+- P9.11 closure criteria — satisfied with only minor/non-blocking visual and Word trust-prompt friction remaining;
+- next canonical action — `R32 — M9 Productive Workspace Hardening + Milestone Code Health Gate`.
+
+## 9. Post-remediation owner validation closure
+
+The pending wording in earlier sections is superseded by real owner evidence recorded after the p9.11.9 and p9.11.10 repairs:
+
+- [`P9-11-F11B-OWNER-VALIDATION-RECHECK-3.md`](P9-11-F11B-OWNER-VALIDATION-RECHECK-3.md) — `PASS / bounded owner usefulness scope`;
+- [`P9-11-F11A-OWNER-VALIDATION-ATTEMPT-2.md`](P9-11-F11A-OWNER-VALIDATION-ATTEMPT-2.md) — `PASS / bounded real template-to-document journey`.
+
+F11B owner feedback accepts the portfolio as usable with only non-critical layout polish remaining. F11A owner feedback confirms real generation, download, open, formatting preservation and text substitution on p9.11.10. The Word trust/provenance prompt is retained as minor non-blocking friction and is not bypassed or misrepresented as a Workspace security failure without evidence.
+
+F11 therefore achieves **bounded owner-usefulness PASS** while the Product Contract remains `Provisional 0.1.0`. This does not establish Stable Product Contract status, Active Platform Capability, canonical asset admission, customer Production/readiness, SLA/support or public/stable API/browser compatibility.

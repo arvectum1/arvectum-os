@@ -1,11 +1,11 @@
 # P9.11 — Real daily-use dogfooding + friction/backlog closure
 
-Status: `Implementation Ready / Owner-session evidence pending`
+Status: `Complete / PASS — real owner sessions and material friction disposition evidenced`
 Date: `2026-08-22`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `product_contract` and `governance` boundaries
 Predecessor: `R31 — Complete / PASS`
-Current canonical action: `P9.11 — Real daily-use dogfooding + friction/backlog closure`
+Current canonical action: `R32 — M9 Productive Workspace Hardening + Milestone Code Health Gate`
 
 ## Canonical baseline checked
 
@@ -17,7 +17,7 @@ Current canonical action: `P9.11 — Real daily-use dogfooding + friction/backlo
 
 No higher-authority conflict was found. No Constitution amendment, new RFC/ADR, Product Contract lifecycle transition or Platform Capability promotion is required for this bounded dogfooding mechanism.
 
-## Why P9.11 is not Complete / PASS yet
+## Historical implementation-readiness state: why P9.11 was not Complete / PASS yet
 
 The Phase 9 M9 gate requires **real owner working sessions completed primarily through the Productive Workspace** and disposition of recurring usability friction discovered by those sessions.
 
@@ -162,7 +162,7 @@ The bounded capture/disposition mechanism is implementation-ready within the exa
 
 This result does **not** establish P9.11 closure, M9 closure, customer Production/readiness, a public/stable API/browser contract, SLA/support/certification, Stable Product Contracts or Active Platform Capabilities.
 
-## P9.11 closure conditions still pending
+## Historical closure conditions that remained pending at implementation-readiness time
 
 The following are intentionally **not** asserted by this implementation milestone:
 
@@ -173,4 +173,21 @@ The following are intentionally **not** asserted by this implementation mileston
 - M9 is satisfied;
 - R32 is the current canonical next action.
 
-Until those facts are evidenced, P9.11 remains the canonical current action.
+Those conditions were intentionally not asserted at implementation-readiness time. They are superseded by the real-owner closure evidence below.
+
+## P9.11 closure evidence — 2026-08-27
+
+P9.11 now has sufficient real owner evidence for bounded closure:
+
+1. multiple real owner sessions occurred primarily through the live Productive Workspace rather than synthetic scenarios;
+2. material usability findings F07–F11 were repaired and rechecked on ordinary owner journeys;
+3. F11B project-portfolio stability/usefulness reached bounded owner PASS after the p9.11.9 cache-backed repair;
+4. F11A real Company-material/template → generated DOCX → protected download → Word-open journey reached bounded owner PASS on p9.11.10;
+5. remaining owner observations are minor/non-closure-blocking: future layout polish and the Word downloaded-file trust/provenance prompt;
+6. no unresolved blocker/material finding remains in the evidenced P9.11 closure path;
+7. the deferred F08 real task-detail → governed-action journey remains eligible for natural recheck when a genuine actionable task exists, without manufacturing a synthetic task and without reopening the resolved false-task defect;
+8. security, authority, provenance and Product Contract boundaries remain fail-closed and unchanged.
+
+Therefore **P9.11 = Complete / PASS** in its exact `Local / Persistent Internal / owner-operated` scope. The next canonical action is **R32 — M9 Productive Workspace Hardening + Milestone Code Health Gate**.
+
+This closure does not establish M9/P9.12 closure, customer Production/readiness, Stable Product Contracts, Active Platform Capabilities, public/stable APIs/browser support, SLA/support or any Organizational Authority delegation.
