@@ -1,9 +1,9 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.25`
+Version: `2.95.26`
 Created: `2026-08-07`
-Updated: `2026-08-26`
+Updated: `2026-08-27`
 Owner: `ООО «Арвектум»`
 Task classification: `governance`
 
@@ -15,7 +15,7 @@ Roadmap status does not itself change Platform Capability lifecycle, Product Con
 
 ## 2. Version note
 
-Version `2.95.25` records F11 owner validation attempt #2 as `FAIL`: the portfolio was initially visible, but after ordinary navigation return every project card became unavailable. F11D-03 root cause was a live GitHub fetch on every page revisit with no last-known-good read-model cache. PR #17 merged the bounded repair at `ef46d23ffe0c724a86f7f49afd4c71345d42265c`, advancing Workspace to `p9.11.9` / app contract `11`. Exact reviewed head `52ab60a332000fff70dc9c9d8d8dc43dccc9b4c5` passed Productive Workspace CI `33005196234` and Reference Python CI `33005196245`. Selected-Mac P7.06 transaction `1bedb028b38c239f2bb2f3632277444d4e56e9a442efd996180e3b300370054e` passed with exact cache-backed navigation smoke. F11B is remediation deployed / owner recheck #3 pending; F11A owner validation remains pending. Neither is owner PASS. Product Contract remains `Provisional 0.1.0`; canonical asset admission remains unavailable; P9.11 remains Current; R32 remains Locked.
+Version `2.95.26` records bounded real-owner closure of F11 and P9.11. F11B owner recheck #3 accepted the stable cache-backed project portfolio as usable, with only non-critical layout polish remaining. F11A owner attempt #2 on live `p9.11.10` completed the real staged material/template → generated `TransientOutput` → protected download → Word-open journey with expected formatting and substituted text. The Word trust/provenance prompt is retained as minor non-blocking friction and is not bypassed. F11A/F11B therefore have bounded owner PASS; Product Contract remains `Provisional 0.1.0`, canonical asset admission remains unavailable, and no capability/lifecycle/authority promotion is implied. Real P9.11 sessions and material-friction disposition are now sufficient for `P9.11 = Complete / PASS`; `R32` becomes the current canonical action.
 
 The live `p9.11.3` Workspace was reviewed by the owner before the F08 sequence: the Home page is understandable and visually acceptable, the top-level navigation is clear, and the owner-provided Arvectum Block logo is accepted in that bounded presentation scope. F07 is therefore closed only for Home/navigation/branding.
 
@@ -36,7 +36,7 @@ F06 remains **operationally verified** in its bounded process-identity scope. F0
 
 The earlier F05 one-time owner decision for historical PID `30686` remains consumed and non-reusable. Normal `UNKNOWN` Workspace listeners remain fail-closed and unsignallable without a separate exact owner decision.
 
-`P9.11` remains Current and `R32` remains Locked. The next canonical action is real owner recheck #3 of F11B portfolio navigation stability and F11 usefulness on live p9.11.9, alongside the still-pending F11A owner journey. No synthetic owner-session evidence or canonical asset-admission claim is admitted. The first naturally occurring genuine actionable task still rechecks the deferred F08 task-detail → governed-action journey when it appears.
+`P9.11` is Complete / PASS and `R32` is Current. F11A/F11B real owner journeys have bounded owner PASS with no unresolved material closure blocker; only minor layout polish and a Word trust/provenance prompt remain. No synthetic owner-session evidence or canonical asset-admission claim is admitted. The first naturally occurring genuine actionable task still rechecks the deferred F08 task-detail → governed-action journey when it appears, without reopening P9.11 unless new material friction is found.
 
 Lane B is internally complete through prepared `INT-B7`; no additional internal integration-planning task is admitted until an exact real 1С/CRM/СЭД/ЭДО endpoint/deployment/account is available.
 
@@ -90,8 +90,8 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 | P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS |
 | P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS |
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS |
-| **P9.11** | **Real daily-use dogfooding + friction/backlog closure** | **🟨 Current — F10A bounded owner PASS; F11 attempt #2 FAIL; p9.11.9 F11D-03 remediation deployed / F11B owner recheck #3 pending** |
-| R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | ⬜ Locked |
+| P9.11 | Real daily-use dogfooding + friction/backlog closure | 🟩 Complete / PASS — F11A/F11B bounded owner PASS; material friction disposition complete |
+| **R32** | **M9 Productive Workspace Hardening + Milestone Code Health Gate** | **🟨 Current** |
 | P9.12 | Phase 9 / M9 closure review | ⬜ |
 
 ### P9.11 live state
@@ -122,7 +122,7 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 - **F11 owner validation attempt #2 / F11D-03:** `FAIL`; project content was initially visible but became unavailable after ordinary navigation return because each revisit required a new live GitHub read with no last-known-good cache;
 - **F11D-03 remediation merge:** PR #17 at `ef46d23ffe0c724a86f7f49afd4c71345d42265c`, Workspace `p9.11.9` / app contract `11`; reviewed head `52ab60a332000fff70dc9c9d8d8dc43dccc9b4c5`; Productive Workspace CI `33005196234` PASS and Reference Python CI `33005196245` PASS;
 - **F11D-03 selected-Mac deployment and smoke:** P7.06 transaction `1bedb028b38c239f2bb2f3632277444d4e56e9a442efd996180e3b300370054e`; backup `p7-03-backup-20260826T194125Z-eac706c115c5180a.tar.gz` SHA-256 `057d55c06290dbeb68b9cf2ac37bc6f15c71d1a6997919e19964760c6385ca45`; first load `fresh-fetch` wrote non-canonical cache; three ordinary revisits were `cached-within-window` with identical exact provenance and no unavailable cards; explicit refresh succeeded;
-- **F11 disposition:** F11B remediation deployed / **OWNER RECHECK #3 PENDING**; F11A owner validation pending; no owner PASS;
+- **F11 owner validation closure:** F11B owner recheck #3 = bounded PASS with only minor layout polish; F11A owner attempt #2 on p9.11.10 = bounded PASS for real template → generated DOCX → protected download → Word-open journey; Word trust/provenance prompt retained as minor non-blocking friction; Product Contract remains Provisional 0.1.0 and canonical asset admission unavailable;
 - **F09 natural recheck:** the F11 deployment started from a running `CURRENT_EXACT` Workspace and reportedly stopped, updated and restarted cleanly in one pass, providing natural live PASS evidence for the repaired bounded stop-for-update path;
 - repository inspection confirms the current preflight is non-consequential (`canonical_mutation_requested=false`, `external_effect_requested=false`, authority/approval not provided) and only records minimized local non-canonical proof evidence;
 - no product business action, Authorization, Organizational Authority, Data Governance permission or Consequential Approval was invented by the F10/F11 sequence;
@@ -131,13 +131,9 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 Current critical sequence:
 
 ```text
-real owner F11A materials/template/transient-document journey + F11B project-portfolio journey
+R32 — M9 Productive Workspace Hardening + Milestone Code Health Gate
         ↓
-disposition any material owner friction; retain deferred natural F08 task journey
-        ↓
-R32
-        ↓
-P9.12 / M9
+P9.12 / M9 closure
 ```
 
 ## 6. Parallel development lanes
