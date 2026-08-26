@@ -1,6 +1,6 @@
 # R32 — M9 Productive Workspace Hardening + Milestone Code Health Gate
 
-Status: `PR-ready / exact-head R32 audit PASS / repository CI pending`
+Status: `Complete / PASS`
 Date: `2026-08-27`
 Owner: `ООО «Арвектум»`
 Task classification: `platform + governance`
@@ -14,7 +14,7 @@ Working branch: `work/r32-m9-code-health-gate`
 - RFC-0001 through RFC-0008 — `Accepted 1.0.0` in the canonical RFC index.
 - ADR-0001 — `Productive Workspace Browser Application Topology`, `Accepted 2026-08-21`.
 - Arvectum Engineering Standard AES-001 `0.1.0` — bootstrap engineering-process baseline currently referenced by the canonical roadmap.
-- Phase 9 roadmap `1.13.23` and canonical ROADMAP `2.95.26` — `R32 = Current`; `P9.12` remains pending.
+- Phase 9 roadmap `1.13.24` and canonical ROADMAP `2.95.27` — `R32 = Complete / PASS`; `P9.12 = Current`; Phase 9 / M9 remains Active pending P9.12.
 
 No lower-authority source is used to weaken Constitution/RFC/ADR requirements.
 
@@ -75,7 +75,7 @@ Exact-head code-health inventory:
 - complexity `>15`: `6` reviewed signals, reduced from the initial `9`;
 - modules `>800` lines: `0`.
 
-The R32 audit is deliberately not a replacement for Productive Workspace CI or the full Reference Python suite. Those repository-level checks are required on the final PR head before merge.
+The R32 audit is deliberately not a replacement for Productive Workspace CI or the full Reference Python suite. Final PR head `8ce78701fdd8865e25cabbc4cce3a36dd1d16cb4` passed Productive Workspace CI `33022720889` and Reference Python CI `33022720900` before merge.
 
 ## 5. Residual high-signal disposition
 
@@ -159,26 +159,28 @@ Evidence reviewed:
 Material objections:
 
 - none from the six residual high signals after explicit disposition;
-- repository-level Productive Workspace CI and full Reference Python CI still required on final PR head;
+- final PR head `8ce78701fdd8865e25cabbc4cce3a36dd1d16cb4` passed Productive Workspace CI `33022720889` and Reference Python CI `33022720900`;
 - no release-id bump is required for this bounded internal refactor because it introduces no browser/BFF contract or user-visible behavior change and does not rebuild or alter frontend assets. Exact repository source identity remains the commit SHA; `p9.11.10` app contract `11` remains compatible. A later release-bearing change must still move compatible SPA+BFF assets together under ADR-0001/P7.06.
 
-Result: `PASS subject to final PR repository CI`.
+Result: `PASS — repository CI requirement satisfied; no material objections remain`.
 
 No third review iteration is required unless PR CI or review surfaces a new material objection.
 
-## 7. PR acceptance gate
+## 7. Canonical closure evidence
 
-Before R32 can close:
+All R32 closure gates are satisfied:
 
-1. permanent R32 workflow remains read-only and no temporary write-enabled refactor/materialization helper is present in final diff;
-2. Productive Workspace backend/full security-context tests PASS on the final PR head;
-3. frontend typecheck/tests/Web Storage guard/build/reproducibility PASS on the final PR head;
-4. full Reference Python suite PASS on the final PR head;
-5. PR diff contains only bounded R32 audit/refactor/review changes;
-6. no unresolved material review objection remains;
-7. canonical merge and read-after-write evidence exist;
-8. GitVerse mirror is verified;
-9. roadmap advances `R32` only after merge evidence exists.
+- permanent R32 audit workflow is contents-read only; no temporary write-enabled helper/workflow is present in the merged diff;
+- exact PR head `8ce78701fdd8865e25cabbc4cce3a36dd1d16cb4` passed Productive Workspace CI `33022720889`;
+- exact PR head passed full Reference Python CI `33022720900`;
+- R32 audit `33022403675` passed code-health plus Python/frontend dependency consistency/vulnerability jobs;
+- PR `#21` contained only the six bounded R32 files and had no unresolved review threads;
+- focused R32 functional cross-review completed at iteration `2/7` with no material objections;
+- PR `#21` squash-merged to canonical `main` as `f7de13c6cf71dd0546ba5a4f253899133511100e`;
+- read-after-write verified the permanent audit workflow and unchanged Workspace release `p9.11.10` / app contract `11`;
+- GitVerse mirror run `33022864556` completed SUCCESS for exact merge SHA `f7de13c6cf71dd0546ba5a4f253899133511100e`.
+
+No L5/live-runtime deployment evidence is required to close this L4/code-health R32 gate because the merged change is behavior-preserving internal hardening/tooling with no release-id, browser/BFF contract or frontend asset change. P9.12 remains responsible for the separate Phase 9 / M9 closure review.
 
 ## 8. Lifecycle and closure limits
 
@@ -194,6 +196,6 @@ R32 does not by itself:
 
 ## 9. Current disposition
 
-`PR-ready / exact-head R32 audit PASS / repository CI pending`.
+`COMPLETE / PASS`.
 
-Next action: open the R32 PR against canonical `main`, run the ordinary Productive Workspace and Reference Python checks on the exact PR head, resolve any material objection, then merge and synchronize canonical roadmap state to `R32 = Complete / PASS` and `P9.12 = Current` without closing M9 itself.
+R32 is canonically closed in its exact L4/M9 pre-closure code-health scope. The permanent audit remains in `main`; residual review signals remain visible and explicitly dispositioned rather than suppressed. `P9.12` is the next canonical action. Phase 9 / M9 is not closed by R32, and no Product Contract, Platform Capability, authority, canonical-admission, public-interface, support, Production or conformance promotion is implied.
