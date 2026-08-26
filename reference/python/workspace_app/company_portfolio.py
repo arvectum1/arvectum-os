@@ -32,6 +32,8 @@ _ALLOWED_TARGETS = frozenset(
 )
 _REPOSITORY_RE = re.compile(r"^arvectum1/[A-Za-z0-9_.-]+$")
 _PATH_RE = re.compile(r"^[A-Za-z0-9_./ -]+\.md$")
+_HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
+_STAGE_HEADING_RE = re.compile(r"^##\s+(R\d+(?:\.\d+)?)\s+[—-]\s+(.+?)\s*$", re.IGNORECASE)
 
 
 def _utc_now() -> str:
@@ -39,9 +41,10 @@ def _utc_now() -> str:
 
 
 def _plain(line: str) -> str:
-    text = line.strip().strip("`|#*- ")
-    text = text.replace("**", "").replace("__", "")
+    text = line.strip().strip("`|#*- >")
+    text = text.replace("**", "").replace("__", "").replace("`", "")
     text = re.sub(r"\[([^]]+)\]\([^)]+\)", r"\1", text)
+    text = text.replace("|", " — ")
     return " ".join(text.split())
 
 
@@ -62,11 +65,14 @@ def _first_value(markdown: str, labels: tuple[str, ...]) -> str | None:
 
 
 def _matching_lines(markdown: str, tokens: tuple[str, ...], *, limit: int = 6) -> list[str]:
+    if limit <= 0:
+        return []
     result: list[str] = []
     seen: set[str] = set()
+    upper_tokens = tuple(token.upper() for token in tokens)
     for raw in markdown.splitlines():
         upper = raw.upper()
-        if not any(token in upper for token in tokens):
+        if not any(token in upper for token in upper_tokens):
             continue
         value = _plain(raw)
         if not value or len(value) < 4 or value in seen:
@@ -78,21 +84,100 @@ def _matching_lines(markdown: str, tokens: tuple[str, ...], *, limit: int = 6) -
     return result
 
 
-def _section_headings(markdown: str, section_title: str, *, limit: int = 6) -> list[str]:
+def _section_body(markdown: str, section_title: str) -> list[str]:
     active = False
-    result: list[str] = []
+    active_level = 0
+    body: list[str] = []
+    needle = section_title.casefold()
     for raw in markdown.splitlines():
-        line = raw.strip()
-        if line.startswith("## "):
-            if active:
-                break
-            active = section_title.lower() in line.lower()
+        match = _HEADING_RE.match(raw.strip())
+        if not active:
+            if match and needle in match.group(2).casefold():
+                active = True
+                active_level = len(match.group(1))
             continue
-        if active and line.startswith("### "):
-            result.append(_bounded(_plain(line)))
-            if len(result) >= limit:
-                break
+        if match and len(match.group(1)) <= active_level:
+            break
+        body.append(raw)
+    return body
+
+
+def _section_headings(markdown: str, section_title: str, *, limit: int = 6) -> list[str]:
+    result: list[str] = []
+    for raw in _section_body(markdown, section_title):
+        match = _HEADING_RE.match(raw.strip())
+        if not match:
+            continue
+        value = _bounded(_plain(match.group(2)))
+        if value:
+            result.append(value)
+        if len(result) >= limit:
+            break
     return result
+
+
+def _table_rows_in_section(markdown: str, section_title: str, *, limit: int = 8) -> list[str]:
+    result: list[str] = []
+    for raw in _section_body(markdown, section_title):
+        line = raw.strip()
+        if not line.startswith("|"):
+            continue
+        cells = [cell.strip().strip("*`") for cell in line.strip("|").split("|")]
+        if not cells or all(re.fullmatch(r":?-{3,}:?", cell or "---") for cell in cells):
+            continue
+        if cells[0].casefold() in {"id", "lane", "phase", "block"}:
+            continue
+        value = _bounded(" — ".join(cell for cell in cells if cell))
+        if value and value not in result:
+            result.append(value)
+        if len(result) >= limit:
+            break
+    return result
+
+
+def _stage_progress(markdown: str) -> tuple[list[str], list[str]]:
+    lines = markdown.splitlines()
+    stages: list[tuple[str, int, int]] = []
+    for index, raw in enumerate(lines):
+        match = _STAGE_HEADING_RE.match(raw.strip())
+        if match:
+            stages.append((f"{match.group(1).upper()} — {_plain(match.group(2))}", index, len(lines)))
+    if not stages:
+        return [], []
+    bounded: list[tuple[str, int, int]] = []
+    for pos, (label, start, _) in enumerate(stages):
+        end = stages[pos + 1][1] if pos + 1 < len(stages) else len(lines)
+        bounded.append((label, start, end))
+    done: list[str] = []
+    remaining: list[str] = []
+    for label, start, end in bounded:
+        section = "\n".join(lines[start:end]).upper()
+        if re.search(r"СТАТУС\s*:\s*(?:\*\*)?DONE", section) or re.search(r"STATUS\s*:\s*(?:\*\*)?DONE", section):
+            done.append(label)
+        else:
+            remaining.append(label)
+    return done[:6], remaining[:6]
+
+
+def _source_execution_targets(markdown: str) -> list[str]:
+    upper = markdown.upper()
+    targets: list[str] = []
+
+    def add(value: str) -> None:
+        if value not in targets:
+            targets.append(value)
+
+    if re.search(r"\[WEB(?:/DECISION)?\]", upper) or "GITHUB IMPLEMENTATION" in upper:
+        add("web")
+    if "MAC MINI" in upper:
+        add("mac-mini")
+    if "MACBOOK" in upper:
+        add("macbook")
+    if "ARVECTUM-DEMO" in upper and "[WIN" in upper:
+        add("windows-test-laptop")
+    if "ARVECTUM-DEMO" in upper and "[LINUX" in upper:
+        add("linux-test-laptop")
+    return targets
 
 
 def _empty_roadmap() -> dict[str, Any]:
@@ -184,8 +269,8 @@ class GitHubRoadmapReader:
 
 def _normalize(descriptor: ProjectDescriptor, source: SourceDocument) -> dict[str, Any]:
     markdown = source.markdown
-    status = _first_value(markdown, ("Статус", "Status"))
-    version = _first_value(markdown, ("Версия", "Version"))
+    status = _first_value(markdown, ("Статус", "Status", "Stage"))
+    version = _first_value(markdown, ("Версия", "Version", "Current product line"))
     updated = _first_value(markdown, ("Обновлено", "Updated", "Дата фиксации"))
     current: list[str] = []
     branches: list[str] = []
@@ -199,32 +284,59 @@ def _normalize(descriptor: ProjectDescriptor, source: SourceDocument) -> dict[st
             current.append(current_action)
         branches = _section_headings(markdown, "Available implementation paths now")
         unlocked = branches[:]
-        blocked = _matching_lines(markdown, ("EXTERNAL EVIDENCE WAIT", " NOT ADMITTED", " LOCKED", " BLOCKED"))
+        blocked = _matching_lines(markdown, ("EXTERNAL EVIDENCE WAIT", " NOT ADMITTED", " LOCKED", " BLOCKED"), limit=5)
         done = _matching_lines(markdown, ("COMPLETE / PASS",), limit=5)
     elif descriptor.adapter == "os-roadmap-v1":
-        current = _matching_lines(markdown, ("P9.11", "NEXT CANONICAL ACTION"), limit=4)
-        branches = _section_headings(markdown, "Parallel development lanes")
-        unlocked = _matching_lines(markdown, (" AVAILABLE", " CURRENT", " READY"), limit=6)
-        blocked = _matching_lines(markdown, (" LOCKED", " PENDING", " BLOCKED"), limit=6)
-        done = _matching_lines(markdown, ("COMPLETE / PASS",), limit=5)
-    elif descriptor.adapter == "proxy-roadmap-v1":
-        current = _matching_lines(markdown, ("CURRENT",), limit=5)
-        branches = _section_headings(markdown, "What can be done now")
-        unlocked = _matching_lines(markdown, ("READY",), limit=6)
-        blocked = _matching_lines(markdown, ("STOP-GATE", "PENDING", "HOLD"), limit=6)
-        done = _matching_lines(markdown, ("DONE",), limit=5)
-    elif descriptor.adapter == "creative-roadmap-v1":
-        priority = _first_value(markdown, ("Current priority",))
-        if priority:
-            current.append(priority)
+        canonical_action = "\n".join(_section_body(markdown, "Current canonical actions"))
+        current = _matching_lines(canonical_action, ("P9.11 —",), limit=1)
         if not current:
-            current = _matching_lines(markdown, ("CURRENT PRIORITY",), limit=3)
-        done = _matching_lines(markdown, ("DONE", "COMPLETE"), limit=4)
+            current = _matching_lines(markdown, ("P9.11", "NEXT CANONICAL ACTION"), limit=2)
+        branches = _table_rows_in_section(markdown, "Parallel development lanes", limit=5)
+        unlocked = [row for row in branches if any(token in row.upper() for token in ("CRITICAL PATH", "AVAILABLE", "CONTINUOUS"))][:5]
+        blocked = _matching_lines(markdown, ("R32", "LOCKED", "BLOCKED ON REAL ENDPOINT"), limit=5)
+        done = _matching_lines("\n".join(_section_body(markdown, "Active Phase 9")), ("COMPLETE / PASS", "ACHIEVED / PASS"), limit=5)
+    elif descriptor.adapter == "proxy-roadmap-v1":
+        available = "\n".join(_section_body(markdown, "What can be done now"))
+        current = _matching_lines(available, ("CURRENT —", "CURRENT — APL", "CURRENT"), limit=4)
+        branches = _section_headings(markdown, "What can be done now", limit=6)
+        unlocked = _matching_lines(available, ("READY", "CURRENT"), limit=6)
+        blocked = _matching_lines(markdown, ("STOP-GATE", "HUMAN/LEGAL PENDING", "ADMIN PENDING"), limit=5)
+        done = _matching_lines(available, ("DONE",), limit=5)
+    elif descriptor.adapter == "creative-roadmap-v1":
+        if status is None and "Current state" in markdown:
+            status = "Current"
+        current_state = "\n".join(_section_body(markdown, "Current state"))
+        next_task = _first_value(current_state, ("next task",))
+        if next_task:
+            current.append(next_task)
+        if not current:
+            current = _matching_lines(current_state or markdown, ("NEXT TASK", "CURRENT PRIORITY"), limit=2)
+        done = _matching_lines(current_state or markdown, ("DONE", "COMPLETE"), limit=5)
+        blocked = _matching_lines(current_state or markdown, ("BLOCKED", "WAITING-FOR-DATA"), limit=4)
+        branches = _matching_lines(current_state or markdown, ("LANE",), limit=3)
+        unlocked = current[:]
+    elif descriptor.adapter == "tender-status-v1":
+        next_milestone = "\n".join(_section_body(markdown, "Next milestone"))
+        current = _matching_lines(next_milestone, ("NEXT STAGE",), limit=2)
+        if not current:
+            current = [_bounded(_plain(line)) for line in _section_body(markdown, "Next milestone") if _plain(line)][:2]
+        done = _matching_lines(markdown, ("PASS", "R0_CLOSED_FUNCTIONALLY"), limit=5)
+        blocked = _matching_lines(markdown, ("NOT PROVEN", "OUT OF R0", "REQUIRED"), limit=5)
+        branches = []
+        unlocked = current[:]
     else:
-        current = _matching_lines(markdown, ("CURRENT", "ТЕКУЩ", "NEXT", "СЛЕДУЮЩ"), limit=5)
-        unlocked = _matching_lines(markdown, ("READY", "ГОТОВО К", "ДОСТУП"), limit=5)
-        blocked = _matching_lines(markdown, ("BLOCKED", "PENDING", "LOCKED", "ЗАБЛОК"), limit=5)
-        done = _matching_lines(markdown, ("DONE", "COMPLETE", "PASS", "ГОТОВО"), limit=5)
+        stage_done, stage_remaining = _stage_progress(markdown)
+        if stage_done or stage_remaining:
+            done = stage_done
+            if stage_remaining:
+                current = [stage_remaining[0]]
+                unlocked = [stage_remaining[0]]
+                branches = stage_remaining[1:6]
+        else:
+            current = _matching_lines(markdown, ("CURRENT", "ТЕКУЩ", "NEXT", "СЛЕДУЮЩ"), limit=5)
+            unlocked = _matching_lines(markdown, ("READY", "ГОТОВО К", "ДОСТУП"), limit=5)
+            done = _matching_lines(markdown, ("DONE", "COMPLETE", "PASS", "ГОТОВО"), limit=5)
+        blocked = _matching_lines(markdown, ("BLOCKED", "PENDING", "LOCKED", "ЗАБЛОК", "HOLD"), limit=5)
 
     return {
         "status": status,
@@ -293,6 +405,7 @@ class RuntimeCompanyPortfolioProvider:
             raise CompanyPortfolioError("server-authorized AccessContext is required")
         cards: list[dict[str, Any]] = []
         for descriptor in self._descriptors:
+            base_targets = list(descriptor.execution_targets) or ["unspecified"]
             base = {
                 "id": descriptor.project_id,
                 "label": descriptor.label,
@@ -300,7 +413,7 @@ class RuntimeCompanyPortfolioProvider:
                 "disposition": descriptor.disposition,
                 "repository": descriptor.repository,
                 "roadmap_path": descriptor.roadmap_path,
-                "execution_targets": list(descriptor.execution_targets) or ["unspecified"],
+                "execution_targets": base_targets,
                 "authority_mode": "External Reference",
                 "projection_authority": "non-authoritative",
             }
@@ -326,11 +439,13 @@ class RuntimeCompanyPortfolioProvider:
                     }
                 )
                 continue
+            source_targets = list(descriptor.execution_targets) or _source_execution_targets(source.markdown) or ["unspecified"]
             cards.append(
                 {
                     **base,
+                    "execution_targets": source_targets,
                     "state": "current-source-backed",
-                    "message": "Данные прочитаны напрямую из зарегистрированного канонического roadmap source.",
+                    "message": "Данные прочитаны напрямую из зарегистрированного канонического roadmap/status source.",
                     "source": {
                         "repository": source.repository,
                         "path": source.path,
