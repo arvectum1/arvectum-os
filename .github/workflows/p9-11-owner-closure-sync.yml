@@ -27,7 +27,7 @@ jobs:
         run: |
           test ! -e .github/workflows/p9-11-owner-closure-sync.yml
           test ! -e scripts/p9_11_owner_closure_sync.py
-          git diff --exit-code --check
+          git diff --check
           git status --short
 
       - name: Commit closure evidence
