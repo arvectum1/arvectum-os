@@ -42,7 +42,7 @@ def _utc_now() -> str:
 
 def _plain(line: str) -> str:
     text = line.strip().strip("`|#*- >")
-    text = text.replace("**", "").replace("__", "")
+    text = text.replace("**", "").replace("__", "").replace("`", "")
     text = re.sub(r"\[([^]]+)\]\([^)]+\)", r"\1", text)
     text = text.replace("|", " — ")
     return " ".join(text.split())
@@ -65,6 +65,8 @@ def _first_value(markdown: str, labels: tuple[str, ...]) -> str | None:
 
 
 def _matching_lines(markdown: str, tokens: tuple[str, ...], *, limit: int = 6) -> list[str]:
+    if limit <= 0:
+        return []
     result: list[str] = []
     seen: set[str] = set()
     upper_tokens = tuple(token.upper() for token in tokens)
@@ -320,7 +322,7 @@ def _normalize(descriptor: ProjectDescriptor, source: SourceDocument) -> dict[st
             current = [_bounded(_plain(line)) for line in _section_body(markdown, "Next milestone") if _plain(line)][:2]
         done = _matching_lines(markdown, ("PASS", "R0_CLOSED_FUNCTIONALLY"), limit=5)
         blocked = _matching_lines(markdown, ("NOT PROVEN", "OUT OF R0", "REQUIRED"), limit=5)
-        branches = _matching_lines("\n".join(_section_body(markdown, "Capability matrix")), ("|" ,), limit=0)
+        branches = []
         unlocked = current[:]
     else:
         stage_done, stage_remaining = _stage_progress(markdown)
