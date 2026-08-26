@@ -1,6 +1,6 @@
 # P9.11-F11A — Real owner validation attempt 1
 
-Status: `FAIL / bounded remediation in progress`
+Status: `FAIL / remediation technically implemented / exact-head CI pending`
 Date: `2026-08-26`
 Owner: `ООО «Арвектум»`
 Task classification: `product_specific + product_contract + platform`
@@ -103,3 +103,27 @@ After reviewed CI, reproducible production assets, merge and governed deployment
 7. report any remaining material friction.
 
 No F11A owner PASS may be claimed before that recheck succeeds.
+
+## 7. Technical implementation evidence before final exact-head CI
+
+The bounded p9.11.10 repair is implemented on PR #19.
+
+Pre-materialization Productive Workspace CI `33014899563` established:
+
+- BFF security/context tests: PASS;
+- frontend typecheck: PASS;
+- frontend tests, including the new F11A owner-journey regression: PASS;
+- Web Storage guard: PASS;
+- production build: PASS;
+- the only failing step was the expected committed-`dist` reproducibility gate because the source release had advanced before the new production bundle was materialized.
+
+Reference Python CI `33015000500` passed the full reference suite on the repair source.
+
+Bounded branch-only materialization run `33015000505` then:
+
+- rebuilt the exact p9.11.10 frontend;
+- committed the reproducible production assets;
+- restored `.github/workflows/workspace-app-ci.yml` to canonical `permissions: contents: read` in the resulting branch head;
+- passed BFF tests, typecheck, frontend tests, Web Storage guard, build, reproducibility and release-pinned asset verification in that materialization run.
+
+The temporary write-enabled workflow is absent from the final branch diff versus `main`. A normal read-only Productive Workspace CI and Reference Python CI are still required on the final human-authored exact head before merge. This is technical readiness evidence only and does not alter the failed owner result.
