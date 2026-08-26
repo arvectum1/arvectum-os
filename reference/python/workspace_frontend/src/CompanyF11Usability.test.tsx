@@ -92,7 +92,7 @@ const materials: CompanyMaterialsProjection = {
 const context: WorkspaceContext = {
   schema: "arvectum.workspace.shell-context/1",
   release: {
-    id: "p9.11.8",
+    id: "p9.11.9",
     app_api_contract: "11",
     classification: "bounded-internal-provisional",
     public_api: false,
