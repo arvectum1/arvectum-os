@@ -228,9 +228,10 @@ class CompanyPortfolioTests(unittest.TestCase):
         )
 
         tender, discount, proxy, creative = provider.project(_access())["projects"]
-        self.assertEqual(tender["roadmap"]["status"], "R0_CLOSED_FUNCTIONALLY`.")
+        self.assertEqual(tender["roadmap"]["status"], "R0_CLOSED_FUNCTIONALLY.")
         self.assertTrue(any("Next stage" in item for item in tender["roadmap"]["current"]))
         self.assertTrue(any("NOT PROVEN" in item for item in tender["roadmap"]["blocked"]))
+        self.assertEqual(tender["roadmap"]["branches"], [])
 
         self.assertEqual(discount["roadmap"]["done"], ["R0 — Specification freeze"])
         self.assertEqual(discount["roadmap"]["current"], ["R1 — Project foundation"])
