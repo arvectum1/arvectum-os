@@ -80,6 +80,63 @@ def _registry(root: Path) -> Path:
     return path
 
 
+def _owner_adapter_registry(root: Path) -> Path:
+    path = root / "owner-adapters.json"
+    path.write_text(
+        json.dumps(
+            {
+                "schema": "arvectum.company.workspace-project-registry/1",
+                "authority": {"portfolio_identity": "AC-301", "git_primary": "2026-08-25 migration closure"},
+                "projects": [
+                    {
+                        "id": "PORT-001",
+                        "label": "Tender Agent",
+                        "kind": "product",
+                        "disposition": "continue",
+                        "repository": "arvectum1/tender-agent",
+                        "roadmap_path": "STATUS.md",
+                        "adapter": "tender-status-v1",
+                        "execution_targets": [],
+                    },
+                    {
+                        "id": "PORT-002",
+                        "label": "Discount Parser",
+                        "kind": "product",
+                        "disposition": "continue",
+                        "repository": "arvectum1/discount-parser",
+                        "roadmap_path": "docs/ROADMAP.md",
+                        "adapter": "generic-roadmap-v1",
+                        "execution_targets": [],
+                    },
+                    {
+                        "id": "PORT-003",
+                        "label": "Proxy Launcher",
+                        "kind": "product",
+                        "disposition": "continue",
+                        "repository": "arvectum1/proxy-launcher",
+                        "roadmap_path": "docs/ROADMAP.md",
+                        "adapter": "proxy-roadmap-v1",
+                        "execution_targets": [],
+                    },
+                    {
+                        "id": "PORT-004",
+                        "label": "Creative Test Agent",
+                        "kind": "product",
+                        "disposition": "continue",
+                        "repository": "arvectum1/creative-test-agent",
+                        "roadmap_path": "docs/roadmap/CURRENT.md",
+                        "adapter": "creative-roadmap-v1",
+                        "execution_targets": [],
+                    },
+                ],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    return path
+
+
 class CompanyPortfolioTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temp = tempfile.TemporaryDirectory()
@@ -157,6 +214,35 @@ class CompanyPortfolioTests(unittest.TestCase):
         self.assertEqual(card["state"], "unavailable")
         self.assertIsNone(card["source"])
         self.assertEqual(card["roadmap"]["current"], [])
+
+    def test_owner_focused_adapters_fill_uniform_fields_without_memory_inference(self) -> None:
+        sources = {
+            "PORT-001": """# Arvectum R0 status\n\n## Product snapshot\nStage: `R0_CLOSED_FUNCTIONALLY`.\n\n## Known limitations\nFunctional acceptance is PASS. Public reliability is NOT PROVEN.\n\n## Next milestone\nNext stage is limited to extraction quality, analysis quality, report structure, and evidence coverage.\n""",
+            "PORT-002": """# Discount Parser\nСтатус: **готово к реализации**\nДата фиксации: **2026-08-08**\n\n## R0 — Specification freeze\n**Статус: DONE**\n\n## R1 — Project foundation\n### Задачи\n- create app\n\n## R2 — Offer domain + persistence\n""",
+            "PORT-003": """# Proxy\nCurrent product line: `0.2.3`\n\n## 8. What can be done now\n### [Web] ChatGPT/GitHub\n1. **READY — architecture decision.**\n### [Win] ARVECTUM-DEMO\n1. **CURRENT — APL-WIN-014 enforced gate.**\n### [Linux] ARVECTUM-DEMO\n1. **READY — APL-LNX-010 after Windows gate.**\n\n### Windows production enforcement STOP-GATE\n""",
+            "PORT-004": """# Current Creative Test Agent roadmap\n\n## Current state\n- Blocks A–D: complete;\n- Block E: blocked on client data;\n- Waiting-for-Data Lane: 4/7 complete and active;\n- `CTA-PILOT-PREP-002`: DONE;\n- next task: `CTA-PILOT-PREP-003 — Synthetic Controlled Pilot Rehearsal`;\n- this next task is HYBRID and requires a local Mac mini/OpenCode rehearsal after GitHub implementation.\n""",
+        }
+        provider = VerifiedRuntimeCompanyPortfolioProvider(
+            _owner_adapter_registry(self.root),
+            reader=FakeReader(sources),  # type: ignore[arg-type]
+        )
+
+        tender, discount, proxy, creative = provider.project(_access())["projects"]
+        self.assertEqual(tender["roadmap"]["status"], "R0_CLOSED_FUNCTIONALLY`.")
+        self.assertTrue(any("Next stage" in item for item in tender["roadmap"]["current"]))
+        self.assertTrue(any("NOT PROVEN" in item for item in tender["roadmap"]["blocked"]))
+
+        self.assertEqual(discount["roadmap"]["done"], ["R0 — Specification freeze"])
+        self.assertEqual(discount["roadmap"]["current"], ["R1 — Project foundation"])
+        self.assertEqual(discount["roadmap"]["unlocked"], ["R1 — Project foundation"])
+        self.assertEqual(discount["roadmap"]["branches"], ["R2 — Offer domain + persistence"])
+
+        self.assertTrue(any("APL-WIN-014" in item for item in proxy["roadmap"]["current"]))
+        self.assertEqual(proxy["execution_targets"], ["web", "windows-test-laptop", "linux-test-laptop"])
+
+        self.assertTrue(any("CTA-PILOT-PREP-003" in item for item in creative["roadmap"]["current"]))
+        self.assertTrue(any("blocked on client data" in item for item in creative["roadmap"]["blocked"]))
+        self.assertEqual(creative["execution_targets"], ["web", "mac-mini"])
 
 
 if __name__ == "__main__":
