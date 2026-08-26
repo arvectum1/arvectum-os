@@ -1,0 +1,202 @@
+name: R32 Closure Sync TEMP
+
+on:
+  push:
+    branches:
+      - work/r32-m9-code-health-closure
+    paths:
+      - ".github/workflows/r32-closure-sync-temp.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/r32-m9-code-health-closure
+          fetch-depth: 0
+      - name: Apply fail-closed R32 closure sync
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          ROOT = Path('.')
+
+          def replace_once(text: str, old: str, new: str, label: str) -> str:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected exactly 1 occurrence, found {count}')
+              return text.replace(old, new, 1)
+
+          def sub_once(text: str, pattern: str, replacement: str, label: str, flags: int = 0) -> str:
+              out, count = re.subn(pattern, replacement, text, count=1, flags=flags)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected exactly 1 regex replacement, found {count}')
+              return out
+
+          # Canonical master roadmap.
+          path = ROOT / 'docs/roadmap/ROADMAP.md'
+          text = path.read_text(encoding='utf-8')
+          text = replace_once(text, 'Version: `2.95.26`', 'Version: `2.95.27`', 'roadmap version')
+          text = sub_once(
+              text,
+              r'(## 2\. Version note\n\n).*?\n\n(?=The live `p9\.11\.3` Workspace)',
+              r'''\1Version `2.95.27` closes R32 — M9 Productive Workspace Hardening + Milestone Code Health Gate. PR `#21` merged the permanent read-only code-health/supply-chain audit, deterministic Workspace inventory and bounded behavior-preserving validation refactors at `f7de13c6cf71dd0546ba5a4f253899133511100e`. Exact PR head `8ce78701fdd8865e25cabbc4cce3a36dd1d16cb4` passed Productive Workspace CI `33022720889` and Reference Python CI `33022720900`; exact R32 audit `33022403675` passed Python/frontend supply-chain and code-health jobs. Complexity review signals were reduced from nine to six; all six residual signals were explicitly reviewed and dispositioned as non-material/refactor-on-touch, remain visible in the permanent inventory, and zero modules exceed the 800-line review threshold. GitVerse mirror run `33022864556` passed for the merge SHA. R32 therefore closes `Complete / PASS`; `P9.12` becomes the current canonical action. Phase 9 / M9 remains Active pending its separate closure review. Workspace release remains `p9.11.10` / app contract `11`; no lifecycle, authority, Product Contract, canonical-admission, public API, support or conformance promotion is implied.\n\n''',
+              'roadmap version note',
+              re.S,
+          )
+          text = replace_once(
+              text,
+              '`P9.11` is Complete / PASS and `R32` is Current.',
+              '`P9.11` and `R32` are Complete / PASS; `P9.12` is Current.',
+              'roadmap current disposition sentence',
+          )
+          text = replace_once(text, '— `Active 1.13.23`.', '— `Active 1.13.24`.', 'phase roadmap link version')
+          text = replace_once(
+              text,
+              '| **R32** | **M9 Productive Workspace Hardening + Milestone Code Health Gate** | **🟨 Current** |',
+              '| R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | 🟩 Complete / PASS |',
+              'roadmap R32 row',
+          )
+          text = replace_once(
+              text,
+              '| P9.12 | Phase 9 / M9 closure review | ⬜ |',
+              '| **P9.12** | **Phase 9 / M9 closure review** | **🟨 Current** |',
+              'roadmap P9.12 row',
+          )
+          text = replace_once(
+              text,
+              '''Current critical sequence:\n\n```text\nR32 — M9 Productive Workspace Hardening + Milestone Code Health Gate\n        ↓\nP9.12 / M9 closure\n```''',
+              '''Current critical sequence:\n\n```text\nR32 — Complete / PASS\n        ↓\nP9.12 — Phase 9 / M9 closure review — Current\n```''',
+              'roadmap critical sequence',
+          )
+          text = replace_once(
+              text,
+              '| A — Productive Workspace | P9.11 → R32 → P9.12 | 🟨 Critical path |',
+              '| A — Productive Workspace | P9.12 Phase 9 / M9 closure review | 🟨 Critical path |',
+              'roadmap lane A',
+          )
+          text = replace_once(
+              text,
+              '- P9.11 is Complete / PASS; R32 is Current; no M9 code-health PASS is claimed before R32 completes.',
+              '- R32 closure: PR `#21` exact head `8ce78701fdd8865e25cabbc4cce3a36dd1d16cb4` passed Productive Workspace CI `33022720889` and Reference Python CI `33022720900`; R32 audit `33022403675` passed code-health plus Python/frontend supply-chain checks; merge `f7de13c6cf71dd0546ba5a4f253899133511100e` mirrored successfully to GitVerse via run `33022864556`; six residual complexity signals are explicitly reviewed non-material/refactor-on-touch and remain visible;\n- P9.11 and R32 are Complete / PASS; P9.12 is Current; Phase 9 / M9 remains Active pending the separate closure review.',
+              'roadmap quality state',
+          )
+          text = replace_once(
+              text,
+              '> **R32 — M9 Productive Workspace Hardening + Milestone Code Health Gate. P9.11 is Complete / PASS from real owner sessions and material-friction disposition. Preserve existing security, authority, provenance, Product Contract and no-canonical-admission boundaries; do not infer M9/P9.12 closure until R32 itself passes.**',
+              '> **P9.12 — Phase 9 / M9 closure review. R32 is Complete / PASS from the permanent code-health/supply-chain gate, exact-head repository CI, explicit residual-signal disposition, canonical merge and mirror evidence. Re-evaluate the complete M9 exit criteria without inferring Stable Product Contracts, Active Platform Capabilities, public/stable interfaces, customer Production, broader conformance or authority promotion.**',
+              'roadmap current canonical action',
+          )
+          path.write_text(text, encoding='utf-8')
+
+          # Detailed Phase 9 roadmap.
+          path = ROOT / 'docs/roadmap/PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md'
+          text = path.read_text(encoding='utf-8')
+          text = replace_once(text, 'Version: `1.13.23`', 'Version: `1.13.24`', 'phase version')
+          text = sub_once(
+              text,
+              r'^Current disposition:.*$',
+              'Current disposition: P9.11 is Complete / PASS from bounded real-owner F11A/F11B evidence. R32 is now Complete / PASS: permanent read-only code-health/supply-chain audit, deterministic inventory, bounded validation refactors, exact R32 audit `33022403675`, Productive Workspace CI `33022720889`, Reference Python CI `33022720900`, explicit disposition of all six residual high-complexity review signals, canonical PR `#21` merge `f7de13c6cf71dd0546ba5a4f253899133511100e`, and successful GitVerse mirror `33022864556`. `P9.12` is Current. Phase 9 / M9 remains Active pending its separate exact-scope closure review; Product Contract/lifecycle/authority/canonical-admission boundaries are unchanged.',
+              'phase current disposition',
+              re.M,
+          )
+          text = replace_once(
+              text,
+              '| **R32** | **M9 Productive Workspace Hardening + Milestone Code Health Gate** | **🟨 Current** | pre-closure hardening PASS |',
+              '| R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | 🟩 Complete / PASS | pre-closure hardening PASS |',
+              'phase R32 row',
+          )
+          text = replace_once(
+              text,
+              '| P9.12 | Phase 9 / M9 closure review | ⬜ | exact-scope M9 closure |',
+              '| **P9.12** | **Phase 9 / M9 closure review** | **🟨 Current** | exact-scope M9 closure |',
+              'phase P9.12 row',
+          )
+          text = replace_once(
+              text,
+              '> **R32 — M9 Productive Workspace Hardening + Milestone Code Health Gate. P9.11 is Complete / PASS from real owner sessions and material-friction disposition. Preserve all existing security, authority, provenance, Product Contract and no-canonical-admission boundaries while performing the pre-closure hardening/code-health review.**',
+              '> **P9.12 — Phase 9 / M9 closure review. R32 is Complete / PASS. Re-evaluate all M9 exit criteria against canonical evidence and preserve all existing security, authority, provenance, Product Contract, lifecycle and no-canonical-admission boundaries; do not claim M9 closure until P9.12 itself passes.**',
+              'phase current canonical action',
+          )
+          path.write_text(text, encoding='utf-8')
+
+          # R32 review closure.
+          path = ROOT / 'docs/reviews/R32-M9-PRODUCTIVE-WORKSPACE-HARDENING-CODE-HEALTH.md'
+          text = path.read_text(encoding='utf-8')
+          text = replace_once(
+              text,
+              'Status: `PR-ready / exact-head R32 audit PASS / repository CI pending`',
+              'Status: `Complete / PASS`',
+              'review status',
+          )
+          text = replace_once(
+              text,
+              '- Phase 9 roadmap `1.13.23` and canonical ROADMAP `2.95.26` — `R32 = Current`; `P9.12` remains pending.',
+              '- Phase 9 roadmap `1.13.24` and canonical ROADMAP `2.95.27` — `R32 = Complete / PASS`; `P9.12 = Current`; Phase 9 / M9 remains Active pending P9.12.',
+              'review roadmap authority state',
+          )
+          text = replace_once(
+              text,
+              'The R32 audit is deliberately not a replacement for Productive Workspace CI or the full Reference Python suite. Those repository-level checks are required on the final PR head before merge.',
+              'The R32 audit is deliberately not a replacement for Productive Workspace CI or the full Reference Python suite. Final PR head `8ce78701fdd8865e25cabbc4cce3a36dd1d16cb4` passed Productive Workspace CI `33022720889` and Reference Python CI `33022720900` before merge.',
+              'review PR CI paragraph',
+          )
+          text = replace_once(
+              text,
+              '- repository-level Productive Workspace CI and full Reference Python CI still required on final PR head;',
+              '- final PR head `8ce78701fdd8865e25cabbc4cce3a36dd1d16cb4` passed Productive Workspace CI `33022720889` and Reference Python CI `33022720900`;',
+              'review iteration2 CI objection',
+          )
+          text = replace_once(
+              text,
+              'Result: `PASS subject to final PR repository CI`.',
+              'Result: `PASS — repository CI requirement satisfied; no material objections remain`.',
+              'review iteration2 result',
+          )
+          text = sub_once(
+              text,
+              r'## 7\. PR acceptance gate\n\n.*?\n\n## 8\. Lifecycle and closure limits',
+              '''## 7. Canonical closure evidence\n\nAll R32 closure gates are satisfied:\n\n- permanent R32 audit workflow is contents-read only; no temporary write-enabled helper/workflow is present in the merged diff;\n- exact PR head `8ce78701fdd8865e25cabbc4cce3a36dd1d16cb4` passed Productive Workspace CI `33022720889`;\n- exact PR head passed full Reference Python CI `33022720900`;\n- R32 audit `33022403675` passed code-health plus Python/frontend dependency consistency/vulnerability jobs;\n- PR `#21` contained only the six bounded R32 files and had no unresolved review threads;\n- focused R32 functional cross-review completed at iteration `2/7` with no material objections;\n- PR `#21` squash-merged to canonical `main` as `f7de13c6cf71dd0546ba5a4f253899133511100e`;\n- read-after-write verified the permanent audit workflow and unchanged Workspace release `p9.11.10` / app contract `11`;\n- GitVerse mirror run `33022864556` completed SUCCESS for exact merge SHA `f7de13c6cf71dd0546ba5a4f253899133511100e`.\n\nNo L5/live-runtime deployment evidence is required to close this L4/code-health R32 gate because the merged change is behavior-preserving internal hardening/tooling with no release-id, browser/BFF contract or frontend asset change. P9.12 remains responsible for the separate Phase 9 / M9 closure review.\n\n## 8. Lifecycle and closure limits''',
+              'review section7 closure evidence',
+              re.S,
+          )
+          text = sub_once(
+              text,
+              r'## 9\. Current disposition\n\n.*\Z',
+              '''## 9. Current disposition\n\n`COMPLETE / PASS`.\n\nR32 is canonically closed in its exact L4/M9 pre-closure code-health scope. The permanent audit remains in `main`; residual review signals remain visible and explicitly dispositioned rather than suppressed. `P9.12` is the next canonical action. Phase 9 / M9 is not closed by R32, and no Product Contract, Platform Capability, authority, canonical-admission, public-interface, support, Production or conformance promotion is implied.\n''',
+              'review current disposition',
+              re.S,
+          )
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Validate closure state
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F 'Version: `2.95.27`' docs/roadmap/ROADMAP.md
+          grep -F '| R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | 🟩 Complete / PASS |' docs/roadmap/ROADMAP.md
+          grep -F '| **P9.12** | **Phase 9 / M9 closure review** | **🟨 Current** |' docs/roadmap/ROADMAP.md
+          grep -F 'Version: `1.13.24`' docs/roadmap/PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md
+          grep -F '| R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | 🟩 Complete / PASS | pre-closure hardening PASS |' docs/roadmap/PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md
+          grep -F 'Status: `Complete / PASS`' docs/reviews/R32-M9-PRODUCTIVE-WORKSPACE-HARDENING-CODE-HEALTH.md
+          grep -F '`P9.12` is the next canonical action.' docs/reviews/R32-M9-PRODUCTIVE-WORKSPACE-HARDENING-CODE-HEALTH.md
+          grep -F 'Phase 9 / M9 is not closed by R32' docs/reviews/R32-M9-PRODUCTIVE-WORKSPACE-HARDENING-CODE-HEALTH.md
+          git diff --check
+      - name: Remove temporary workflow and commit docs-only closure
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/r32-closure-sync-temp.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/roadmap/ROADMAP.md docs/roadmap/PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md docs/reviews/R32-M9-PRODUCTIVE-WORKSPACE-HARDENING-CODE-HEALTH.md .github/workflows/r32-closure-sync-temp.yml
+          git diff --cached --check
+          git commit -m "roadmap: close R32 and advance P9.12"
+          git push origin HEAD:work/r32-m9-code-health-closure
