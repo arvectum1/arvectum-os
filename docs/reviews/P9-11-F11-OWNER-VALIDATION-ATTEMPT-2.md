@@ -1,6 +1,6 @@
 # P9.11-F11 — Real owner validation attempt 2
 
-Status: `FAIL / remediation implemented / final CI pending`
+Status: `FAIL / remediation technically verified / deploy + owner recheck pending`
 Date: `2026-08-26`
 Owner: `ООО «Арвектум»`
 Task classification: `platform + product_contract + product_specific`
@@ -84,7 +84,7 @@ Technical PASS requires at minimum:
 
 - F11 Product Contract — `Provisional 0.1.0` unchanged;
 - F11A — remediation deployed from attempt #1 / owner validation still pending;
-- F11B — **owner validation attempt #2 FAIL / remediation implemented / final CI pending**;
+- F11B — **owner validation attempt #2 FAIL / remediation technically verified / deploy + owner recheck pending**;
 - canonical roadmap sources — remain external authority;
 - local portfolio cache — non-canonical read model only;
 - P9.11 — `Current`;
@@ -94,7 +94,7 @@ Technical PASS requires at minimum:
 
 The prior F11 functional cross-review reached the seven-iteration ceiling. This is a new real-owner defect finding and bounded implementation repair, not an eighth formal functional cross-review iteration. A focused defect review may still check whether the repair introduces material security, authority, provenance or reliability regressions.
 
-## 7. Implementation evidence before final CI
+## 7. Implementation evidence
 
 The repair branch implements the bounded design above and advances Workspace to `p9.11.9` / app contract `11`.
 
@@ -111,4 +111,16 @@ Focused implementation safeguards include:
 - regression tests cover no-refetch ordinary revisit, stale fallback, Organization isolation, cache-write failure, symlink rejection and frontend stale-refresh behavior;
 - a one-shot CI materialization produced the `p9.11.9` production `dist` and restored `.github/workflows/workspace-app-ci.yml` to its ordinary read-only form in the same branch update.
 
-This section is implementation evidence only. Final exact-head CI and real owner recheck remain required before any PASS claim.
+## 8. Technical verification
+
+Exact implementation/release head before this evidence-only update: `5bf9adbb7f006ca6e7f90c96e84c83f7df651622`.
+
+- Productive Workspace CI `33005070564`: `PASS`;
+- Reference Python CI `33005070555`: `PASS`;
+- BFF security/context suite: PASS;
+- frontend typecheck/tests/Web Storage guard: PASS;
+- production build and committed `dist` reproducibility: PASS;
+- release-pinned production asset verification: PASS;
+- temporary write-enabled materialization workflow is absent from the final PR diff; ordinary workflow is restored to `contents: read`.
+
+This establishes technical readiness only. The p9.11.9 repair still requires governed deployment to the selected Mac and a new real owner recheck. F11 owner PASS is not established.
