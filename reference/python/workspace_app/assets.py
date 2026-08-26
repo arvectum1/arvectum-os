@@ -33,8 +33,7 @@ def _tree_hash(root: Path) -> str:
     return digest.hexdigest()
 
 
-def verify_frontend_assets(frontend_root: Path, release: WorkspaceRelease) -> dict[str, Any]:
-    frontend_root = frontend_root.resolve()
+def _required_paths(frontend_root: Path) -> tuple[Path, Path, Path, Path]:
     lock = frontend_root / "package-lock.json"
     dist = frontend_root / "dist"
     index = dist / "index.html"
@@ -42,28 +41,55 @@ def verify_frontend_assets(frontend_root: Path, release: WorkspaceRelease) -> di
     for path, label in ((lock, "package lock"), (index, "built index"), (manifest, "Vite manifest")):
         if not path.is_file():
             raise AssetVerificationError(f"{label} missing: {path}")
-    html = index.read_text(encoding="utf-8")
-    if "/src/" in html or "src/main.tsx" in html:
-        raise AssetVerificationError("built index still references source modules")
+    return lock, dist, index, manifest
+
+
+def _read_manifest(manifest: Path) -> dict[str, Any]:
     try:
-        vite_manifest = json.loads(manifest.read_text(encoding="utf-8"))
+        payload = json.loads(manifest.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise AssetVerificationError("Vite manifest unreadable") from exc
-    if not isinstance(vite_manifest, dict) or not vite_manifest:
+    if not isinstance(payload, dict) or not payload:
         raise AssetVerificationError("Vite manifest empty")
+    return payload
+
+
+def _asset_names(dist: Path) -> tuple[Path, list[str]]:
     assets_dir = dist / "assets"
     assets = [path.name for path in assets_dir.iterdir() if path.is_file()] if assets_dir.is_dir() else []
     if not any(HASHED_ASSET.fullmatch(name) for name in assets):
         raise AssetVerificationError("content-hashed frontend assets not found")
-    source_bundle = "\n".join(
+    return assets_dir, assets
+
+
+def _javascript_bundle(assets_dir: Path) -> str:
+    return "\n".join(
         path.read_text(encoding="utf-8", errors="ignore")
         for path in sorted(assets_dir.iterdir())
         if path.is_file() and path.suffix == ".js"
     )
-    if release.release_id not in source_bundle:
+
+
+def _verify_index(index: Path) -> None:
+    html = index.read_text(encoding="utf-8")
+    if "/src/" in html or "src/main.tsx" in html:
+        raise AssetVerificationError("built index still references source modules")
+
+
+def _verify_bundle(bundle: str, release: WorkspaceRelease) -> None:
+    if release.release_id not in bundle:
         raise AssetVerificationError("frontend bundle is not pinned to the declared application release")
-    if "localStorage" in source_bundle or "sessionStorage" in source_bundle:
+    if "localStorage" in bundle or "sessionStorage" in bundle:
         raise AssetVerificationError("forbidden browser Web Storage reference found in production bundle")
+
+
+def verify_frontend_assets(frontend_root: Path, release: WorkspaceRelease) -> dict[str, Any]:
+    frontend_root = frontend_root.resolve()
+    lock, dist, index, manifest = _required_paths(frontend_root)
+    _verify_index(index)
+    _read_manifest(manifest)
+    assets_dir, assets = _asset_names(dist)
+    _verify_bundle(_javascript_bundle(assets_dir), release)
     return {
         "status": "PASS",
         "release_id": release.release_id,
