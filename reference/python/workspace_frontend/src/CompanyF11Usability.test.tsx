@@ -139,9 +139,10 @@ describe("F11 owner usability remediation", () => {
     expect(screen.getByText("Стендовый ноутбук Windows")).toBeTruthy();
 
     const technical = screen.getByText("Источник и технические доказательства");
-    expect(technical.closest("details")?.open).toBe(false);
+    const technicalDetails = technical.closest("details");
+    expect(technicalDetails?.hasAttribute("open")).toBe(false);
     fireEvent.click(technical);
-    expect(technical.closest("details")?.open).toBe(true);
+    expect(technicalDetails?.hasAttribute("open")).toBe(true);
     expect(screen.getByText("arvectum1/proxy-launcher")).toBeTruthy();
   });
 
