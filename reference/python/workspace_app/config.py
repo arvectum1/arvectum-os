@@ -4,7 +4,7 @@ import ipaddress
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import SplitResult, urlsplit
 
 
 class ConfigurationError(RuntimeError):
@@ -58,6 +58,79 @@ def _copilot_endpoint() -> str | None:
     return endpoint
 
 
+def _origin_parts(origin: str) -> SplitResult:
+    parsed = urlsplit(origin)
+    if parsed.scheme not in {"http", "https"}:
+        raise ConfigurationError("ARVECTUM_WORKSPACE_ORIGIN must be an origin only")
+    if not parsed.hostname or parsed.path not in {"", "/"}:
+        raise ConfigurationError("ARVECTUM_WORKSPACE_ORIGIN must be an origin only")
+    if parsed.query or parsed.fragment:
+        raise ConfigurationError("ARVECTUM_WORKSPACE_ORIGIN must be an origin only")
+    if parsed.port is not None and not 1 <= parsed.port <= 65535:
+        raise ConfigurationError("ARVECTUM_WORKSPACE_ORIGIN port is invalid")
+    return parsed
+
+
+def _validate_bind_profile(
+    parsed: SplitResult,
+    bind_host: str,
+    bind_port: int,
+    allow_loopback_http: bool,
+) -> None:
+    if not 1 <= bind_port <= 65535:
+        raise ConfigurationError("ARVECTUM_WORKSPACE_BIND_PORT is invalid")
+    if parsed.scheme == "http":
+        if not allow_loopback_http:
+            raise ConfigurationError("HTTP requires the explicit loopback-only exception")
+        if not _is_loopback(parsed.hostname or "") or not _is_loopback(bind_host):
+            raise ConfigurationError("HTTP Workspace profile is permitted only on loopback")
+        return
+    if not _is_loopback(bind_host) and _truthy("ARVECTUM_WORKSPACE_REQUIRE_LOOPBACK_BIND", True):
+        raise ConfigurationError("non-loopback bind requires an explicitly reviewed deployment profile")
+
+
+def _allowed_hosts(origin_host: str) -> tuple[str, ...]:
+    configured_hosts = os.environ.get("ARVECTUM_WORKSPACE_ALLOWED_HOSTS", origin_host)
+    allowed = tuple(sorted({item.strip().lower() for item in configured_hosts.split(",") if item.strip()}))
+    if not allowed:
+        raise ConfigurationError("at least one allowed Host is required")
+    if origin_host.lower() not in allowed:
+        raise ConfigurationError("public origin Host must be allowlisted")
+    return allowed
+
+
+def _runtime_root() -> Path:
+    default = Path.home() / "Library" / "Application Support" / "ArvectumOS" / "persistent-internal"
+    return Path(os.environ.get("ARVECTUM_P7_02_ROOT", str(default))).expanduser()
+
+
+def _display_labels() -> tuple[str, str]:
+    organization = os.environ.get("ARVECTUM_WORKSPACE_ORGANIZATION_LABEL", "ООО «Арвектум»").strip()
+    actor = os.environ.get("ARVECTUM_WORKSPACE_ACTOR_LABEL", "Owner operator").strip()
+    if not organization or not actor:
+        raise ConfigurationError("Organization and actor display labels must be non-empty")
+    return organization, actor
+
+
+def _session_expiry() -> tuple[int, int]:
+    idle = _positive_int("ARVECTUM_WORKSPACE_SESSION_IDLE_SECONDS", 1800)
+    absolute = _positive_int("ARVECTUM_WORKSPACE_SESSION_ABSOLUTE_SECONDS", 28800)
+    if idle > absolute:
+        raise ConfigurationError("session idle expiry cannot exceed absolute expiry")
+    return idle, absolute
+
+
+def _copilot_profile() -> tuple[str | None, str, int]:
+    model_url = _copilot_endpoint()
+    model_name = os.environ.get("ARVECTUM_WORKSPACE_COPILOT_MODEL", "local-grounded-model").strip()
+    if not model_name or len(model_name) > 160:
+        raise ConfigurationError("ARVECTUM_WORKSPACE_COPILOT_MODEL must be bounded non-empty text")
+    timeout = _positive_int("ARVECTUM_WORKSPACE_COPILOT_MODEL_TIMEOUT_SECONDS", 20)
+    if timeout > 120:
+        raise ConfigurationError("Copilot model timeout exceeds the bounded P9.08 profile")
+    return model_url, model_name, timeout
+
+
 @dataclass(frozen=True)
 class WorkspaceSettings:
     runtime_root: Path
@@ -88,54 +161,16 @@ class WorkspaceSettings:
         bind_host = os.environ.get("ARVECTUM_WORKSPACE_BIND_HOST", "127.0.0.1").strip()
         bind_port = _positive_int("ARVECTUM_WORKSPACE_BIND_PORT", 8769)
         allow_loopback_http = _truthy("ARVECTUM_WORKSPACE_ALLOW_LOOPBACK_HTTP", True)
-        parsed = urlsplit(origin)
-        if parsed.scheme not in {"http", "https"} or not parsed.hostname or parsed.path not in {"", "/"} or parsed.query or parsed.fragment:
-            raise ConfigurationError("ARVECTUM_WORKSPACE_ORIGIN must be an origin only")
-        if parsed.port is not None and not 1 <= parsed.port <= 65535:
-            raise ConfigurationError("ARVECTUM_WORKSPACE_ORIGIN port is invalid")
-        if not 1 <= bind_port <= 65535:
-            raise ConfigurationError("ARVECTUM_WORKSPACE_BIND_PORT is invalid")
-        if parsed.scheme == "http":
-            if not allow_loopback_http:
-                raise ConfigurationError("HTTP requires the explicit loopback-only exception")
-            if not _is_loopback(parsed.hostname) or not _is_loopback(bind_host):
-                raise ConfigurationError("HTTP Workspace profile is permitted only on loopback")
-        elif not _is_loopback(bind_host) and _truthy("ARVECTUM_WORKSPACE_REQUIRE_LOOPBACK_BIND", True):
-            raise ConfigurationError("non-loopback bind requires an explicitly reviewed deployment profile")
 
-        origin_host = parsed.netloc
-        configured_hosts = os.environ.get("ARVECTUM_WORKSPACE_ALLOWED_HOSTS", origin_host)
-        allowed_hosts = tuple(sorted({item.strip().lower() for item in configured_hosts.split(",") if item.strip()}))
-        if not allowed_hosts:
-            raise ConfigurationError("at least one allowed Host is required")
-        if origin_host.lower() not in allowed_hosts:
-            raise ConfigurationError("public origin Host must be allowlisted")
-
-        runtime_root = Path(
-            os.environ.get(
-                "ARVECTUM_P7_02_ROOT",
-                str(Path.home() / "Library" / "Application Support" / "ArvectumOS" / "persistent-internal"),
-            )
-        ).expanduser()
-        organization_label = os.environ.get("ARVECTUM_WORKSPACE_ORGANIZATION_LABEL", "ООО «Арвектум»").strip()
-        actor_label = os.environ.get("ARVECTUM_WORKSPACE_ACTOR_LABEL", "Owner operator").strip()
-        if not organization_label or not actor_label:
-            raise ConfigurationError("Organization and actor display labels must be non-empty")
-        idle = _positive_int("ARVECTUM_WORKSPACE_SESSION_IDLE_SECONDS", 1800)
-        absolute = _positive_int("ARVECTUM_WORKSPACE_SESSION_ABSOLUTE_SECONDS", 28800)
-        if idle > absolute:
-            raise ConfigurationError("session idle expiry cannot exceed absolute expiry")
-
-        copilot_model_url = _copilot_endpoint()
-        copilot_model_name = os.environ.get("ARVECTUM_WORKSPACE_COPILOT_MODEL", "local-grounded-model").strip()
-        if not copilot_model_name or len(copilot_model_name) > 160:
-            raise ConfigurationError("ARVECTUM_WORKSPACE_COPILOT_MODEL must be bounded non-empty text")
-        copilot_model_timeout_seconds = _positive_int("ARVECTUM_WORKSPACE_COPILOT_MODEL_TIMEOUT_SECONDS", 20)
-        if copilot_model_timeout_seconds > 120:
-            raise ConfigurationError("Copilot model timeout exceeds the bounded P9.08 profile")
+        parsed = _origin_parts(origin)
+        _validate_bind_profile(parsed, bind_host, bind_port, allow_loopback_http)
+        allowed_hosts = _allowed_hosts(parsed.netloc)
+        organization_label, actor_label = _display_labels()
+        idle, absolute = _session_expiry()
+        copilot_model_url, copilot_model_name, copilot_model_timeout_seconds = _copilot_profile()
 
         return cls(
-            runtime_root=runtime_root,
+            runtime_root=_runtime_root(),
             public_origin=origin.rstrip("/"),
             bind_host=bind_host,
             bind_port=bind_port,
