@@ -1,7 +1,7 @@
 # P9.11-F11 — Материалы компании и единый портфель проектов
 
-Status: `Implementation technically ready / owner validation pending`
-Version: `0.4.0`
+Status: `Deployed / technical smoke PASS / owner validation pending`
+Version: `0.5.0`
 Created: `2026-08-26`
 Updated: `2026-08-26`
 Owner: `ООО «Арвектум»`
@@ -12,8 +12,10 @@ Predecessor: [`P9.11-F10`](P9-11-F10-workspace-guidance-and-organizational-asset
 Product Contract: [`Provisional 0.1.0`](../contracts/P9-11-F11-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT-PROVISIONAL-v0.1.0.md)
 Owner approval: [`DECISION-2026-08-26-P9-11-F11-PROVISIONAL-APPROVAL`](../governance/decisions/DECISION-2026-08-26-P9-11-F11-PROVISIONAL-APPROVAL.md)
 Transition review: [`P9-11-F11-provisional-transition`](P9-11-F11-provisional-transition.md)
+Deployment evidence: [`P9-11-F11-LOCAL-DEPLOY-2026-08-26`](P9-11-F11-LOCAL-DEPLOY-2026-08-26.md)
 Workspace release: `p9.11.7`
 App API contract: `11`
+Merged source: `ff73db4e0ee9917572654287d4dc74b4a0dea1ff`
 
 ## 1. Исходный реальный finding
 
@@ -158,7 +160,7 @@ Source frontend проходил typecheck/tests/Web Storage guard/build, но c
 
 Final technical evidence на normal read-only workflow:
 
-- Productive Workspace CI run `32980578877` on exact final code/release head `352f49372753f43a387808ebf67d1b0997594406` — **PASS**:
+- Productive Workspace CI run `32981091559` on exact final reviewed head `d8211e903559cecea7331042023de89e4a90cbcc` — **PASS**:
   - BFF security/context tests — PASS;
   - frontend typecheck — PASS;
   - frontend tests — PASS;
@@ -166,11 +168,7 @@ Final technical evidence на normal read-only workflow:
   - production build — PASS;
   - committed `dist` reproducibility — PASS;
   - release-pinned asset boundary — PASS.
-- Reference Python CI run `32980578955` on the same exact code/release head — **PASS**.
-
-Material objections after iteration 6: **none for merge/deploy of the bounded Provisional slice**.
-
-Functional review не является owner-usefulness PASS, Stable Product Contract promotion, canonical asset admission, authority grant или operational-readiness approval.
+- Reference Python CI run `32981091552` on the same exact reviewed head — **PASS**.
 
 ### Iteration 6 — final project-binding UX reconciliation
 
@@ -178,11 +176,50 @@ Functional review не является owner-usefulness PASS, Stable Product Co
 
 Исправлено минимально: backend scope не расширялся на platform identity; F11A project selector filters to `COMPANY | PORT-*`. Exact final frontend bundle was rebuilt reproducibly and normal read-only CI passed.
 
-## 6. Acceptance state
+### Iteration 7 — post-deploy evidence and authority-boundary reconciliation
+
+Проверено owner-supplied selected-Mac deployment evidence against merged repository state, RFC-0005/RFC-0006/RFC-0008 and ADR-0001.
+
+Результат:
+
+- exact merged source/release identity agrees with canonical repository state;
+- local P7.06/process/backup evidence is recorded explicitly as owner-supplied operational evidence rather than repository-observed fact;
+- deployment/smoke PASS does not promote staged materials into canonical Documents/Artifacts, does not create Authorization/Organizational Authority and does not establish owner-usefulness PASS;
+- F09's repaired ordinary stop/update/restart branch gained natural live PASS evidence from this running-Workspace update without broadening its bounded lifecycle scope;
+- next evidence remains real owner F11A/F11B interaction.
+
+Material objections after iteration 7 of maximum 7: **none**.
+
+Functional review не является owner-usefulness PASS, Stable Product Contract promotion, canonical asset admission, authority grant или operational-readiness approval.
+
+## 6. Governed deployment evidence
+
+PR #12 squash-merged the implementation to canonical `main` at:
+
+`ff73db4e0ee9917572654287d4dc74b4a0dea1ff`.
+
+The selected Mac then reportedly completed one-pass P7.06 governed update from runtime/source `d5b4fdc3b81a82767473ed1da62f623773d4112a` / Workspace `p9.11.6` to exact merged runtime/source `ff73db4e0ee9917572654287d4dc74b4a0dea1ff` / Workspace `p9.11.7`.
+
+Canonical deployment evidence record: [`P9-11-F11-LOCAL-DEPLOY-2026-08-26`](P9-11-F11-LOCAL-DEPLOY-2026-08-26.md).
+
+Reported technical state:
+
+- P7.06 transaction `edb403383cf719deb48c76040927bad19f50182d4d8a8a9524d217dafdc4a3a7` — PASS;
+- P7.02/P7.05 — healthy;
+- Workspace — `CURRENT_EXACT` / `MANAGED_SPAWN_PROOF`;
+- listener — loopback-only `127.0.0.1:8769`;
+- exact release manifest/assets — PASS;
+- `/company-materials` technical smoke — PASS;
+- `/projects` technical smoke — PASS;
+- Desktop launcher — PASS;
+- deployment friction — none;
+- no rollback, canonical mutation, product external effect or historical-effect replay reported.
+
+## 7. Acceptance state
 
 ### F11A
 
-**Technical implementation: ready for governed deploy.**
+**Technical implementation: deployed and technical smoke PASS.**
 
 Owner PASS остаётся pending. Он требует на live Workspace минимум:
 
@@ -198,7 +235,7 @@ Canonical asset admission **не реализован и не требуется
 
 ### F11B
 
-**Technical implementation: ready for governed deploy.**
+**Technical implementation: deployed and technical smoke PASS.**
 
 Owner PASS остаётся pending. Он требует live dashboard, который:
 
@@ -208,13 +245,15 @@ Owner PASS остаётся pending. Он требует live dashboard, кот�
 4. отражает новый source SHA после refresh;
 5. практически отвечает владельцу, где находятся проекты и что доступно дальше.
 
-## 7. Current disposition
+## 8. Current disposition
 
 - F10A — bounded owner PASS;
 - F11 Product Contract — `Provisional 0.1.0`;
-- F11A — **technical implementation ready; owner validation pending; canonical admission unavailable**;
-- F11B — **technical implementation ready; owner validation pending**;
+- F11A — **deployed; technical smoke PASS; owner validation pending; canonical admission unavailable**;
+- F11B — **deployed; technical smoke PASS; owner validation pending**;
+- F09 — ordinary running-Workspace stop/update/restart path now has natural live PASS evidence from the F11 deployment, within its existing bounded scope;
 - Workspace release — `p9.11.7`, app contract `11`;
+- deployed selected-Mac runtime/source — `ff73db4e0ee9917572654287d4dc74b4a0dea1ff` according to owner-supplied local evidence;
 - P9.11 — `Current`;
 - R32 — `Locked`;
-- следующий canonical action после merge — governed P7.06 deploy exact latest `main`, затем real owner F11A/F11B journeys.
+- следующий canonical action — real owner F11A and F11B journeys; any material friction becomes the next P9.11 finding.
