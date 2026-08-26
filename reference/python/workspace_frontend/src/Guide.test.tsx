@@ -18,8 +18,8 @@ describe("P9.11-F10A Workspace guide", () => {
     expect(screen.getByRole("heading", { name: "Чего пока нет" })).toBeTruthy();
     expect(screen.getByText(/ещё нет общего приёма организационных материалов/)).toBeTruthy();
     expect(screen.getByText(/не является решением, разрешением, организационным полномочием/)).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Посмотреть задачи" })).toHaveAttribute("href", "/work");
-    expect(screen.getByRole("link", { name: "Найти информацию" })).toHaveAttribute("href", "/information");
-    expect(screen.getByRole("link", { name: "Спросить Arvectum AI" })).toHaveAttribute("href", "/copilot");
+    expect(screen.getByRole("link", { name: "Посмотреть задачи" }).getAttribute("href")).toBe("/work");
+    expect(screen.getByRole("link", { name: "Найти информацию" }).getAttribute("href")).toBe("/information");
+    expect(screen.getByRole("link", { name: "Спросить Arvectum AI" }).getAttribute("href")).toBe("/copilot");
   });
 });
