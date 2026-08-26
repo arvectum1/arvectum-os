@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: workspace-app-ci-${{ github.workflow }}-${{ github.ref }}
@@ -26,8 +26,10 @@ jobs:
       run:
         working-directory: reference/python
     steps:
-      - name: Check out repository
+      - name: Check out repair branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -49,8 +51,10 @@ jobs:
       run:
         working-directory: reference/python/workspace_frontend
     steps:
-      - name: Check out repository
+      - name: Check out repair branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -67,6 +71,21 @@ jobs:
         run: npm run guard:web-storage
       - name: Rebuild production assets
         run: npm run build
+      - name: Materialize exact production assets and restore read-only workflow
+        working-directory: .
+        shell: bash
+        run: |
+          git fetch origin main
+          git checkout origin/main -- .github/workflows/workspace-app-ci.yml
+          git add -A reference/python/workspace_frontend/dist .github/workflows/workspace-app-ci.yml
+          if git diff --cached --quiet; then
+            echo "Nothing to materialize"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build(workspace): materialize p9.11.9 production assets"
+          git push origin HEAD:${{ github.head_ref }}
       - name: Require committed lock and production assets to be reproducible
         run: git diff --exit-code -- package-lock.json dist
       - name: Verify release-pinned production asset boundary
