@@ -61,6 +61,19 @@ export function Shell({ context, onLogout }: { context: WorkspaceContext; onLogo
   const productId = currentPath.startsWith("/products/") ? decodeURIComponent(currentPath.slice("/products/".length)) : null;
   const navLabel = (item: NavigationItem) => navigationLabels[item.id]?.[language] ?? item.label;
   const navigate = (item: NavigationItem) => (event: React.MouseEvent<HTMLAnchorElement>) => { event.preventDefault(); navigateTo(item.href); };
+  const specialWorkPath = currentPath === "/projects" || currentPath === "/company-materials";
+  const primaryNavigation = context.navigation.flatMap((item) => {
+    const items = [
+      <li key={item.id}><a href={item.href} onClick={navigate(item)} aria-current={item.id === active.id && !specialWorkPath ? "page" : undefined}><span>{navLabel(item)}</span></a></li>,
+    ];
+    if (item.id === "work") {
+      items.push(
+        <li key="company-projects"><a href="/projects" aria-current={currentPath === "/projects" ? "page" : undefined} onClick={(event) => { event.preventDefault(); navigateTo("/projects"); }}><span>{text("Проекты", "Projects")}</span></a></li>,
+        <li key="company-materials"><a href="/company-materials" aria-current={currentPath === "/company-materials" ? "page" : undefined} onClick={(event) => { event.preventDefault(); navigateTo("/company-materials"); }}><span>{text("Материалы компании", "Company materials")}</span></a></li>,
+      );
+    }
+    return items;
+  });
 
   let content: React.ReactNode;
   if (objectId) content = <ObjectDetail objectId={objectId} />;
@@ -87,10 +100,8 @@ export function Shell({ context, onLogout }: { context: WorkspaceContext; onLogo
     <a className="skip-link" href="#workspace-main">{text("К содержанию", "Skip to content")}</a>
     <aside className="sidebar" aria-label={text("Навигация Arvectum OS", "Workspace navigation")}>
       <div className="brand" aria-label="Arvectum OS"><img src={arvectumLogo} className="brand-logo" alt="Arvectum" /><span className="brand-product">OS</span></div>
-      <nav aria-label={text("Навигация Arvectum OS", "Workspace navigation")}><ul>{context.navigation.map((item) => <li key={item.id}><a href={item.href} onClick={navigate(item)} aria-current={item.id === active.id ? "page" : undefined}><span>{navLabel(item)}</span></a></li>)}</ul></nav>
+      <nav aria-label={text("Навигация Arvectum OS", "Workspace navigation")}><ul>{primaryNavigation}</ul></nav>
       <div className="sidebar-controls">
-        <a href="/projects" aria-current={currentPath === "/projects" ? "page" : undefined} onClick={(event) => { event.preventDefault(); navigateTo("/projects"); }}>{text("Проекты компании", "Company projects")}</a>
-        <a href="/company-materials" aria-current={currentPath === "/company-materials" ? "page" : undefined} onClick={(event) => { event.preventDefault(); navigateTo("/company-materials"); }}>{text("Материалы компании", "Company materials")}</a>
         <a href="/guide" onClick={(event) => { event.preventDefault(); navigateTo("/guide"); }}>{text("Руководство", "Guide")}</a>
         <div className="language-switch" role="group" aria-label={text("Язык интерфейса", "Interface language")}><button type="button" className={language === "ru" ? "active" : ""} aria-pressed={language === "ru"} onClick={() => setLanguage("ru")}>RU</button><button type="button" className={language === "en" ? "active" : ""} aria-pressed={language === "en"} onClick={() => setLanguage("en")}>EN</button></div><div className="sidebar-footnote">{text("Внутреннее рабочее пространство", "Internal workspace")} · {context.release.id}</div></div>
     </aside>
