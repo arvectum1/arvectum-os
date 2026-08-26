@@ -67,6 +67,13 @@ jobs:
         run: npm run guard:web-storage
       - name: Rebuild production assets
         run: npm run build
+      - name: Upload exact rebuilt production assets for reconciliation
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-dist-f11
+          path: reference/python/workspace_frontend/dist
+          if-no-files-found: error
+          retention-days: 1
       - name: Require committed lock and production assets to be reproducible
         run: git diff --exit-code -- package-lock.json dist
       - name: Verify release-pinned production asset boundary
