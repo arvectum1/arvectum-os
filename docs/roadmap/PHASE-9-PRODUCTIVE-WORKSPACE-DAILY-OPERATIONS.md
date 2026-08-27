@@ -84,7 +84,7 @@ P9.11 cannot close from repository tests or simulated clicks alone. Real owner w
 
 ### F03 — owner-first information architecture
 
-Real owner use found that the Workspace did not make ordinary work obvious enough. `p9.11.2` repaired the navigation/presentation around Today, Work, Information and System. Later F07 work superseded the owner-facing labels without changing the stable route/backend identities.
+Real owner use found that the Workspace did not make ordinary work obvious enough. `p9.11.2` repaired the navigation/presentation around Today, Work, Information, Arvectum AI and System. Later F07 work superseded the owner-facing labels without changing the stable route/backend identities.
 
 ### F04 — canonical repository identity migration
 
