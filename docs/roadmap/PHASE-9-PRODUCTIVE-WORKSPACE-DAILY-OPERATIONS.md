@@ -1,15 +1,15 @@
 # Arvectum OS Phase 9 — Productive Workspace & Daily Operations
 
-Status: `Active`
-Version: `1.13.24`
+Status: `Complete / PASS`
+Version: `1.14.0`
 Created: `2026-08-21`
 Updated: `2026-08-27`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `product_contract` and `governance`
 Parent roadmap: [`ROADMAP.md`](ROADMAP.md)
 
-Current disposition: P9.11 is Complete / PASS from bounded real-owner F11A/F11B evidence. R32 is now Complete / PASS: permanent read-only code-health/supply-chain audit, deterministic inventory, bounded validation refactors, exact R32 audit `33022403675`, Productive Workspace CI `33022720889`, Reference Python CI `33022720900`, explicit disposition of all six residual high-complexity review signals, canonical PR `#21` merge `f7de13c6cf71dd0546ba5a4f253899133511100e`, and successful GitVerse mirror `33022864556`. `P9.12` is Current. Phase 9 / M9 remains Active pending its separate exact-scope closure review; Product Contract/lifecycle/authority/canonical-admission boundaries are unchanged.
-Milestone: `M9 — Daily-use organizational workbench`
+Current disposition: `P9.12 = Complete / PASS` and `M9 = Achieved / PASS` for the exact `Local / Persistent Internal / owner-operated` Productive Workspace scope. The authoritative Section 9 M9 exit set is satisfied by canonical P9.03–P9.11, R29–R32 and real-owner evidence; no Stable Product Contract, Active Platform Capability, public/stable interface, customer Production, broader conformance or authority promotion is implied. The deferred F08 real task-detail → governed-action journey remains a natural future recheck when a genuine actionable task appears and is not represented as completed natural evidence. Closure evidence: [`P9-12-phase-9-m9-closure-review.md`](../reviews/P9-12-phase-9-m9-closure-review.md).
+Milestone: `M9 — Daily-use organizational workbench — Achieved / PASS`
 Intermediate milestone: `M9-alpha — Usable Internal Workspace — Achieved / PASS`
 Architecture baseline: Constitution `1.2.0`; RFC-0001 through RFC-0008 `Accepted 1.0.0`; ADR-0001 `Accepted`
 Predecessor: `Phase 8 / M8 — Complete / PASS`
@@ -56,7 +56,7 @@ The legacy P4/P7 browser surfaces remain diagnostic/reference/recovery evidence.
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS | product/AI boundaries PASS |
 | P9.11 | Real daily-use dogfooding + friction/backlog closure | 🟩 Complete / PASS — F11A/F11B bounded owner PASS | real owner sessions + material friction closure |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | 🟩 Complete / PASS | pre-closure hardening PASS |
-| **P9.12** | **Phase 9 / M9 closure review** | **🟨 Current** | exact-scope M9 closure |
+| P9.12 | Phase 9 / M9 closure review | 🟩 Complete / PASS | exact-scope M9 closure |
 
 ## 4. Accepted application architecture
 
@@ -201,17 +201,19 @@ The selected Mac governed-deployed exact merged `p9.11.9` through P7.06 transact
 
 Subsequent real owner evidence closes both journeys in bounded scope. F11B owner recheck #3 accepts the stable project portfolio as usable with only minor layout polish. F11A owner attempt #2 on p9.11.10 confirms real generation, release-bound download, Word open, expected formatting and text replacement; the Word trust/provenance prompt is minor/non-blocking. F11A/F11B therefore have bounded owner PASS while Product Contract remains Provisional 0.1.0 and canonical asset admission remains unavailable.
 
-## 7. Current critical path
+## 7. Closure critical path
 
 ```text
-R32 hardening + M9 Code Health Gate
+R32 hardening + M9 Code Health Gate   PASS
         ↓
-P9.12 / M9 closure
+P9.12 / M9 closure                    PASS
 ```
+
+P9.12 closes the numbered Phase 9 critical path. It does not activate a successor numbered phase.
 
 ## 8. Parallel work relationship
 
-Parallel work does not change the Phase 9 critical path.
+Parallel work does not change the Phase 9 closure result.
 
 - Lane B integration design is internally complete through INT-B7 and waits for an exact real external endpoint/deployment/account.
 - Lane C product↔Workspace work may continue only on evidence and Product Contract/product-local boundaries.
@@ -236,12 +238,14 @@ M9 requires:
 10. R29–R32 material findings are closed or explicitly accepted by proper authority;
 11. M9 Milestone Code Health Gate passes before closure.
 
+P9.12 evaluates all eleven criteria as `PASS` in [`P9-12-phase-9-m9-closure-review.md`](../reviews/P9-12-phase-9-m9-closure-review.md). The result is scoped to the exact internal owner-operated contour and carries forward every limitation in that review.
+
 ## 10. Explicit non-goals
 
 Phase 9 does not by itself establish public SaaS, customer Production, universal multi-tenancy, public/stable API or SDK, Stable Product Contracts, Active Platform Capabilities, external browser support matrix, SLA/support commitments, AI Organizational Authority or automatic promotion of Observations/generated outputs into validated Knowledge.
 
-## 11. Current canonical action
+## 11. Post-M9 canonical sequencing
 
-> **P9.12 — Phase 9 / M9 closure review. R32 is Complete / PASS. Re-evaluate all M9 exit criteria against canonical evidence and preserve all existing security, authority, provenance, Product Contract, lifecycle and no-canonical-admission boundaries; do not claim M9 closure until P9.12 itself passes.**
+No successor numbered implementation phase is activated by P9.12. Canonical sequencing returns to [`ROADMAP.md`](ROADMAP.md), which remains the sole current-action source.
 
-The deferred F08 real task-detail → governed-action journey remains a natural future recheck when a genuine actionable task appears; it is not a blocker for R32 and must not be satisfied with synthetic owner work.
+The deferred F08 real task-detail → governed-action journey remains a natural future recheck when a genuine actionable task appears. It must not be satisfied with synthetic owner work and does not become a retroactive claim of missing evidence.
