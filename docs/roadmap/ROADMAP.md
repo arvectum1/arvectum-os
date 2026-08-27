@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.96.0`
+Version: `2.97.0`
 Created: `2026-08-07`
 Updated: `2026-08-27`
 Owner: `ООО «Арвектум»`
@@ -13,45 +13,35 @@ This document is the canonical planning source for Arvectum OS sequencing and co
 
 Roadmap status does not itself change Platform Capability lifecycle, Product Contract lifecycle, operational environment/readiness, conformance maturity, SLA/support or commercial commitments.
 
+Detailed completed-phase evidence remains in the corresponding phase roadmaps, reviews, decisions and repository history rather than being duplicated indefinitely here.
+
 ## 2. Version note
 
-Version `2.96.0` closes P9.12 — Phase 9 / M9 closure review. The authoritative detailed-roadmap Section 9 M9 exit set is `PASS` in [`P9-12-phase-9-m9-closure-review.md`](../reviews/P9-12-phase-9-m9-closure-review.md): M9-alpha remains valid; two product-owned surfaces remain explicitly composed; Copilot and Activity/company composition preserve source/authority boundaries; real owner Workspace sessions and material-friction disposition are complete; ADR-0001 obligations remain satisfied; R29–R32 are Complete / PASS; and the M9 Milestone Code Health Gate passed before closure. `Phase 9 = Complete / PASS` and `M9 = Achieved / PASS` only for the exact `Local / Persistent Internal / owner-operated` Productive Workspace scope. The first naturally occurring genuine actionable task still rechecks the deferred F08 task-detail → governed-action journey; no synthetic natural evidence is claimed. No Stable Product Contract, Active Platform Capability, public/stable interface, customer Production, broader conformance, SLA/support/certification or authority promotion is implied. No Phase 10 is activated by this closure.
+Version `2.97.0` activates **Phase 10 — Operational Work & Organizational Assets** after canonical Phase 9 / M9 closure.
 
-The live `p9.11.3` Workspace was reviewed by the owner before the F08 sequence: the Home page is understandable and visually acceptable, the top-level navigation is clear, and the owner-provided Arvectum Block logo is accepted in that bounded presentation scope. F07 is therefore closed only for Home/navigation/branding.
+Activation is owner-approved in [`DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION`](../governance/decisions/DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION.md) after [`P10.00 activation review`](../reviews/P10-00-post-M9-outcome-selection-and-phase-10-activation.md) `Complete / PASS`.
 
-F08 was refined through real owner use. The first F08 repair made the task/governed screens clearer, but the live `p9.11.4` owner recheck established a deeper semantic defect: P7.06-UI4 has no concrete action request or owner resolution path, yet its Waiting gates were projected as high-urgency owner work. Governance gates may qualify a concrete product-owned action; they cannot manufacture one.
+Phase 10 is grounded in real M9/F11 evidence:
 
-Repository review confirms the binding truthfulness boundary. The P7.06-UI4 bridge intentionally supplies none of the four RFC-0005 action-specific decisions and exposes no consequential action request. Its preflight only re-evaluates retained evidence and records minimized owner-local non-canonical proof evidence; it requests no canonical mutation or external effect and grants no authority or approval.
+- Company materials can already be received as `StagedNonCanonical` and used for exact-version generation;
+- generated document output remains `TransientOutput` by default;
+- the current F11 Company Workspace Product Contract remains `Provisional 0.1.0` and does not authorize canonical asset admission or arbitrary product action execution;
+- M9 proved a usable owner-operated Workspace but did not prove the full real organizational-asset lifecycle or a naturally occurring genuine task → governed-action loop;
+- the first natural genuine action remains the truthful deferred F08 recheck and is carried into Phase 10 without synthetic evidence.
 
-Canonical evidence:
-
-- [`P9.11-F07 — Owner-first Workspace UX repair`](../reviews/P9-11-F07-owner-first-workspace-ux-repair.md) — `Owner recheck PASS in bounded Home/navigation/branding scope`;
-- [`P9.11-F08 — Task-to-Governed Action Comprehension and Actionability`](../reviews/P9-11-F08-task-to-governed-action-comprehension.md) — `Resolved in bounded owner-task eligibility scope / real-task journey awaits natural evidence`;
-- [`P9.11-F09 — Workspace Stop-for-Update Graceful-Shutdown Race`](../reviews/P9-11-F09-workspace-stop-for-update-graceful-shutdown-race.md) — `Resolved in bounded scope / operationally restored; ordinary running-Workspace update path now naturally re-exercised PASS during F11 deployment`;
-- [`P9.11-F10 — Workspace Guidance and Organizational Asset Intake Gap`](../reviews/P9-11-F10-workspace-guidance-and-organizational-asset-intake-gap.md) — `F10A bounded owner PASS for guide understandability; F10B/F10C superseded into F11 material findings`;
-- [`P9.11-F11 — Материалы компании и единый портфель проектов`](../reviews/P9-11-F11-company-materials-and-project-portfolio.md) — `bounded F11A/F11B owner PASS; Product Contract remains Provisional 0.1.0`;
-- [`P9.11-F11 selected-Mac deployment`](../reviews/P9-11-F11-LOCAL-DEPLOY-2026-08-26.md) — `historical initial deployment PASS; later p9.11.9/p9.11.10 remediation and owner evidence supersede its pending-validation state`.
-
-F06 remains **operationally verified** in its bounded process-identity scope. F08 does not reopen F05/F06 and does not authorize any new effect, authority grant or decision path.
-
-The earlier F05 one-time owner decision for historical PID `30686` remains consumed and non-reusable. Normal `UNKNOWN` Workspace listeners remain fail-closed and unsignallable without a separate exact owner decision.
-
-`P9.11`, `R32` and `P9.12` are Complete / PASS; Phase 9 / M9 is closed in the exact internal owner-operated scope. F11A/F11B real owner journeys have bounded owner PASS with no unresolved material closure blocker; only minor layout polish and a Word trust/provenance prompt remain. No synthetic owner-session evidence or canonical asset-admission claim is admitted. The first naturally occurring genuine actionable task still rechecks the deferred F08 task-detail → governed-action journey when it appears, without reopening P9.11 unless new material friction is found.
-
-Lane B is internally complete through prepared `INT-B7`; no additional internal integration-planning task is admitted until an exact real 1С/CRM/СЭД/ЭДО endpoint/deployment/account is available.
-
-This update creates no public/stable API/connector/browser contract, no customer Production, no Stable Product Contract, no Active Platform Capability and no SLA/support/conformance promotion.
+This activation creates no Constitution/RFC amendment, new Kernel primitive, public/stable API/browser contract, customer Production, Stable Product Contract, Active Platform Capability, SLA/support/certification or broader conformance claim.
 
 ## 3. Architecture and governance baseline
 
 - Constitution `1.2.0` — `Ratified`, frozen;
 - RFC-0001 through RFC-0008 — `Accepted 1.0.0`;
 - ADR-0001 — `Productive Workspace Browser Application Topology`, `Accepted 2026-08-21`;
-- Decision Authority Policy remains `Proposed 0.2.1`; residual authority remains with the owner;
+- Decision Authority Policy remains `Proposed 0.2.1`; residual authority remains with the owner under Accepted governance;
 - Approved Engineering Quality and Refactoring Gates remain binding;
 - CAP-001 through CAP-004 remain `Incubating / Provisional`;
-- P6.02, P6.06, P8.03 and P8.06 Product Contracts remain Provisional within their exact scopes;
+- Product Contracts remain in their current lifecycle states unless separately transitioned;
 - operating environment remains `Local / Persistent Internal / owner-operated` with scoped conformance;
+- current canonical repository for new checkouts/deployments is `arvectum1/arvectum-os`;
 - no public/stable SDK/API/wire/browser/connector surface, external/customer Production, SLA/support/certification or broader conformance claim exists.
 
 ## 4. Strategic roadmap
@@ -61,142 +51,160 @@ This update creates no public/stable API/connector/browser contract, no customer
 | `Phase 0` | Foundation / Architecture Bootstrap | 🟩 Complete | M0 |
 | `Phase 1` | Reference Implementation | 🟩 Complete | M1 |
 | `Phase 2` | Core Runtime | 🟩 Complete | M2 |
-| `Phase 3` | Shared Platform Capabilities | 🟩 Complete | `M3` Validated shared capability baseline |
+| `Phase 3` | Shared Platform Capabilities | 🟩 Complete | M3 |
 | `Phase 4` | Workspace / Operator Experience | 🟩 Complete | M4 |
 | `Phase 5` | SDK, Contracts and Extension Experience | 🟩 Complete | M5 |
 | `Phase 6` | Product-driven Platform Validation | 🟩 Complete / PASS | M6 |
 | `Phase 7` | Operational / Enterprise Readiness | 🟩 Complete / PASS | M7 |
-| `Phase 8` | Ecosystem and External Integration | 🟩 Complete / PASS | `M8` Governed external ecosystem baseline — exact activated one-Organization scope |
-| `Phase 9` | Productive Workspace & Daily Operations | 🟩 Complete / PASS | `M9` Daily-use organizational workbench — exact internal owner-operated scope |
+| `Phase 8` | Ecosystem and External Integration | 🟩 Complete / PASS | M8 |
+| `Phase 9` | Productive Workspace & Daily Operations | 🟩 Complete / PASS | `M9 — Daily-use organizational workbench` |
+| **`Phase 10`** | **Operational Work & Organizational Assets** | **🟨 Active** | **`M10 — Governed Daily Operations Baseline`** |
 
-## 5. Completed Phase 9
+## 5. Completed Phase 9 baseline
 
 Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Complete / PASS 1.14.0`.
 
+Closure review: [`P9-12-phase-9-m9-closure-review.md`](../reviews/P9-12-phase-9-m9-closure-review.md) — `Complete / PASS`.
+
+`M9 = Achieved / PASS` only for the exact `Local / Persistent Internal / owner-operated` Productive Workspace scope.
+
+The first naturally occurring genuine actionable task still rechecks the repaired F08 task-detail → governed-action journey. No synthetic natural task evidence is admitted.
+
+## 6. Active Phase 10 — Operational Work & Organizational Assets
+
+Detailed roadmap: [`PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md`](PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md) — `Active 1.0.0`.
+
+Activation decision: [`DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION`](../governance/decisions/DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION.md) — `Approved`.
+
+### 6.1 Milestones
+
+- `M10-alpha — First Governed Company Asset Cycle`;
+- `M10 — Governed Daily Operations Baseline`.
+
+M10-alpha requires one real Company-owned material to move through staged receipt → explicit owner review → Governed Execution canonical admission → immutable asset/version/provenance → later retrieval/use through Workspace.
+
+M10 additionally requires at least one naturally occurring genuine product/company action to move through owner-facing actionable context → current server-side authority/gate revalidation → Governed Execution → truthful completed/blocked/failed/uncertain result with reconstruction evidence.
+
+### 6.2 Work breakdown
+
 | ID | Work item | Status |
 |---|---|---:|
-| P9.00 | Productive Workspace activation + outcome baseline | 🟩 Complete / PASS |
-| P9.01 | Real operator jobs-to-be-done + acceptance journeys | 🟩 Complete / PASS |
-| P9.02 | Application architecture spike + frontend/BFF/session decision | 🟩 Complete / PASS |
-| R29 | Productive Workspace Boundary Review | 🟩 Complete / PASS |
-| P9.03 | Real application shell + navigation + Organization/user context | 🟩 Complete / PASS |
-| P9.04 | My Work / Needs Attention projection | 🟩 Complete / PASS |
-| P9.05 | Human-friendly Records / Documents / Knowledge + global search | 🟩 Complete / PASS |
-| P9.06 | Executions / Decisions / governed actions UX | 🟩 Complete / PASS |
-| R30 | M9-alpha Usability / IA Review | 🟩 Complete / PASS |
-| M9-alpha | Usable Internal Workspace | 🟩 Achieved / PASS |
-| P9.07 | Product-owned Workspace surfaces / composition | 🟩 Complete / PASS |
-| P9.08 | Arvectum AI Copilot | 🟩 Complete / PASS |
-| P9.09 | Activity / notifications / attention routing | 🟩 Complete / PASS |
-| P9.10 | ООО «Арвектум» organization composition | 🟩 Complete / PASS |
-| R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS |
-| P9.11 | Real daily-use dogfooding + friction/backlog closure | 🟩 Complete / PASS — F11A/F11B bounded owner PASS; material friction disposition complete |
-| R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | 🟩 Complete / PASS |
-| P9.12 | Phase 9 / M9 closure review | 🟩 Complete / PASS |
+| `P10.00` | Post-M9 outcome selection + Phase 10 activation baseline | 🟩 Complete / PASS |
+| **`P10.01`** | **Asset/admission + real-work authority matrix** | **🟨 Current** |
+| `P10.02` | Product Contract evolution for Company assets + operational work | ⬜ |
+| `R33` | Asset / Product Contract / Authority Boundary Review | ⬜ gate |
+| `P10.03` | Domain-neutral organizational-asset admission execution path | ⬜ |
+| `P10.04` | Company Asset Library UX + version/handling lifecycle | ⬜ |
+| `P10.05` | Reviewed generated-output promotion boundary | ⬜ |
+| `R34` | M10-alpha Asset Governance / Usability Review | ⬜ gate |
+| `M10-alpha` | First Governed Company Asset Cycle | ⬜ |
+| `P10.06` | Real Action Request / Actionable Work boundary | ⬜ |
+| `P10.07` | First real governed operational action | ⬜ — waits for genuine request |
+| `P10.08` | Product operational entry-point composition | ⬜ |
+| `R35` | Operational Work / Product Boundary / AI Authority Review | ⬜ gate |
+| `P10.09` | Source-grounded use of admitted assets in Workspace / AI / generation | ⬜ |
+| `P10.10` | Real daily-operations dogfooding + friction closure | ⬜ |
+| `P10.11` | Lifecycle / platform-reuse / capability disposition | ⬜ |
+| `R36` | M10 Hardening + Milestone Code Health Gate | ⬜ gate |
+| `P10.12` | Phase 10 / M10 closure review | ⬜ |
 
-### P9.11 live state
-
-- F03 owner-first IA repair remains historical P9.11 evidence;
-- F04 canonical repository identity migration is merged;
-- F05 listener-lifecycle repair and one-time historical-listener reconciliation are complete in their exact scope; the PID `30686` authorization is consumed;
-- F06 process-identity repair is merged and operationally verified;
-- F07 implementation repair PR `#6` merged at `3e0b472a015bde7a44ac8202f364fbf5ea568ebb`, advancing Workspace to `p9.11.3` / app contract `11`;
-- **F07 bounded owner recheck:** PASS for Home first-glance orientation, primary actions, top-level navigation and Arvectum branding;
-- **F08 p9.11.4 deployment:** target `dc0e0cff83a9031a3686191b5cf304ee03c2d1eb` reached P7.02/P7.05 healthy, exact manifest/assets, `CURRENT_EXACT`, and `MANAGED_SPAWN_PROOF`;
-- **F08 p9.11.4 owner recheck:** FAIL. UI4's preflight-only proof was still projected as high-urgency owner work despite no concrete requested action or resolution path;
-- **F08 p9.11.5 repair:** PR `#8` merged at `037cd59d7917d52b3ff6aa2dea20dcad22ed484d`; UI4 is absent from ordinary Home/Tasks attention and Activity alerts, remains available under Settings technical diagnostics, and no stale task-focus or diagnostic result copy manufactures owner-task semantics;
-- **F09 graceful-shutdown race:** PR `#9` merged as `8d10059c8b45abfd679891a0442bca3073a36dcc`; targeted lifecycle validation `90 passed` and Reference Python CI `32890992380` passed. The selected Mac was subsequently restored through successful governed deployment to `03ba2c72fb9460e97b628c4b3dac36ac496cb942` from Workspace `NOT_RUNNING`; no stop or SIGTERM occurred in that recovery transition. F09 remained resolved in bounded scope, with its repaired real post-SIGTERM branch awaiting natural confirmation until the F11 update;
-- **F08 p9.11.5 deployment readiness:** P7.06 preflight/update PASS; transaction `8d8893f5207cbd52eb67e99abad593f6ce069add3314c95373f081abdcd74ae0`; backup SHA-256 `ee93ae8fd9d4d4f5b8729e8309e3459ef3fbbfbf7995516d15c9ce5f836ce836`; P7.02/P7.05 healthy; exact target Workspace started once and reached `CURRENT_EXACT` with `MANAGED_SPAWN_PROOF`; loopback-only and exact index/assets PASS; UI4 absent from Home/Tasks and Activity false attention, diagnostics available, launcher PASS;
-- **F08 p9.11.5 real owner recheck:** bounded PASS for the false-task/owner-task eligibility defect. Owner reports: `сейчас все чисто, но задач нет, поэтому полноценно проверить не могу`. No genuine actionable task exists, so the real task-detail → governed-action journey remains unevidenced until the first natural real task; no synthetic task is admitted;
-- **F10 Workspace guidance and organizational asset intake gap:** real owner finding after F08/F09 — owner asked how to use Workspace and whether logo/brandbook/templates can be uploaded;
-- **F10A PR #10** merged at `43f2bffde14073809cb228731a594a2fcb9707fb`; built-in Russian-first Workspace guide at `/guide`; release `p9.11.6` / app contract `11`;
-- **F10A p9.11.6 governed deployment:** P7.06 update PASS transaction `bd87b195d2f27e7bc83114d505e995fdfff124dd97e4962455e12fb4969b3dd6`; P7.02/P7.05 healthy; exact Workspace process `CURRENT_EXACT` / `MANAGED_SPAWN_PROOF` on `127.0.0.1:8769`; loopback-only; exact index/assets PASS;
-- **F10A technical smoke:** sidebar «Руководство», home «Открыть руководство», `/guide` heading «Что здесь можно делать», sections «Что работает сейчас» / «Чего пока нет», release `p9.11.6` visible, navigation links present, Russian default, no Authorization/Authority/Knowledge claims — PASS;
-- **F10A owner recheck:** bounded PASS for guide understandability; owner feedback: `руководство есть, оно понятное. но пока система пустая, работать не с чем.`;
-- **F11 Product Contract:** `Provisional 0.1.0`, owner-approved for bounded implementation/real validation only;
-- **F11 owner validation attempt #1:** `FAIL`; F11B portfolio was not visually usable/uniform and F11A Company Materials was not discoverable through normal navigation;
-- **F11 remediation merge:** PR #15 merged at `3b8044db42c2d029458434c8bd90761d2e720a9d`, Workspace `p9.11.8` / app contract `11`; reviewed head `d069abba5a7fb175ad16265abeb3d7d3bd968c90`; Productive Workspace CI `32995660581` PASS and Reference Python CI `32995661043` PASS;
-- **F11 p9.11.8 selected-Mac governed deployment:** P7.06 PASS transaction `d8588f7c7da5e75e4c64f6a25d512c4311c1dc9554eab8558d3bd83266a998ce`; backup `p7-03-backup-20260826T175516Z-a78ca28c0053fdbe.tar.gz` SHA-256 `c7ad0c2c75c4db20184f79aad7a03ba4ca40d0bb12ca41a2eb222ab98bee0c92`; P7.02/P7.05 healthy, `CURRENT_EXACT` / `MANAGED_SPAWN_PROOF`, one loopback listener, exact assets/launcher PASS;
-- **F11A/F11B technical remediation smoke:** vertical/uniform six-section project cards, collapsed provenance, Tender Agent `STATUS.md`, Creative Test Agent `docs/roadmap/CURRENT.md`, PORT-005 unresolved, Doors Parser/Data Platform reconciliation-required, source-supported execution targets only, and primary-nav return to Company Materials; no roadmap write, remote execution or authority claim;
-- **F11A/F11B disposition:** **bounded owner PASS**; canonical asset admission remains unavailable and Product Contract remains Provisional 0.1.0;
-- **F11 owner validation attempt #2 / F11D-03:** `FAIL`; project content was initially visible but became unavailable after ordinary navigation return because each revisit required a new live GitHub read with no last-known-good cache;
-- **F11D-03 remediation merge:** PR #17 at `ef46d23ffe0c724a86f7f49afd4c71345d42265c`, Workspace `p9.11.9` / app contract `11`; reviewed head `52ab60a332000fff70dc9c9d8d8dc43dccc9b4c5`; Productive Workspace CI `33005196234` PASS and Reference Python CI `33005196245` PASS;
-- **F11D-03 selected-Mac deployment and smoke:** P7.06 transaction `1bedb028b38c239f2bb2f3632277444d4e56e9a442efd996180e3b300370054e`; backup `p7-03-backup-20260826T194125Z-eac706c115c5180a.tar.gz` SHA-256 `057d55c06290dbeb68b9cf2ac37bc6f15c71d1a6997919e19964760c6385ca45`; first load `fresh-fetch` wrote non-canonical cache; three ordinary revisits were `cached-within-window` with identical exact provenance and no unavailable cards; explicit refresh succeeded;
-- **F11 owner validation closure:** F11B owner recheck #3 = bounded PASS with only minor layout polish; F11A owner attempt #2 on p9.11.10 = bounded PASS for real template → generated DOCX → protected download → Word-open journey; Word trust/provenance prompt retained as minor non-blocking friction; Product Contract remains Provisional 0.1.0 and canonical asset admission unavailable;
-- **F09 natural recheck:** the F11 deployment started from a running `CURRENT_EXACT` Workspace and reportedly stopped, updated and restarted cleanly in one pass, providing natural live PASS evidence for the repaired bounded stop-for-update path;
-- repository inspection confirms the current preflight is non-consequential (`canonical_mutation_requested=false`, `external_effect_requested=false`, authority/approval not provided) and only records minimized local non-canonical proof evidence;
-- no product business action, Authorization, Organizational Authority, Data Governance permission or Consequential Approval was invented by the F10/F11 sequence;
-- synthetic owner-session evidence: prohibited.
-
-Closure sequence:
+### 6.3 Critical-path sequencing
 
 ```text
-R32 — Complete / PASS
-        ↓
-P9.12 — Phase 9 / M9 closure review — Complete / PASS
+P10.01
+   ↓
+P10.02
+   ↓
+R33
+   ↓
+P10.03 → P10.04 → P10.05
+   ↓
+R34
+   ↓
+M10-alpha
+   ↓
+P10.06 → P10.07 → P10.08
+   ↓
+R35
+   ↓
+P10.09 → P10.10 → P10.11
+   ↓
+R36
+   ↓
+P10.12 / M10
 ```
 
-No successor numbered phase is activated by this closure.
+P10.06 design may overlap the asset stream after P10.01 fixes the authority model, but P10.07 cannot execute until the applicable Product Contract is effective and a genuine action request naturally exists.
 
-## 6. Parallel development lanes
+## 7. Phase 10 authority boundaries
 
-Detailed plan: [`PARALLEL-WORKSTREAMS-POST-M9-ALPHA.md`](PARALLEL-WORKSTREAMS-POST-M9-ALPHA.md) `1.1.0`.
+### 7.1 Organizational assets
 
-| Lane | Scope | Current status |
+- `StagedNonCanonical` receipt is not canonical admission;
+- generated output remains `TransientOutput` by default;
+- canonical Company asset/version admission is a consequential canonical mutation through RFC-0005 Governed Execution;
+- admitted documents/assets do not automatically become RFC-0007 validated Knowledge;
+- historical immutable versions are not overwritten;
+- asset handling remains Organization/access/classification/purpose/rights/retention/deletion constrained.
+
+### 7.2 Real work
+
+Phase 10 does not create a universal Kernel `Task` primitive.
+
+Concrete requests remain product/company-owned. Workspace may provide a domain-neutral non-authoritative Actionable Work projection, but it cannot invent urgency, responsibility, permission, approval or Organizational Authority.
+
+### 7.3 Product Contract
+
+The effective Product Contract must exist before new governed reliance. The expected default is evolution of the existing Arvectum Company ↔ Productive Workspace contract lineage for Company asset scope, while materially independent product-action scopes may require separate contracts rather than overloading one boundary.
+
+### 7.4 AI
+
+AI may retrieve, explain, summarize, compare, draft and propose. It cannot independently admit assets, approve consequential actions, create authority or promote documents into validated Knowledge.
+
+## 8. Parallel lanes
+
+| Lane | Scope | Status |
 |---|---|---:|
-| A — Productive Workspace | Phase 9 / M9 closed; no successor numbered phase activated | 🟩 Complete / PASS |
-| B — Russian-market integrations | INT-B1…INT-B7 | 🟦 Internally complete / blocked on real endpoint |
-| C — Product ↔ Workspace | product-owned projections / governed entry points | 🟦 Available on evidence |
-| D — Reliability / DX / technical debt | CI, recovery, observability, evidence-backed cleanup | 🟦 Continuous |
-| E — Future customer/external readiness | second Organization/customer readiness | ⬜ Discovery only |
+| **A — Organizational Assets** | P10.01–P10.05 → R34 → M10-alpha | 🟨 Primary early critical path |
+| **B — Real Operational Work** | P10.06–P10.08 → R35 | 🟦 available after P10.01; real execution waits genuine request + contract |
+| **C — Product ↔ Workspace** | product-owned operational surfaces/entry points | 🟦 bounded on Product Contract/product-local evidence |
+| **D — External integrations** | existing INT-B7 real connector pilot | ⏸ blocked on exact real endpoint/deployment/account |
+| **E — Reliability / DX / technical debt** | CI, recovery, observability, dependency/security, evidence-backed refactoring | 🟦 continuous |
 
-### Lane B state
+### Lane D — integration state
 
-- INT-B1 — Complete / PASS;
-- INT-B2 — Complete / PASS;
-- INT-B3 — Complete / PASS;
-- INT-B4 — Complete / PASS;
-- INT-B5 — Complete / PASS;
-- INT-B6 — Complete / scoped PASS;
-- INT-B7 — package prepared and cross-reviewed; **pilot NOT ADMITTED** without an exact real endpoint/deployment/account.
+INT-B1 through INT-B6 are complete/scoped PASS. INT-B7 is prepared and cross-reviewed but the pilot remains `NOT ADMITTED` until an exact real 1С/CRM/СЭД/ЭДО endpoint/deployment/account and least-privilege credential binding exist.
 
-Preferred first prepared candidate remains a bounded read-only `1С:ERP 2.5` procurement projection. No synthetic endpoint/credential/pilot evidence is acceptable. When a real endpoint exists, populate and execute INT-B7 rather than inventing INT-B8 prematurely.
+Preferred prepared candidate remains a bounded read-only `1С:ERP 2.5` procurement projection. Do not invent INT-B8 or synthetic endpoint evidence merely to keep the lane moving.
 
-## 7. Quality / test state
+## 9. M10 closure definition
 
-- merged F04 repository-identity repair: focused P7.06 Python/shell validation `44 passed`; shell syntax and Python compilation PASS;
-- merged F05 PR `#3`: final focused lifecycle/P7.06/P7.02 evidence `72 passed`; historical roadmap guards `4 passed`; GitHub Reference Python CI / full suite PASS on exact reviewed head `9474b846d316ed4fb038ce90a11999401b83fcc9`;
-- merged F06 PR `#4`: exact `Application Support` executable/entrypoint regressions PASS, framework + managed proof reaches `CURRENT_EXACT`, framework without managed proof remains `UNKNOWN` / `NONE`, PID-reuse and historical unproven-process guards PASS, and GitHub full Reference Python CI PASS on exact reviewed head `99d4d1a130885c6a399e3077f4ac15a113d67a98`;
-- F06 selected-Mac operational verification: P7.02/P7.05 healthy, `CURRENT_EXACT`, `MANAGED_SPAWN_PROOF`, exact live assets PASS, Desktop launcher refreshed/opened on runtime `470d4e310973ed873eb71d1bec3cf0985288be6b`;
-- merged F07 PR `#6`: reviewed head `5e5db4b0dbf84774cc5915baccce5a21e109d267`; frontend `27 passed`; typecheck, no-Web-Storage guard, build and diff check PASS; Productive Workspace CI `32850241215` PASS; Reference Python CI `32850241199` PASS;
-- local F07 targeted backend/reference run reported `41 passed` plus one macOS `/var` symlink-policy baseline failure reproduced on canonical `main`; it is not treated as a waiver or post-deploy readiness proof;
-- real `p9.11.3` owner recheck proves F07 Home/navigation/branding improvement but also proves F08 downstream usability failure;
-- merged F08 PR `#7`: reviewed head `d2949821347fc3078757303d5858a67dfdd7e23b`; frontend `32 passed`; typecheck/build/diff-check PASS; Productive Workspace CI `32856696161` PASS including SPA and BFF security/context jobs; Reference Python CI `32856696061` full reference suite PASS;
-- F08 p9.11.4 selected-Mac deployment passed exact runtime/readiness/assets/launcher checks, but the real owner recheck failed because a non-actionable preflight proof was projected as owner work;
-- merged F08 owner-task eligibility PR `#8`: reviewed head `dde1102d0892a6c71e7a47de9c3a93fba98c84de`; frontend `34 passed`; typecheck, Web Storage guard, build and diff check PASS; Productive Workspace CI `32864084390` PASS; Reference Python CI `32864084387` PASS;
-- merged F09 PR `#9`: reviewed head `a451451037f8f77382264418039dac1ed5a9089f`; targeted lifecycle validation `90 passed`; Python compilation, shell syntax and diff check PASS; Reference Python CI `32890992380` PASS;
-- post-F09 selected-Mac governed deployment: target `03ba2c72fb9460e97b628c4b3dac36ac496cb942`, P7.06 PASS transaction `8d8893f5207cbd52eb67e99abad593f6ce069add3314c95373f081abdcd74ae0`, P7.02/P7.05 healthy, exact p9.11.5 managed start `1`, `CURRENT_EXACT` / `MANAGED_SPAWN_PROOF`, loopback-only, exact index/assets and launcher PASS;
-- p9.11.5 real owner recheck: bounded PASS for no fabricated UI4 owner task; real task-detail/governed journey remains pending natural evidence because no genuine task exists;
-- F11 PR #15: reviewed head `d069abba5a7fb175ad16265abeb3d7d3bd968c90`; Productive Workspace CI `32995660581` PASS; Reference Python CI `32995661043` PASS; release-bearing merge SHA `3b8044db42c2d029458434c8bd90761d2e720a9d`;
-- F11 p9.11.8 deployment evidence: attempt #1 remains FAIL; P7.06 PASS transaction `d8588f7c7da5e75e4c64f6a25d512c4311c1dc9554eab8558d3bd83266a998ce`, P7.02/P7.05 healthy, `CURRENT_EXACT` / `MANAGED_SPAWN_PROOF`, loopback-only exact assets/launcher PASS, F11A/F11B technical remediation smoke PASS, owner recheck pending;
-- F11D-03 p9.11.9: attempt #2 remains FAIL; PR #17 reviewed head `52ab60a332000fff70dc9c9d8d8dc43dccc9b4c5`; Productive Workspace CI `33005196234` PASS; Reference Python CI `33005196245` PASS; P7.06 transaction `1bedb028b38c239f2bb2f3632277444d4e56e9a442efd996180e3b300370054e` PASS; cache-backed ordinary revisits retain exact source evidence with no unavailable-card collapse; owner recheck #3 pending;
-- F11 p9.11.10 repair: PR #19 exact reviewed head `3b849e926346240011c010a58085a2cc57fe05f1` passed Productive Workspace CI `33015126576` and Reference Python CI `33015126605`; release-bearing merge `470878b8778fbac009d1ae52092879cf50d8f3f1`; selected-Mac P7.06 transaction `129845fa731fee12f2f9d2ada6894c42bc366b582835f8c299533d78565ad877` deployed exact p9.11.10 with healthy P7.02/P7.05, `CURRENT_EXACT`, `MANAGED_SPAWN_PROOF`, loopback-only listener, exact assets and launcher PASS;
-- real owner closure: F11B recheck #3 bounded PASS with only minor layout polish; F11A attempt #2 bounded PASS for template → generated DOCX → protected download → Word-open journey, with Word trust/provenance prompt retained as minor/non-blocking;
-- R32 closure: PR `#21` exact head `8ce78701fdd8865e25cabbc4cce3a36dd1d16cb4` passed Productive Workspace CI `33022720889` and Reference Python CI `33022720900`; R32 audit `33022403675` passed code-health plus Python/frontend supply-chain checks; merge `f7de13c6cf71dd0546ba5a4f253899133511100e` mirrored successfully to GitVerse via run `33022864556`; six residual complexity signals are explicitly reviewed non-material/refactor-on-touch and remain visible;
-- P9.11, R32 and P9.12 are Complete / PASS; Phase 9 / M9 is `Complete / Achieved — PASS` in the exact internal owner-operated scope. No synthetic owner evidence, lifecycle promotion, public/stable surface, customer Production, broader conformance or authority promotion is implied.
+M10 requires:
 
-## 8. M9 definition
+1. M10-alpha remains valid with a real governed Company asset cycle;
+2. receipt/staging, canonical admission and generated-output promotion remain distinct;
+3. immutable asset versions/provenance/authority/handling are reconstructable;
+4. owner can perform ordinary asset work through Workspace without terminal/GitHub/internal identifiers;
+5. one genuine action reaches a truthful governed outcome or truthful blocked/failed/uncertain state with complete reconstruction evidence;
+6. Actionable Work does not manufacture tasks/urgency/authority;
+7. effective Product Contracts cover actual platform reliance;
+8. product business semantics remain product-owned;
+9. AI remains proposal/source-grounded and does not become authority or Knowledge-promotion source;
+10. external source-of-truth declarations remain intact;
+11. real daily-operations dogfooding has no unresolved material closure blockers;
+12. R33–R36 material findings are closed or properly dispositioned;
+13. M10 Milestone Code Health Gate passes before closure.
 
-M9 requires M9-alpha to remain valid plus real owner working sessions primarily through Workspace, recurring material friction disposition, real product composition and AI/Activity/company surfaces remaining valid, applicable ADR obligations satisfied, R29–R32 material findings closed, and the M9 Milestone Code Health Gate PASS.
+If no genuine action naturally exists, Phase 10 may reach M10-alpha and remain Active rather than fabricating P10.07 evidence.
 
-P9.12 evaluates the complete current M9 exit set as `PASS` in the exact internal owner-operated scope. Parallel integration progress did not substitute for P9.11 operational evidence.
+## 10. Current canonical actions
 
-## 9. Current canonical actions
+**Critical path:**
 
-**Numbered critical path:**
+> **P10.01 — Asset/admission + real-work authority matrix.**
 
-> **No active successor numbered implementation phase. Phase 9 / M9 is Complete / Achieved — PASS. Any future numbered phase/milestone requires a separate governed roadmap/activation decision with a concrete outcome and fresh scope/gate validation.**
+Fix exact first-slice Company asset classes, authority/admission decisions, generated-output promotion semantics and real Action Request source classes before implementing canonical admission or new product action execution.
 
-**Lane B:**
+**Parallel integrations:**
 
-> **No internally executable action. Resume INT-B7 only when an exact real integration endpoint/deployment/account is available.**
+> **No internally executable INT-B follow-on. Resume INT-B7 only when an exact real external endpoint/deployment/account exists.**
