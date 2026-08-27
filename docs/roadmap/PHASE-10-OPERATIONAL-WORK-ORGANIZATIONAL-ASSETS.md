@@ -1,7 +1,7 @@
 # Arvectum OS Phase 10 — Operational Work & Organizational Assets
 
 Status: `Active`
-Version: `1.0.0`
+Version: `1.0.1`
 Created: `2026-08-27`
 Updated: `2026-08-27`
 Owner: `ООО «Арвектум»`
@@ -13,6 +13,21 @@ Intermediate milestone: `M10-alpha — First Governed Company Asset Cycle`
 Architecture baseline: Constitution `1.2.0`; RFC-0001 through RFC-0008 `Accepted 1.0.0`; ADR-0001 `Accepted`
 Activation decision: [`DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION`](../governance/decisions/DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION.md)
 Activation review: [`P10-00-post-M9-outcome-selection-and-phase-10-activation.md`](../reviews/P10-00-post-M9-outcome-selection-and-phase-10-activation.md)
+
+## 0. Version note
+
+Version `1.0.1` records completion of P10.01 and P10.02 and advances the blocking Phase 10 gate to `R33 — Asset / Product Contract / Authority Boundary Review`.
+
+Canonical P10.01 evidence: [`P10-01-asset-admission-real-work-authority-matrix`](../reviews/P10-01-asset-admission-real-work-authority-matrix.md) — `Complete / PASS`.
+
+Canonical P10.02 evidence:
+
+- exact reviewed Draft `0.2.0` blob `a92c1d1aac54d565d3d32ce746925620c9d1fd12`;
+- [`DECISION-2026-08-27-P10-02-PROVISIONAL-APPROVAL`](../governance/decisions/DECISION-2026-08-27-P10-02-PROVISIONAL-APPROVAL.md) — `Approved`;
+- [`P10-02-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT-PROVISIONAL-v0.2.0`](../contracts/P10-02-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT-PROVISIONAL-v0.2.0.md) — lifecycle-current `Provisional 0.2.0`;
+- [`P10-02-product-contract-publication-closure`](../reviews/P10-02-product-contract-publication-closure.md) — `Complete / PASS`.
+
+The Product Contract transition admits only the exact bounded product/platform boundary. It does not establish P10.03 implementation PASS, R33 PASS, Stable Product Contract status, Active Platform Capability status, customer Production or broader conformance/support commitments.
 
 ## 1. Purpose
 
@@ -36,10 +51,11 @@ Phase 10 starts from these canonical facts:
 - `Phase 9 / M9 = Complete / Achieved — PASS` in the exact `Local / Persistent Internal / owner-operated` scope;
 - Productive Workspace release at the M9 closure baseline is `p9.11.10`, internal application contract `11`;
 - F11 proved useful owner-local `StagedNonCanonical` Company material intake, exact version/digest/provenance retention and exact-version DOCX generation as `TransientOutput`;
-- F11 Product Contract remains `Provisional 0.1.0` and explicitly does **not** admit staged material or generated output into canonical organizational state;
+- F11 Product Contract `Provisional 0.1.0` remains immutable historical evidence; P10.02 has now evolved the same contract lineage to lifecycle-current `Provisional 0.2.0` for bounded canonical Company asset-admission and operational-entry semantics;
+- generated-output promotion is contractually bounded by `0.2.0` but remains unavailable for real reliance until P10.05 implementation/review;
 - F08 false-task projection was repaired; the first naturally occurring genuine actionable task still remains the truthful real-world recheck of task-detail → governed-action comprehension;
 - CAP-001 through CAP-004 remain `Incubating / Provisional` unless separately governed;
-- no Product Contract is promoted to `Stable` and no capability to `Active` by M9 closure;
+- no Product Contract is promoted to `Stable` and no capability to `Active` by P10.02 closure;
 - Lane B integration design is internally complete through prepared INT-B7, but a real connector pilot remains blocked on an exact external endpoint/deployment/account.
 
 Phase 10 uses these facts as evidence rather than reopening completed M9 work.
@@ -71,13 +87,17 @@ Canonical admission of a Company material/version is a consequential canonical m
 
 ### 3.3 Product Contract before new governed reliance
 
-The current F11 Product Contract `Provisional 0.1.0` explicitly excludes canonical asset admission and remote/product action execution.
+The lifecycle-current Company Workspace Product Contract is `Provisional 0.2.0` for the exact owner-approved Draft blob `a92c1d1aac54d565d3d32ce746925620c9d1fd12`.
 
-Phase 10 MUST publish the minimum sufficient new/updated Product Contract boundary before implementation relies on Arvectum OS for:
+It admits the minimum sufficient boundary for:
 
-- Company asset canonical admission/promotion;
-- consequential use of product-owned operational actions through Workspace;
-- any new shared platform dependency not already declared by the effective Product Contract.
+- Company asset canonical admission operations;
+- external-reference admission preserving external authority;
+- the later reviewed generated-output promotion boundary, with real reliance deferred until P10.05;
+- non-authoritative Actionable Work projection;
+- no-side-effect Workspace product-operation entry/routing.
+
+Actual downstream consequential product actions still require the owning product's exact effective Product Contract and product-owned governed workflow/operation. P10.03 implementation remains blocked until R33 passes.
 
 ### 3.4 No universal Task primitive by default
 
@@ -128,16 +148,16 @@ M10 does not require customer Production, public interfaces, multi-Organization 
 | ID | Work item | Status | Exit outcome |
 |---|---|---:|---|
 | `P10.00` | Post-M9 outcome selection + Phase 10 activation baseline | 🟩 Complete / PASS | Phase 10 bounded scope, milestone, non-goals and gates activated |
-| **`P10.01`** | **Asset/admission + real-work authority matrix** | **🟨 Current** | exact subject classes, authority modes, owner decisions, retention/classification, action-request sources and consequentiality matrix fixed |
-| `P10.02` | Product Contract evolution for Company assets + operational work | ⬜ | effective minimum-sufficient Provisional boundary exists before governed reliance |
-| `R33` | Asset / Product Contract / Authority Boundary Review | ⬜ gate | no hidden authority, product leakage, competing truth or accidental stable/public surface |
-| `P10.03` | Domain-neutral organizational-asset admission execution path | ⬜ | staged material can enter canonical asset history only through explicit Governed Execution |
+| `P10.01` | Asset/admission + real-work authority matrix | 🟩 Complete / PASS | exact subject classes, authority modes, owner decisions, retention/classification, action-request sources and consequentiality matrix fixed |
+| `P10.02` | Product Contract evolution for Company assets + operational work | 🟩 Complete / PASS — `Provisional 0.2.0` | effective minimum-sufficient Provisional boundary exists before governed reliance |
+| **`R33`** | **Asset / Product Contract / Authority Boundary Review** | **🟨 Current gate** | no hidden authority, product leakage, competing truth or accidental stable/public surface |
+| `P10.03` | Domain-neutral organizational-asset admission execution path | ⬜ blocked on R33 PASS | staged material can enter canonical asset history only through explicit Governed Execution |
 | `P10.04` | Company Asset Library UX + version/handling lifecycle | ⬜ | owner can review, admit, find, inspect, supersede/version and export/download admitted assets through Workspace |
 | `P10.05` | Reviewed generated-output promotion boundary | ⬜ | generated `TransientOutput` can be reviewed and, only when admitted, promoted to a governed Company document/asset version |
 | `R34` | M10-alpha Asset Governance / Usability Review | ⬜ gate | real asset cycle safe, understandable and reconstructable |
 | `M10-alpha` | First Governed Company Asset Cycle | ⬜ | first real asset cycle owner PASS |
 | `P10.06` | Real Action Request / Actionable Work boundary | ⬜ | concrete product/company requests can appear truthfully without a universal Task primitive |
-| `P10.07` | First real governed operational action | ⬜ | one natural genuine action reaches Governed Execution and truthful terminal/uncertain state |
+| `P10.07` | First real governed operational action | ⬜ — waits genuine request | one natural genuine action reaches Governed Execution and truthful terminal/uncertain state |
 | `P10.08` | Product operational entry-point composition | ⬜ | Workspace can start/continue admitted product-owned actions without embedding product business logic in platform |
 | `R35` | Operational Work / Product Boundary / AI Authority Review | ⬜ gate | action semantics, authority and product ownership remain correct |
 | `P10.09` | Source-grounded use of admitted assets in Workspace / AI / generation | ⬜ | exact admitted assets can be retrieved/used with provenance without automatic Knowledge promotion |
@@ -155,11 +175,13 @@ P10.00 is `Complete / PASS` because:
 - the owner explicitly directed creation and implementation of a detailed Phase 10 roadmap;
 - the scope is bounded to the existing internal owner-operated environment;
 - the phase reuses Accepted RFC-0002/0004/0005/0007/0008 semantics rather than requiring a Constitution or foundational RFC change;
-- new Product Contract scope is deferred to P10.02 before new governed reliance;
+- new Product Contract scope is governed through P10.02 before new implementation reliance;
 - capability lifecycle promotion is not implied by activation;
 - the work remains reversible and evidence-driven.
 
 ## 7. P10.01 — Asset/admission + real-work authority matrix
+
+P10.01 is `Complete / PASS` in [`P10-01-asset-admission-real-work-authority-matrix`](../reviews/P10-01-asset-admission-real-work-authority-matrix.md).
 
 ### Purpose
 
@@ -167,28 +189,20 @@ Fix the exact organizational and authority meaning before writing admission/acti
 
 ### P10.01-A — real Company asset classes
 
-Inventory the first real material classes to be admitted, starting from evidence already used in F11:
+The first-slice classes are bounded to:
 
 - brandbook;
 - logo/brand assets;
 - Company document templates;
 - Company source/reference materials;
-- project-bound generated documents considered for internal acceptance.
+- governed external references;
+- project-bound generated documents considered for internal acceptance only through the later explicit promotion path.
 
-For each class define:
-
-- owner/product semantic role;
-- whether bytes are `Native` after admission or remain `External Reference`;
-- classification/default purpose;
-- rights/usage affirmation;
-- retention/deletion expectation;
-- versioning/supersession semantics;
-- whether content parsing/extraction is allowed;
-- whether Knowledge promotion is explicitly out of scope or separately governed.
+For each class the P10.01 matrix fixes or requires the owner/product semantic role, authority mode, classification/purpose, rights basis, retention/deletion expectation, versioning/supersession semantics, parsing/extraction boundary and Knowledge non-promotion rule.
 
 ### P10.01-B — admission decision matrix
 
-For every first-slice admission operation define separately:
+For every first-slice admission operation the matrix separates:
 
 - Authentication/Actor resolution;
 - Authorization;
@@ -205,67 +219,66 @@ The current owner-operated flow may be simple, but no UI button or session may c
 
 ### P10.01-C — generated-output decision matrix
 
-Define the lifecycle:
+Lifecycle remains:
 
-`TransientOutput → owner review → reject / keep transient / admit as governed document/asset version`.
+`TransientOutput → owner review → reject / keep transient / request governed promotion`.
 
 No generated result is canonical merely because the owner downloaded or opened it.
 
 ### P10.01-D — real Action Request source classes
 
-Inventory real action sources that can naturally appear during Phase 10, for example:
+Eligible source classes include:
 
-- a Tender Operator result requiring owner disposition;
-- a Discount Parser controlled publication requiring a real owner decision where the applicable Product Contract permits it;
-- a Company document/asset review request;
-- another product-owned request that already has an explicit canonical/product source.
+- a Company document/asset review/admission request;
+- a Tender Operator/Tender Agent result requiring owner disposition where its own effective Product Contract admits the operation;
+- a Discount Parser controlled publication/approval request where its own effective Product Contract admits the operation;
+- another explicit product-owned request with a truthful product/canonical source.
 
-Do not create a synthetic request solely to satisfy M10.
+Chat/model suggestion alone does not create a governed request. No synthetic request is created solely to satisfy M10.
 
 ### P10.01-E — selection of first action journey
 
-Select the first real action only when a genuine request exists. Record:
+The first real action remains unselected until a genuine request exists. The repaired F08 journey remains eligible for natural recheck only when such a request appears.
 
-- product/company owner;
-- source of truth;
-- exact Product Contract dependency;
-- requested operation;
-- side-effect class;
-- authority/approval requirements;
-- success/failure/uncertain outcome;
-- required reconstruction evidence.
+### Exit result
 
-### Exit criteria
-
-P10.01 is PASS when:
-
-- first-slice asset classes and admission semantics are explicit;
-- no receipt/generation action is confused with canonical admission;
-- real Action Request source classes are explicit without a new Kernel Task primitive;
-- authority/data-governance/approval decisions are separated;
-- no Product Contract expansion is implemented prematurely;
-- R33 inputs are complete.
+P10.01 PASS establishes complete R33 inputs without implementing canonical admission or fabricating real-action evidence.
 
 ## 8. P10.02 — Product Contract evolution
 
-The exact version decision is made from P10.01 evidence. Expected default is an evolution of the existing Arvectum Company ↔ Productive Workspace Product Contract lineage rather than an unrelated new contract, because the phase extends the same Company material/workspace reliance.
+P10.02 is `Complete / PASS` for Product Contract definition/publication.
 
-The effective Provisional contract must declare at least:
+The existing Arvectum Company ↔ Productive Workspace Product Contract Subject lineage was evolved from historical `Provisional 0.1.0` to lifecycle-current `Provisional 0.2.0` rather than creating an unrelated contract.
 
-- canonical Company asset admission operation(s);
+The exact owner-approved Draft blob is:
+
+`a92c1d1aac54d565d3d32ce746925620c9d1fd12`
+
+The effective Provisional contract declares:
+
+- canonical Company asset admission operations;
 - allowed asset classes and explicit exclusions;
 - CAP-001 reliance and exact governed asset/document semantics;
 - exact Governed Execution operation/effect classes;
 - Company-owned semantic roles and approval rules;
 - staging versus canonical state boundary;
 - generated-output review/promotion semantics;
-- actionable-work/product entry-point boundary where admitted;
+- actionable-work/product entry-point boundary;
 - security/data/retention/portability rules;
 - failure/reconciliation behavior;
 - compatibility/migration from F11 `0.1.0`;
 - explicit non-claims.
 
-If product-action scope is materially independent, it MAY require a separate Product Contract instead of overloading the Company Workspace contract. R33 decides the minimum sufficient boundary.
+The contract deliberately does not authorize arbitrary downstream product side effects. Materially independent Tender Agent, Discount Parser or other product actions remain governed by their owning product's exact effective Product Contract and workflow/operation.
+
+Approval/publication integrity:
+
+- approval record commit `0675b50d7d035ee8000edfb2c05a825d655d1894`;
+- Provisional publication commit `8ce6935cd7aed7c754bfb14c6029ede20ac42b19`;
+- approval commit precedes publication commit;
+- closure review `Complete / PASS`.
+
+The owner additionally recorded that the approval request should have presented the decision substance more clearly before requesting exact approval. Future governance gates must provide a human-readable brief before checksum/version confirmation; checksum identity is not a substitute for explainability.
 
 ## 9. R33 — Asset / Product Contract / Authority Boundary Review
 
@@ -282,7 +295,7 @@ Review questions:
 9. Does any browser/BFF route accidentally become a public/stable API promise?
 10. Does any AI suggestion become approval or canonical admission?
 
-R33 is a blocking gate for P10.03.
+R33 is the current blocking gate for P10.03.
 
 ## 10. P10.03 — domain-neutral organizational-asset admission path
 
@@ -502,11 +515,11 @@ Phase 10 intentionally supports bounded concurrency.
 
 ### Lane A — Organizational Assets — primary early critical path
 
-`P10.01 → P10.02 → R33 → P10.03 → P10.04 → P10.05 → R34 → M10-alpha`.
+`P10.01 ✓ → P10.02 ✓ → R33 CURRENT → P10.03 → P10.04 → P10.05 → R34 → M10-alpha`.
 
 ### Lane B — Real Operational Work
 
-May design P10.06 in parallel after P10.01 semantics are fixed. P10.07 waits for both an admitted Product Contract boundary and a genuine real action request.
+May design P10.06 in parallel because P10.01 semantics are fixed and the Workspace contract now contains the bounded Actionable Work/product-entry envelope. P10.07 still waits for the owning product's applicable effective Product Contract and a genuine real action request.
 
 ### Lane C — Product ↔ Workspace operational composition
 
@@ -524,10 +537,10 @@ CI, recovery, observability, dependency/security, deterministic build and eviden
 
 ```text
                          ┌─ Lane A: Assets
-                         │   P10.01 → P10.02 → R33 → P10.03 → P10.04 → P10.05 → R34 → M10-alpha
+                         │   P10.01 ✓ → P10.02 ✓ → R33 CURRENT → P10.03 → P10.04 → P10.05 → R34 → M10-alpha
                          │
 Phase 10 current main ───┼─ Lane B: Real work
-                         │   P10.06 ──[genuine request + contract]──→ P10.07 → P10.08 → R35
+                         │   P10.06 ──[genuine request + owning-product contract]──→ P10.07 → P10.08 → R35
                          │
                          ├─ Lane C: product-owned operational surfaces
                          ├─ Lane D: INT-B7 ──[wait real external endpoint]
@@ -557,6 +570,8 @@ Phase 10 does not by itself establish:
 
 ## 26. Current canonical action
 
-> **P10.01 — Asset/admission + real-work authority matrix.**
+> **R33 — Asset / Product Contract / Authority Boundary Review.**
 
-Produce the exact first-slice asset classes, authority/admission matrix, generated-output promotion matrix and real Action Request source classes. Do not implement canonical admission or product action execution until P10.02 + R33 establish the effective Product Contract and authority boundary.
+Review the effective `Provisional 0.2.0` Product Contract against the P10.01 authority matrix, Constitution `1.2.0`, Accepted RFC-0001 through RFC-0008 and ADR-0001. Verify no hidden authority, Company semantic leakage, competing source of truth, accidental public/stable surface or AI authority path exists.
+
+P10.03 remains blocked until R33 itself passes.

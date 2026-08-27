@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.97.0`
+Version: `2.97.1`
 Created: `2026-08-07`
 Updated: `2026-08-27`
 Owner: `ООО «Арвектум»`
@@ -17,19 +17,24 @@ Detailed completed-phase evidence remains in the corresponding phase roadmaps, r
 
 ## 2. Version note
 
-Version `2.97.0` activates **Phase 10 — Operational Work & Organizational Assets** after canonical Phase 9 / M9 closure.
+Version `2.97.1` closes the Phase 10 P10.01/P10.02 architecture-contract prerequisites and advances the blocking critical path to `R33 — Asset / Product Contract / Authority Boundary Review`.
 
-Activation is owner-approved in [`DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION`](../governance/decisions/DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION.md) after [`P10.00 activation review`](../reviews/P10-00-post-M9-outcome-selection-and-phase-10-activation.md) `Complete / PASS`.
+P10.01 authority/admission and real-work source semantics are recorded in [`P10-01-asset-admission-real-work-authority-matrix`](../reviews/P10-01-asset-admission-real-work-authority-matrix.md) — `Complete / PASS`.
 
-Phase 10 is grounded in real M9/F11 evidence:
+P10.02 evolves the existing Company Workspace Product Contract lineage to lifecycle-current [`Provisional 0.2.0`](../contracts/P10-02-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT-PROVISIONAL-v0.2.0.md), approved in [`DECISION-2026-08-27-P10-02-PROVISIONAL-APPROVAL`](../governance/decisions/DECISION-2026-08-27-P10-02-PROVISIONAL-APPROVAL.md) and closed by [`P10-02-product-contract-publication-closure`](../reviews/P10-02-product-contract-publication-closure.md) — `Complete / PASS`.
+
+The approval was content-addressed to exact Draft blob `a92c1d1aac54d565d3d32ce746925620c9d1fd12`; the independent approval commit precedes the Provisional publication commit. This lifecycle transition admits only the bounded contract scope and does not establish implementation PASS, Stable Product Contract status, Active Platform Capability status, customer Production or broader conformance/support commitments.
+
+Phase 10 remains grounded in real M9/F11 evidence:
 
 - Company materials can already be received as `StagedNonCanonical` and used for exact-version generation;
 - generated document output remains `TransientOutput` by default;
-- the current F11 Company Workspace Product Contract remains `Provisional 0.1.0` and does not authorize canonical asset admission or arbitrary product action execution;
+- canonical Company asset admission is now contractually admitted in `Provisional 0.2.0` but not yet implemented or R33-approved;
+- generated-output promotion is contractually bounded but remains unavailable for real reliance until P10.05 implementation/review;
 - M9 proved a usable owner-operated Workspace but did not prove the full real organizational-asset lifecycle or a naturally occurring genuine task → governed-action loop;
 - the first natural genuine action remains the truthful deferred F08 recheck and is carried into Phase 10 without synthetic evidence.
 
-This activation creates no Constitution/RFC amendment, new Kernel primitive, public/stable API/browser contract, customer Production, Stable Product Contract, Active Platform Capability, SLA/support/certification or broader conformance claim.
+This roadmap update creates no Constitution/RFC amendment, new Kernel primitive, public/stable API/browser contract, customer Production, Stable Product Contract, Active Platform Capability, SLA/support/certification or broader conformance claim.
 
 ## 3. Architecture and governance baseline
 
@@ -39,7 +44,7 @@ This activation creates no Constitution/RFC amendment, new Kernel primitive, pub
 - Decision Authority Policy remains `Proposed 0.2.1`; residual authority remains with the owner under Accepted governance;
 - Approved Engineering Quality and Refactoring Gates remain binding;
 - CAP-001 through CAP-004 remain `Incubating / Provisional`;
-- Product Contracts remain in their current lifecycle states unless separately transitioned;
+- Arvectum Company ↔ Productive Workspace Product Contract is lifecycle-current `Provisional 0.2.0` for its exact declared scope;
 - operating environment remains `Local / Persistent Internal / owner-operated` with scoped conformance;
 - current canonical repository for new checkouts/deployments is `arvectum1/arvectum-os`;
 - no public/stable SDK/API/wire/browser/connector surface, external/customer Production, SLA/support/certification or broader conformance claim exists.
@@ -72,7 +77,7 @@ The first naturally occurring genuine actionable task still rechecks the repaire
 
 ## 6. Active Phase 10 — Operational Work & Organizational Assets
 
-Detailed roadmap: [`PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md`](PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md) — `Active 1.0.0`.
+Detailed roadmap: [`PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md`](PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md) — `Active`.
 
 Activation decision: [`DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION`](../governance/decisions/DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION.md) — `Approved`.
 
@@ -90,10 +95,10 @@ M10 additionally requires at least one naturally occurring genuine product/compa
 | ID | Work item | Status |
 |---|---|---:|
 | `P10.00` | Post-M9 outcome selection + Phase 10 activation baseline | 🟩 Complete / PASS |
-| **`P10.01`** | **Asset/admission + real-work authority matrix** | **🟨 Current** |
-| `P10.02` | Product Contract evolution for Company assets + operational work | ⬜ |
-| `R33` | Asset / Product Contract / Authority Boundary Review | ⬜ gate |
-| `P10.03` | Domain-neutral organizational-asset admission execution path | ⬜ |
+| `P10.01` | Asset/admission + real-work authority matrix | 🟩 Complete / PASS |
+| `P10.02` | Product Contract evolution for Company assets + operational work | 🟩 Complete / PASS — `Provisional 0.2.0` effective |
+| **`R33`** | **Asset / Product Contract / Authority Boundary Review** | **🟨 Current gate** |
+| `P10.03` | Domain-neutral organizational-asset admission execution path | ⬜ blocked on R33 PASS |
 | `P10.04` | Company Asset Library UX + version/handling lifecycle | ⬜ |
 | `P10.05` | Reviewed generated-output promotion boundary | ⬜ |
 | `R34` | M10-alpha Asset Governance / Usability Review | ⬜ gate |
@@ -111,12 +116,12 @@ M10 additionally requires at least one naturally occurring genuine product/compa
 ### 6.3 Critical-path sequencing
 
 ```text
-P10.01
+P10.01 ✓
    ↓
-P10.02
+P10.02 ✓
    ↓
-R33
-   ↓
+R33 ← CURRENT
+   ↓ PASS required
 P10.03 → P10.04 → P10.05
    ↓
 R34
@@ -155,7 +160,7 @@ Concrete requests remain product/company-owned. Workspace may provide a domain-n
 
 ### 7.3 Product Contract
 
-The effective Product Contract must exist before new governed reliance. The expected default is evolution of the existing Arvectum Company ↔ Productive Workspace contract lineage for Company asset scope, while materially independent product-action scopes may require separate contracts rather than overloading one boundary.
+The lifecycle-current Company Workspace Product Contract is `Provisional 0.2.0` for the exact owner-approved boundary. It admits Company asset canonical-admission semantics and bounded Actionable Work/product-entry semantics, but actual downstream consequential product effects still require the owning product's exact effective Product Contract and governed operation.
 
 ### 7.4 AI
 
@@ -165,8 +170,8 @@ AI may retrieve, explain, summarize, compare, draft and propose. It cannot indep
 
 | Lane | Scope | Status |
 |---|---|---:|
-| **A — Organizational Assets** | P10.01–P10.05 → R34 → M10-alpha | 🟨 Primary early critical path |
-| **B — Real Operational Work** | P10.06–P10.08 → R35 | 🟦 available after P10.01; real execution waits genuine request + contract |
+| **A — Organizational Assets** | P10.01–P10.05 → R34 → M10-alpha | 🟨 R33 current blocking gate |
+| **B — Real Operational Work** | P10.06–P10.08 → R35 | 🟦 design available; real execution waits genuine request + applicable contract |
 | **C — Product ↔ Workspace** | product-owned operational surfaces/entry points | 🟦 bounded on Product Contract/product-local evidence |
 | **D — External integrations** | existing INT-B7 real connector pilot | ⏸ blocked on exact real endpoint/deployment/account |
 | **E — Reliability / DX / technical debt** | CI, recovery, observability, dependency/security, evidence-backed refactoring | 🟦 continuous |
@@ -201,9 +206,9 @@ If no genuine action naturally exists, Phase 10 may reach M10-alpha and remain A
 
 **Critical path:**
 
-> **P10.01 — Asset/admission + real-work authority matrix.**
+> **R33 — Asset / Product Contract / Authority Boundary Review.**
 
-Fix exact first-slice Company asset classes, authority/admission decisions, generated-output promotion semantics and real Action Request source classes before implementing canonical admission or new product action execution.
+Review the now-effective `Provisional 0.2.0` boundary against P10.01 authority semantics and Accepted architecture. P10.03 remains blocked until R33 itself passes.
 
 **Parallel integrations:**
 
