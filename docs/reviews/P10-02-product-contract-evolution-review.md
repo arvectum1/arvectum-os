@@ -1,6 +1,6 @@
 # P10.02 — Product Contract Evolution Review
 
-Status: `Complete / PASS — owner approval pending`
+Status: `Complete / PASS — ready for explicit owner approval`
 Date: `2026-08-27`
 Owner: `ООО «Арвектум»`
 Task classification: `product_contract` with `platform`, `product_specific` and `governance`
@@ -11,6 +11,7 @@ Accepted ADR: `ADR-0001 — Productive Workspace Browser Application Topology`
 P10.01 prerequisite: [`P10-01-asset-admission-real-work-authority-matrix.md`](P10-01-asset-admission-real-work-authority-matrix.md) — `Complete / PASS`
 Reviewed Draft: [`P10-02-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT-DRAFT-v0.2.0.md`](../contracts/P10-02-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT-DRAFT-v0.2.0.md)
 Reviewed Draft blob SHA: `a92c1d1aac54d565d3d32ce746925620c9d1fd12`
+Owner approval readiness: [`P10-02-owner-approval-readiness.md`](P10-02-owner-approval-readiness.md) — `Ready for explicit owner decision`
 Predecessor lifecycle-current contract: `P9.11-F11 Arvectum Company ↔ Productive Workspace — Provisional 0.1.0`
 
 ## 1. Purpose
@@ -258,7 +259,7 @@ A separate Product Contract/version remains required for any materially independ
 
 ## 15. Review verdict
 
-> **`P10.02 Draft 0.2.0 = functional design PASS; exact owner approval pending.`**
+> **`P10.02 Draft 0.2.0 = functional design PASS; ready for explicit owner approval.`**
 
 The exact reviewed Draft is blob:
 
@@ -266,9 +267,12 @@ The exact reviewed Draft is blob:
 
 The Product Contract must remain `Draft` until explicit owner approval of that exact bounded version is canonically recorded and a lifecycle-current `Provisional 0.2.0` publication is created.
 
+The exact approval package and required owner statement are fixed in [`P10-02-owner-approval-readiness.md`](P10-02-owner-approval-readiness.md).
+
 Therefore:
 
-- P10.01 design prerequisite can be closed as `Complete / PASS` when the branch is canonically integrated;
+- P10.01 design prerequisite is `Complete / PASS` on PR #24;
+- P10.02 has no remaining material pre-approval design blocker;
 - P10.02 is not yet canonically `Complete` because its Phase 10 exit outcome requires an **effective** minimum-sufficient Provisional boundary;
 - R33 cannot be opened as the implementation gate until the effective Product Contract exists;
 - P10.03 implementation remains blocked.
