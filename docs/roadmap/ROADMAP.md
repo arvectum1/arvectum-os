@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.97.0`
+Version: `2.97.1`
 Created: `2026-08-07`
 Updated: `2026-08-27`
 Owner: `ООО «Арвектум»`
@@ -17,11 +17,15 @@ Detailed completed-phase evidence remains in the corresponding phase roadmaps, r
 
 ## 2. Version note
 
-Version `2.97.0` activates **Phase 10 — Operational Work & Organizational Assets** after canonical Phase 9 / M9 closure.
+Version `2.97.1` closes **P10.01 — Asset/admission + real-work authority matrix** in design/evidence scope and advances the Phase 10 critical path to **P10.02 — Product Contract evolution for Company assets + operational work**.
 
-Activation is owner-approved in [`DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION`](../governance/decisions/DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION.md) after [`P10.00 activation review`](../reviews/P10-00-post-M9-outcome-selection-and-phase-10-activation.md) `Complete / PASS`.
+P10.01 is recorded in [`P10-01-asset-admission-real-work-authority-matrix.md`](../reviews/P10-01-asset-admission-real-work-authority-matrix.md). It fixes the first-slice Company asset classes, staged/transient versus canonical admission semantics, `Native` / `External Reference` authority treatment, rights/handling/retention expectations, generated-output promotion boundary, separate Authentication/Authorization/Organizational Authority/Data Governance/approval gates, real Action Request source classes and a consequence-based real-work authority matrix.
 
-Phase 10 is grounded in real M9/F11 evidence:
+P10.01 creates no new Kernel primitive, Product Contract expansion, canonical admission implementation, product-action execution authority, Stable/public surface, validated Knowledge promotion or delegated authority. The current F11 Company Workspace Product Contract remains `Provisional 0.1.0`; P10.02 must publish the minimum-sufficient effective boundary before P10.03 governed admission implementation relies on it. The first P10.07 journey remains unselected until a genuine request naturally exists.
+
+Phase 10 was activated by owner-approved [`DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION`](../governance/decisions/DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION.md) after [`P10.00 activation review`](../reviews/P10-00-post-M9-outcome-selection-and-phase-10-activation.md) `Complete / PASS`.
+
+Phase 10 remains grounded in real M9/F11 evidence:
 
 - Company materials can already be received as `StagedNonCanonical` and used for exact-version generation;
 - generated document output remains `TransientOutput` by default;
@@ -29,7 +33,7 @@ Phase 10 is grounded in real M9/F11 evidence:
 - M9 proved a usable owner-operated Workspace but did not prove the full real organizational-asset lifecycle or a naturally occurring genuine task → governed-action loop;
 - the first natural genuine action remains the truthful deferred F08 recheck and is carried into Phase 10 without synthetic evidence.
 
-This activation creates no Constitution/RFC amendment, new Kernel primitive, public/stable API/browser contract, customer Production, Stable Product Contract, Active Platform Capability, SLA/support/certification or broader conformance claim.
+This progress creates no Constitution/RFC amendment, new Kernel primitive, public/stable API/browser contract, customer Production, Stable Product Contract, Active Platform Capability, SLA/support/certification or broader conformance claim.
 
 ## 3. Architecture and governance baseline
 
@@ -72,7 +76,7 @@ The first naturally occurring genuine actionable task still rechecks the repaire
 
 ## 6. Active Phase 10 — Operational Work & Organizational Assets
 
-Detailed roadmap: [`PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md`](PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md) — `Active 1.0.0`.
+Detailed roadmap: [`PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md`](PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md) — `Active 1.0.1`.
 
 Activation decision: [`DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION`](../governance/decisions/DECISION-2026-08-27-PHASE-10-OPERATIONAL-WORK-ACTIVATION.md) — `Approved`.
 
@@ -90,8 +94,8 @@ M10 additionally requires at least one naturally occurring genuine product/compa
 | ID | Work item | Status |
 |---|---|---:|
 | `P10.00` | Post-M9 outcome selection + Phase 10 activation baseline | 🟩 Complete / PASS |
-| **`P10.01`** | **Asset/admission + real-work authority matrix** | **🟨 Current** |
-| `P10.02` | Product Contract evolution for Company assets + operational work | ⬜ |
+| `P10.01` | Asset/admission + real-work authority matrix | 🟩 Complete / PASS |
+| **`P10.02`** | **Product Contract evolution for Company assets + operational work** | **🟨 Current** |
 | `R33` | Asset / Product Contract / Authority Boundary Review | ⬜ gate |
 | `P10.03` | Domain-neutral organizational-asset admission execution path | ⬜ |
 | `P10.04` | Company Asset Library UX + version/handling lifecycle | ⬜ |
@@ -134,7 +138,7 @@ R36
 P10.12 / M10
 ```
 
-P10.06 design may overlap the asset stream after P10.01 fixes the authority model, but P10.07 cannot execute until the applicable Product Contract is effective and a genuine action request naturally exists.
+P10.01 is complete. P10.06 design may now overlap the asset stream, but P10.07 cannot execute until the applicable Product Contract is effective and a genuine action request naturally exists.
 
 ## 7. Phase 10 authority boundaries
 
@@ -155,7 +159,7 @@ Concrete requests remain product/company-owned. Workspace may provide a domain-n
 
 ### 7.3 Product Contract
 
-The effective Product Contract must exist before new governed reliance. The expected default is evolution of the existing Arvectum Company ↔ Productive Workspace contract lineage for Company asset scope, while materially independent product-action scopes may require separate contracts rather than overloading one boundary.
+The effective Product Contract must exist before new governed reliance. P10.01 supports evolution of the existing Arvectum Company ↔ Productive Workspace contract lineage for Company asset admission/generated-output promotion, while materially independent product-action scopes must not be overloaded into that boundary merely for convenience. P10.02 fixes the exact effective boundary and R33 reviews it.
 
 ### 7.4 AI
 
@@ -165,8 +169,8 @@ AI may retrieve, explain, summarize, compare, draft and propose. It cannot indep
 
 | Lane | Scope | Status |
 |---|---|---:|
-| **A — Organizational Assets** | P10.01–P10.05 → R34 → M10-alpha | 🟨 Primary early critical path |
-| **B — Real Operational Work** | P10.06–P10.08 → R35 | 🟦 available after P10.01; real execution waits genuine request + contract |
+| **A — Organizational Assets** | P10.02–P10.05 → R34 → M10-alpha | 🟨 Primary early critical path |
+| **B — Real Operational Work** | P10.06–P10.08 → R35 | 🟦 P10.06 design available; real execution waits genuine request + effective contract |
 | **C — Product ↔ Workspace** | product-owned operational surfaces/entry points | 🟦 bounded on Product Contract/product-local evidence |
 | **D — External integrations** | existing INT-B7 real connector pilot | ⏸ blocked on exact real endpoint/deployment/account |
 | **E — Reliability / DX / technical debt** | CI, recovery, observability, dependency/security, evidence-backed refactoring | 🟦 continuous |
@@ -201,9 +205,13 @@ If no genuine action naturally exists, Phase 10 may reach M10-alpha and remain A
 
 **Critical path:**
 
-> **P10.01 — Asset/admission + real-work authority matrix.**
+> **P10.02 — Product Contract evolution for Company assets + operational work.**
 
-Fix exact first-slice Company asset classes, authority/admission decisions, generated-output promotion semantics and real Action Request source classes before implementing canonical admission or new product action execution.
+Use the completed P10.01 matrix to publish the minimum-sufficient effective Provisional Product Contract boundary before canonical Company-asset admission implementation or new product action execution relies on Arvectum OS. Keep materially independent product-action semantics in their owning product contracts rather than overloading the Company asset contract.
+
+**Parallel design:**
+
+> **P10.06 design may proceed from the P10.01 authority baseline, but P10.07 remains waiting for both an effective Product Contract and a naturally occurring genuine request.**
 
 **Parallel integrations:**
 
