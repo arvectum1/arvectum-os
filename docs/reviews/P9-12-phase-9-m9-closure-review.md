@@ -1,6 +1,6 @@
 # P9.12 — Phase 9 / M9 Closure Review
 
-Status: `Ready for closure / PASS evidence — canonical closure requires synchronized roadmaps and merge`
+Status: `Complete / PASS`
 Date: `2026-08-27`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `governance` and `product_contract`
@@ -133,7 +133,7 @@ Evidence verdict:
 
 > **`M9 = Achieved / PASS — exact Local / Persistent Internal / owner-operated Productive Workspace scope only.`**
 
-> **`P9.12 = Ready for canonical Complete / PASS once detailed and master roadmaps are synchronized in this closure change and the resulting repository state is merged/read back successfully.`**
+> **`P9.12 = Complete / PASS in the synchronized closure change; canonical closure is confirmed by merge and read-after-write from main.`**
 
 The milestone outcome means that the Productive Workspace is evidenced as the daily-use organizational workbench for the exact internal owner-operated scope defined by Phase 9. It does not mean that every future real task shape, customer deployment, multi-Organization contour, external browser contract or product workflow has been validated.
 
