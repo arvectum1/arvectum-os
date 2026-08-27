@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.95.27`
+Version: `2.96.0`
 Created: `2026-08-07`
 Updated: `2026-08-27`
 Owner: `ООО «Арвектум»`
@@ -15,7 +15,7 @@ Roadmap status does not itself change Platform Capability lifecycle, Product Con
 
 ## 2. Version note
 
-Version `2.95.27` closes R32 — M9 Productive Workspace Hardening + Milestone Code Health Gate. PR `#21` merged the permanent read-only code-health/supply-chain audit, deterministic Workspace inventory and bounded behavior-preserving validation refactors at `f7de13c6cf71dd0546ba5a4f253899133511100e`. Exact PR head `8ce78701fdd8865e25cabbc4cce3a36dd1d16cb4` passed Productive Workspace CI `33022720889` and Reference Python CI `33022720900`; exact R32 audit `33022403675` passed Python/frontend supply-chain and code-health jobs. Complexity review signals were reduced from nine to six; all six residual signals were explicitly reviewed and dispositioned as non-material/refactor-on-touch, remain visible in the permanent inventory, and zero modules exceed the 800-line review threshold. GitVerse mirror run `33022864556` passed for the merge SHA. R32 therefore closes `Complete / PASS`; `P9.12` becomes the current canonical action. Phase 9 / M9 remains Active pending its separate closure review. Workspace release remains `p9.11.10` / app contract `11`; no lifecycle, authority, Product Contract, canonical-admission, public API, support or conformance promotion is implied.
+Version `2.96.0` closes P9.12 — Phase 9 / M9 closure review. The authoritative detailed-roadmap Section 9 M9 exit set is `PASS` in [`P9-12-phase-9-m9-closure-review.md`](../reviews/P9-12-phase-9-m9-closure-review.md): M9-alpha remains valid; two product-owned surfaces remain explicitly composed; Copilot and Activity/company composition preserve source/authority boundaries; real owner Workspace sessions and material-friction disposition are complete; ADR-0001 obligations remain satisfied; R29–R32 are Complete / PASS; and the M9 Milestone Code Health Gate passed before closure. `Phase 9 = Complete / PASS` and `M9 = Achieved / PASS` only for the exact `Local / Persistent Internal / owner-operated` Productive Workspace scope. The first naturally occurring genuine actionable task still rechecks the deferred F08 task-detail → governed-action journey; no synthetic natural evidence is claimed. No Stable Product Contract, Active Platform Capability, public/stable interface, customer Production, broader conformance, SLA/support/certification or authority promotion is implied. No Phase 10 is activated by this closure.
 
 The live `p9.11.3` Workspace was reviewed by the owner before the F08 sequence: the Home page is understandable and visually acceptable, the top-level navigation is clear, and the owner-provided Arvectum Block logo is accepted in that bounded presentation scope. F07 is therefore closed only for Home/navigation/branding.
 
@@ -36,7 +36,7 @@ F06 remains **operationally verified** in its bounded process-identity scope. F0
 
 The earlier F05 one-time owner decision for historical PID `30686` remains consumed and non-reusable. Normal `UNKNOWN` Workspace listeners remain fail-closed and unsignallable without a separate exact owner decision.
 
-`P9.11` and `R32` are Complete / PASS; `P9.12` is Current. F11A/F11B real owner journeys have bounded owner PASS with no unresolved material closure blocker; only minor layout polish and a Word trust/provenance prompt remain. No synthetic owner-session evidence or canonical asset-admission claim is admitted. The first naturally occurring genuine actionable task still rechecks the deferred F08 task-detail → governed-action journey when it appears, without reopening P9.11 unless new material friction is found.
+`P9.11`, `R32` and `P9.12` are Complete / PASS; Phase 9 / M9 is closed in the exact internal owner-operated scope. F11A/F11B real owner journeys have bounded owner PASS with no unresolved material closure blocker; only minor layout polish and a Word trust/provenance prompt remain. No synthetic owner-session evidence or canonical asset-admission claim is admitted. The first naturally occurring genuine actionable task still rechecks the deferred F08 task-detail → governed-action journey when it appears, without reopening P9.11 unless new material friction is found.
 
 Lane B is internally complete through prepared `INT-B7`; no additional internal integration-planning task is admitted until an exact real 1С/CRM/СЭД/ЭДО endpoint/deployment/account is available.
 
@@ -67,11 +67,11 @@ This update creates no public/stable API/connector/browser contract, no customer
 | `Phase 6` | Product-driven Platform Validation | 🟩 Complete / PASS | M6 |
 | `Phase 7` | Operational / Enterprise Readiness | 🟩 Complete / PASS | M7 |
 | `Phase 8` | Ecosystem and External Integration | 🟩 Complete / PASS | `M8` Governed external ecosystem baseline — exact activated one-Organization scope |
-| **`Phase 9`** | **Productive Workspace & Daily Operations** | **🟨 Active** | **M9 — Daily-use organizational workbench** |
+| `Phase 9` | Productive Workspace & Daily Operations | 🟩 Complete / PASS | `M9` Daily-use organizational workbench — exact internal owner-operated scope |
 
-## 5. Active Phase 9
+## 5. Completed Phase 9
 
-Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Active 1.13.24`.
+Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md) — `Complete / PASS 1.14.0`.
 
 | ID | Work item | Status |
 |---|---|---:|
@@ -92,7 +92,7 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 | R31 | Product Composition / AI Safety Review | 🟩 Complete / PASS |
 | P9.11 | Real daily-use dogfooding + friction/backlog closure | 🟩 Complete / PASS — F11A/F11B bounded owner PASS; material friction disposition complete |
 | R32 | M9 Productive Workspace Hardening + Milestone Code Health Gate | 🟩 Complete / PASS |
-| **P9.12** | **Phase 9 / M9 closure review** | **🟨 Current** |
+| P9.12 | Phase 9 / M9 closure review | 🟩 Complete / PASS |
 
 ### P9.11 live state
 
@@ -128,13 +128,15 @@ Detailed roadmap: [`PHASE-9-PRODUCTIVE-WORKSPACE-DAILY-OPERATIONS.md`](PHASE-9-P
 - no product business action, Authorization, Organizational Authority, Data Governance permission or Consequential Approval was invented by the F10/F11 sequence;
 - synthetic owner-session evidence: prohibited.
 
-Current critical sequence:
+Closure sequence:
 
 ```text
 R32 — Complete / PASS
         ↓
-P9.12 — Phase 9 / M9 closure review — Current
+P9.12 — Phase 9 / M9 closure review — Complete / PASS
 ```
+
+No successor numbered phase is activated by this closure.
 
 ## 6. Parallel development lanes
 
@@ -142,7 +144,7 @@ Detailed plan: [`PARALLEL-WORKSTREAMS-POST-M9-ALPHA.md`](PARALLEL-WORKSTREAMS-PO
 
 | Lane | Scope | Current status |
 |---|---|---:|
-| A — Productive Workspace | P9.12 Phase 9 / M9 closure review | 🟨 Critical path |
+| A — Productive Workspace | Phase 9 / M9 closed; no successor numbered phase activated | 🟩 Complete / PASS |
 | B — Russian-market integrations | INT-B1…INT-B7 | 🟦 Internally complete / blocked on real endpoint |
 | C — Product ↔ Workspace | product-owned projections / governed entry points | 🟦 Available on evidence |
 | D — Reliability / DX / technical debt | CI, recovery, observability, evidence-backed cleanup | 🟦 Continuous |
@@ -181,19 +183,19 @@ Preferred first prepared candidate remains a bounded read-only `1С:ERP 2.5` pro
 - F11 p9.11.10 repair: PR #19 exact reviewed head `3b849e926346240011c010a58085a2cc57fe05f1` passed Productive Workspace CI `33015126576` and Reference Python CI `33015126605`; release-bearing merge `470878b8778fbac009d1ae52092879cf50d8f3f1`; selected-Mac P7.06 transaction `129845fa731fee12f2f9d2ada6894c42bc366b582835f8c299533d78565ad877` deployed exact p9.11.10 with healthy P7.02/P7.05, `CURRENT_EXACT`, `MANAGED_SPAWN_PROOF`, loopback-only listener, exact assets and launcher PASS;
 - real owner closure: F11B recheck #3 bounded PASS with only minor layout polish; F11A attempt #2 bounded PASS for template → generated DOCX → protected download → Word-open journey, with Word trust/provenance prompt retained as minor/non-blocking;
 - R32 closure: PR `#21` exact head `8ce78701fdd8865e25cabbc4cce3a36dd1d16cb4` passed Productive Workspace CI `33022720889` and Reference Python CI `33022720900`; R32 audit `33022403675` passed code-health plus Python/frontend supply-chain checks; merge `f7de13c6cf71dd0546ba5a4f253899133511100e` mirrored successfully to GitVerse via run `33022864556`; six residual complexity signals are explicitly reviewed non-material/refactor-on-touch and remain visible;
-- P9.11 and R32 are Complete / PASS; P9.12 is Current; Phase 9 / M9 remains Active pending the separate closure review.
+- P9.11, R32 and P9.12 are Complete / PASS; Phase 9 / M9 is `Complete / Achieved — PASS` in the exact internal owner-operated scope. No synthetic owner evidence, lifecycle promotion, public/stable surface, customer Production, broader conformance or authority promotion is implied.
 
 ## 8. M9 definition
 
 M9 requires M9-alpha to remain valid plus real owner working sessions primarily through Workspace, recurring material friction disposition, real product composition and AI/Activity/company surfaces remaining valid, applicable ADR obligations satisfied, R29–R32 material findings closed, and the M9 Milestone Code Health Gate PASS.
 
-Parallel integration progress cannot substitute for P9.11 operational evidence.
+P9.12 evaluates the complete current M9 exit set as `PASS` in the exact internal owner-operated scope. Parallel integration progress did not substitute for P9.11 operational evidence.
 
 ## 9. Current canonical actions
 
-**Critical path:**
+**Numbered critical path:**
 
-> **P9.12 — Phase 9 / M9 closure review. R32 is Complete / PASS from the permanent code-health/supply-chain gate, exact-head repository CI, explicit residual-signal disposition, canonical merge and mirror evidence. Re-evaluate the complete M9 exit criteria without inferring Stable Product Contracts, Active Platform Capabilities, public/stable interfaces, customer Production, broader conformance or authority promotion.**
+> **No active successor numbered implementation phase. Phase 9 / M9 is Complete / Achieved — PASS. Any future numbered phase/milestone requires a separate governed roadmap/activation decision with a concrete outcome and fresh scope/gate validation.**
 
 **Lane B:**
 
