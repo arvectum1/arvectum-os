@@ -1,11 +1,11 @@
 """P10.04 owner-facing Company Asset Library composition.
 
-This module is product-local.  It composes the existing F11 staged-material store
+This module is product-local. It composes the existing F11 staged-material store
 with the P10.03 domain-neutral Organizational Asset admission semantics without
 creating a second canonical store or a new durable persistence mechanism.
 
-Browser/UI state is never authority.  Draft/review/reject state is a
-non-canonical annotation on the existing product-owned staged manifest.  A
+Browser/UI state is never authority. Draft/review/reject state is a
+non-canonical annotation on the existing product-owned staged manifest. A
 canonical admission can happen only through ``CompanyAssetAdmissionExecutor``;
 the concrete P10.03 executor below accepts only a server-side provider that
 returns a fully admitted RFC-0005 Governed Execution with current independent
@@ -15,11 +15,12 @@ gate evidence.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Protocol
 
 from arvectum_os_ref.canonical import AuthorityMode
 from arvectum_os_ref.canonical_lineage import CanonicalLineage
+from arvectum_os_ref.document_artifact_governance import DocumentVersionCandidate
 from arvectum_os_ref.governed_execution import GovernedExecutionContext
 from arvectum_os_ref.identity import Identity
 from arvectum_os_ref.integration_adapters import IntegrationCapabilityAdapter
@@ -44,10 +45,10 @@ from .company_asset_admission import (
 )
 from .company_materials import (
     CompanyMaterialUnavailable,
-    CompanyMaterialsError,
     CompanyMaterialsInputError,
     CompanyMaterialsStore,
     _atomic_json,
+    _identity_text as _staging_identity_text,
     _utc_now,
 )
 
@@ -194,7 +195,7 @@ class CompanyAssetGovernedAdmissionProvider(Protocol):
         self,
         *,
         access: AccessContext,
-        candidate: object,
+        candidate: DocumentVersionCandidate,
         staged: ExactCompanyStagedMaterial,
     ) -> PreparedCompanyAssetAdmission:
         ...
@@ -204,7 +205,7 @@ class P1003CompanyAssetAdmissionExecutor:
     """In-process reference composition over the exact P10.03 admission semantic.
 
     The bounded state is intentionally the same in-memory reference state as
-    P10.03.  This class therefore makes no durable-store/transaction claim.  A
+    P10.03. This class therefore makes no durable-store/transaction claim. A
     provider must re-resolve the current actor and return an already admitted
     RFC-0005 execution; this executor never manufactures gate ALLOW decisions.
     """
@@ -217,19 +218,18 @@ class P1003CompanyAssetAdmissionExecutor:
         return bool(self.provider.available(access))
 
     def _views(self, access: AccessContext) -> tuple[AdmittedCompanyAssetVersion, ...]:
-        organization_scope = access.organization.value
         matching = tuple(
             item
             for item in self.state.committed
             if item.admitted_document.canonical_record.organization.organization_id == access.organization
         )
-        by_subject: dict[Identity, list[object]] = {}
+        by_subject: dict[Identity, list[Any]] = {}
         for item in matching:
             record = item.admitted_document.canonical_record
             by_subject.setdefault(record.subject_id, []).append(record)
         heads: set[Identity] = set()
         for records in by_subject.values():
-            lineage = CanonicalLineage(tuple(records))  # type: ignore[arg-type]
+            lineage = CanonicalLineage(tuple(records))
             heads.add(lineage.head.version_id)
 
         result: list[AdmittedCompanyAssetVersion] = []
@@ -267,6 +267,24 @@ class P1003CompanyAssetAdmissionExecutor:
             raise CompanyAssetLibraryError("server-authorized AccessContext is required")
         return self._views(access)
 
+    def _require_linear_successor(self, access: AccessContext, staged: ExactCompanyStagedMaterial) -> None:
+        material_versions = tuple(
+            item for item in self._views(access) if item.material_id == staged.material_id
+        )
+        current = tuple(item for item in material_versions if item.current)
+        if not material_versions:
+            if staged.predecessor_version_id is not None:
+                raise CompanyAssetAdmissionUnavailable(
+                    "first canonical admission for a material must start from its initial staged version"
+                )
+            return
+        if len(current) != 1:
+            raise CompanyAssetAdmissionUnavailable("current canonical Company Asset version is ambiguous")
+        if staged.predecessor_version_id != current[0].version_id:
+            raise CompanyAssetAdmissionUnavailable(
+                "admission must extend the exact current canonical predecessor without branching or skipping"
+            )
+
     def admit(
         self,
         *,
@@ -284,12 +302,13 @@ class P1003CompanyAssetAdmissionExecutor:
             material_id=material_id,
             version_id=version_id,
         )
+        self._require_linear_successor(access, staged)
         actor = self.provider.actor_for(access)
         candidate = build_staged_document_candidate(
             staged=staged,
             access=access,
             actor=actor,
-            candidate_created_at=datetime.now().astimezone(),
+            candidate_created_at=datetime.now(timezone.utc),
         )
         prepared = self.provider.prepare(access=access, candidate=candidate, staged=staged)
         if prepared.actor != actor:
@@ -369,9 +388,12 @@ class CompanyAssetLibrary:
         self.materials = materials
         self.admission = admission or UnavailableCompanyAssetAdmissionExecutor()
 
+    def _manifest(self, access: AccessContext, material_id: str) -> dict[str, Any]:
+        return self.materials._read_manifest(material_id, _staging_identity_text(access.organization))
+
     def _review_state(self, access: AccessContext, material_id: str, version_id: str) -> dict[str, Any]:
         self.materials._version(access, material_id, version_id)
-        manifest = self.materials._read_manifest(material_id, access.organization.value)
+        manifest = self._manifest(access, material_id)
         states = manifest.get("p10_04_review_states", {})
         if not isinstance(states, dict):
             raise CompanyAssetLibraryError("staged review metadata is invalid")
@@ -395,7 +417,7 @@ class CompanyAssetLibrary:
         if state not in _REVIEW_STATES:
             raise CompanyAssetReviewError("unsupported review state")
         self.materials._version(access, material_id, version_id)
-        manifest = self.materials._read_manifest(material_id, access.organization.value)
+        manifest = self._manifest(access, material_id)
         states = manifest.get("p10_04_review_states")
         if states is None:
             states = {}
@@ -406,7 +428,7 @@ class CompanyAssetLibrary:
             "policy": policy.to_payload() if policy is not None else None,
             "reason": reason,
             "updated_at": _utc_now(),
-            "actor": _identity_text(access.actor),
+            "actor": _staging_identity_text(access.actor),
             "canonical_authority": False,
         }
         states[version_id] = value
@@ -589,7 +611,7 @@ class CompanyAssetLibrary:
         return {
             "schema": "arvectum.workspace.company-asset-library-export/1",
             "generated_at": _utc_now(),
-            "organization": access.organization.value,
+            "organization": _staging_identity_text(access.organization),
             "items": ordered,
             "bounded": True,
             "limit": limit,
