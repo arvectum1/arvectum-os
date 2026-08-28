@@ -67,47 +67,8 @@ jobs:
         run: npm run guard:web-storage
       - name: Rebuild production assets
         run: npm run build
-      - name: Upload rebuilt production assets for P10.04 reconciliation
-        uses: actions/upload-artifact@v4
-        with:
-          name: p10-04-workspace-dist
-          path: reference/python/workspace_frontend/dist
-          if-no-files-found: error
       - name: Require committed lock and production assets to be reproducible
         run: git diff --exit-code -- package-lock.json dist
       - name: Verify release-pinned production asset boundary
         working-directory: reference/python
         run: python -c 'from pathlib import Path; from workspace_app.assets import verify_frontend_assets; from workspace_app.release import load_release; print(verify_frontend_assets(Path("workspace_frontend"), load_release()))'
-
-  reconcile_dist:
-    name: Reconcile exact CI-built SPA assets
-    needs: frontend
-    if: ${{ always() && github.event_name == 'pull_request' && needs.frontend.result == 'failure' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: write
-      actions: read
-    steps:
-      - name: Check out PR head without executing repository code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-      - name: Download exact dist produced by this workflow run
-        uses: actions/download-artifact@v4
-        with:
-          name: p10-04-workspace-dist
-          path: /tmp/p10-04-workspace-dist
-      - name: Replace committed dist with exact CI artifact
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf reference/python/workspace_frontend/dist
-          mkdir -p reference/python/workspace_frontend/dist
-          cp -a /tmp/p10-04-workspace-dist/. reference/python/workspace_frontend/dist/
-          git add reference/python/workspace_frontend/dist
-          git diff --cached --exit-code && exit 0 || true
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "build(p10.04): reconcile production assets"
-          git push origin HEAD:${{ github.head_ref }}
