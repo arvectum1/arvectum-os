@@ -18,6 +18,10 @@ from arvectum_os_ref.canonical import AuthorityMode, CanonicalRecord
 from arvectum_os_ref.execution import GovernedVersionPin
 from arvectum_os_ref.governed_execution import GovernedGateKind
 from arvectum_os_ref.identity import Identity
+from arvectum_os_ref.organizational_asset_admission import (
+    ORGANIZATIONAL_ASSET_DESIGNATION_AUTHORITY_SCOPE,
+    ORGANIZATIONAL_ASSET_DESIGNATION_SEMANTIC_TYPE,
+)
 from arvectum_os_ref.product_capability_consumption import (
     CAPABILITY_CONTRACT_VERSION,
     CAP_001_DOCUMENT_ARTIFACT,
@@ -121,7 +125,9 @@ class P1003ExecutableProductContractProjection(ProductContract):
         return self.canonical_source_pin
 
 
-def _access(*, authority_mode: AuthorityMode, authority_scope: str, source: str) -> CanonicalAccessDeclaration:
+def _document_access(
+    *, authority_mode: AuthorityMode, authority_scope: str, source: str
+) -> CanonicalAccessDeclaration:
     return CanonicalAccessDeclaration(
         semantic_type=DOCUMENT_SEMANTIC_TYPE,
         authority_mode=authority_mode,
@@ -131,6 +137,20 @@ def _access(*, authority_mode: AuthorityMode, authority_scope: str, source: str)
         failure_behavior=(
             "Fail closed if exact version, authority mapping, Organization scope, current governance "
             "or integrity evidence cannot be resolved."
+        ),
+    )
+
+
+def _designation_access() -> CanonicalAccessDeclaration:
+    return CanonicalAccessDeclaration(
+        semantic_type=ORGANIZATIONAL_ASSET_DESIGNATION_SEMANTIC_TYPE,
+        authority_mode=AuthorityMode.NATIVE,
+        authority_scope=ORGANIZATIONAL_ASSET_DESIGNATION_AUTHORITY_SCOPE,
+        access_modes=(CanonicalAccessMode.WRITE,),
+        authoritative_source="Arvectum OS governed Organizational Asset designation",
+        failure_behavior=(
+            "No Organizational Asset designation may be written outside the exact admitted Product Contract, "
+            "Workflow, authority, approval and source-version evidence for the same operation."
         ),
     )
 
@@ -151,16 +171,17 @@ def build_p10_03_product_contract_projection(
     product_id = Identity("product", PRODUCT_ID_VALUE, scope)
     canonical_pin = p10_02_canonical_version_pin(organization=organization)
 
-    native_access = _access(
+    native_access = _document_access(
         authority_mode=AuthorityMode.NATIVE,
         authority_scope=NATIVE_ASSET_DOCUMENT_SCOPE,
         source="ООО «Арвектум» within the declared Company-held asset scope",
     )
-    external_access = _access(
+    external_access = _document_access(
         authority_mode=AuthorityMode.EXTERNAL_REFERENCE,
         authority_scope=EXTERNAL_ASSET_DOCUMENT_SCOPE,
         source="declared external authoritative system; Arvectum OS stores governed reference only",
     )
+    designation_access = _designation_access()
 
     dependency = PlatformDependencyDeclaration(
         dependency_id=CAP_001_DOCUMENT_ARTIFACT,
@@ -186,10 +207,11 @@ def build_p10_03_product_contract_projection(
         dependency_id=CAP_001_DOCUMENT_ARTIFACT,
         side_effect_classes=(OperationSideEffectClass.CANONICAL_MUTATION,),
         required_gates=REQUIRED_ADMISSION_GATES,
-        canonical_accesses=(native_access,),
+        canonical_accesses=(native_access, designation_access),
         failure_behavior=(
             "Admit only the exact staged Company material version under Native authority within the declared "
-            "Company-held scope; staging itself remains StagedNonCanonical."
+            "Company-held scope; staging itself remains StagedNonCanonical and the separate designation is "
+            "written only inside the same governed admission operation."
         ),
     )
     external_operation = ProductOperationDeclaration(
@@ -197,10 +219,11 @@ def build_p10_03_product_contract_projection(
         dependency_id=CAP_001_DOCUMENT_ARTIFACT,
         side_effect_classes=(OperationSideEffectClass.CANONICAL_MUTATION,),
         required_gates=REQUIRED_ADMISSION_GATES,
-        canonical_accesses=(external_access,),
+        canonical_accesses=(external_access, designation_access),
         failure_behavior=(
             "Admit only a governed External Reference after current freshness/conflict/availability resolution; "
-            "the external system remains authoritative and is not mutated."
+            "the external system remains authoritative and the separate local designation is written only inside "
+            "the same governed admission operation."
         ),
     )
 
@@ -291,6 +314,7 @@ __all__ = [
     "P10_02_APPROVED_DRAFT_BLOB_SHA",
     "P10_02_CANONICAL_BLOB_SHA",
     "P10_02_CANONICAL_CONTRACT_PATH",
+    "P10_02_CONTRACT_VERSION_VALUE",
     "P1003ExecutableProductContractProjection",
     "PRODUCT_ID_VALUE",
     "PRODUCT_VERSION",
