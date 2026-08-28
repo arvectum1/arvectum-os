@@ -1,0 +1,129 @@
+.asset-library-head {
+  max-width: 1040px;
+}
+
+.asset-library-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid var(--border, #d8dde6);
+  border-radius: 14px;
+  background: var(--surface, #fff);
+}
+
+.asset-library-tabs button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.asset-library-tabs button.active {
+  background: #eef1f5;
+  font-weight: 700;
+}
+
+.asset-library-tabs span {
+  display: inline-flex;
+  min-width: 1.5rem;
+  justify-content: center;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #e3e7ec;
+  font-size: .8rem;
+}
+
+.asset-library-view {
+  min-height: 120px;
+}
+
+.asset-library-card {
+  gap: 16px;
+}
+
+.company-state-canonical {
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.asset-human-facts {
+  padding: 12px 0;
+}
+
+.asset-review-proof {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--border, #d8dde6);
+  border-radius: 10px;
+  background: #f8f9fb;
+}
+
+.asset-review-proof h3,
+.asset-inline-form h3 {
+  margin: 0;
+}
+
+.asset-review-proof p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.asset-inline-form,
+.asset-reject-form {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--border, #d8dde6);
+  border-radius: 10px;
+}
+
+.asset-inline-form label,
+.asset-reject-form label {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.asset-inline-form input,
+.asset-reject-form input {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+}
+
+.asset-review-actions,
+.asset-card-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.asset-review-actions > button,
+.asset-card-actions > button,
+.asset-inline-form > button,
+.asset-reject-form > button {
+  justify-self: start;
+}
+
+.asset-empty-state {
+  margin: 0;
+  padding: 28px;
+  border: 1px dashed var(--border, #d8dde6);
+  border-radius: 14px;
+  color: #69717d;
+}
+
+@media (max-width: 680px) {
+  .asset-library-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .asset-library-tabs button {
+    text-align: left;
+  }
+}
