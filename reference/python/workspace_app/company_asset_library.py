@@ -1,17 +1,8 @@
 """P10.04 owner-facing Company Asset Library composition.
 
-This module is product-local. It composes the existing F11 staged-material store
-with the P10.03 domain-neutral Organizational Asset admission semantics without
-creating a second canonical store or a new durable persistence mechanism.
-
-Browser/UI state is never authority. Draft/review/reject state is a
-non-canonical annotation on the existing product-owned staged manifest. A
-canonical admission can happen only through ``CompanyAssetAdmissionExecutor``;
-the concrete P10.03 executor below accepts only a server-side provider that
-returns a fully admitted RFC-0005 Governed Execution with current independent
-gate evidence.
+Product-local staging/review remains non-canonical. Consequential admission is
+performed only through the P10.03 governed Organizational Asset entrypoint.
 """
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -32,8 +23,8 @@ from arvectum_os_ref.organizational_asset_admission import (
     OrganizationalAssetAdmissionRequest,
     OrganizationalAssetAdmissionState,
     OrganizationalAssetHandlingPolicy,
-    admit_organizational_asset,
 )
+from arvectum_os_ref.organizational_asset_admission_guard import admit_governed_organizational_asset
 from arvectum_os_ref.security import ActorContext
 
 from .access import AccessContext
@@ -52,20 +43,19 @@ from .company_materials import (
     _utc_now,
 )
 
-
 _REVIEW_STATES = frozenset({"Draft", "InReview", "Rejected"})
 
 
 class CompanyAssetLibraryError(RuntimeError):
-    """The bounded P10.04 library could not resolve a truthful result."""
+    pass
 
 
 class CompanyAssetReviewError(ValueError, CompanyAssetLibraryError):
-    """A non-canonical review transition or review payload is invalid."""
+    pass
 
 
 class CompanyAssetAdmissionUnavailable(CompanyAssetLibraryError):
-    """No current server-side governed admission can be proven."""
+    pass
 
 
 def _bounded_text(value: object, *, field: str, maximum: int) -> str:
@@ -88,19 +78,16 @@ class CompanyAssetReviewPolicy:
 
     @classmethod
     def from_payload(cls, payload: object) -> "CompanyAssetReviewPolicy":
-        if not isinstance(payload, dict):
-            raise CompanyAssetReviewError("review payload must be an object")
-        if set(payload) != {"deletion_rule", "permitted_reuse"}:
+        if not isinstance(payload, dict) or set(payload) != {"deletion_rule", "permitted_reuse"}:
             raise CompanyAssetReviewError("review payload fields are invalid")
         deletion = _bounded_text(payload.get("deletion_rule"), field="deletion_rule", maximum=240)
-        reuse_raw = payload.get("permitted_reuse")
-        if not isinstance(reuse_raw, list) or not reuse_raw or len(reuse_raw) > 8:
+        raw = payload.get("permitted_reuse")
+        if not isinstance(raw, list) or not raw or len(raw) > 8:
             raise CompanyAssetReviewError("permitted_reuse must contain 1..8 explicit values")
-        reuse = tuple(
-            _bounded_text(value, field="permitted_reuse", maximum=160)
-            for value in reuse_raw
+        return cls(
+            deletion_rule=deletion,
+            permitted_reuse=tuple(_bounded_text(v, field="permitted_reuse", maximum=160) for v in raw),
         )
-        return cls(deletion_rule=deletion, permitted_reuse=reuse)
 
     def to_payload(self) -> dict[str, Any]:
         return {"deletion_rule": self.deletion_rule, "permitted_reuse": list(self.permitted_reuse)}
@@ -135,29 +122,15 @@ class AdmittedCompanyAssetVersion:
 
 
 class CompanyAssetAdmissionExecutor(Protocol):
-    """Server-side-only consequential boundary used by the Workspace BFF."""
-
-    def available(self, access: AccessContext) -> bool:
-        ...
-
-    def admitted_versions(self, access: AccessContext) -> tuple[AdmittedCompanyAssetVersion, ...]:
-        ...
-
+    def available(self, access: AccessContext) -> bool: ...
+    def admitted_versions(self, access: AccessContext) -> tuple[AdmittedCompanyAssetVersion, ...]: ...
     def admit(
-        self,
-        *,
-        access: AccessContext,
-        store: CompanyMaterialsStore,
-        material_id: str,
-        version_id: str,
-        policy: CompanyAssetReviewPolicy,
-    ) -> AdmittedCompanyAssetVersion:
-        ...
+        self, *, access: AccessContext, store: CompanyMaterialsStore,
+        material_id: str, version_id: str, policy: CompanyAssetReviewPolicy,
+    ) -> AdmittedCompanyAssetVersion: ...
 
 
 class UnavailableCompanyAssetAdmissionExecutor:
-    """Default fail-closed boundary when no governed runtime provider is installed."""
-
     def available(self, access: AccessContext) -> bool:
         return False
 
@@ -172,8 +145,6 @@ class UnavailableCompanyAssetAdmissionExecutor:
 
 @dataclass(frozen=True, slots=True)
 class PreparedCompanyAssetAdmission:
-    """Server-resolved command evidence; never accepted from browser JSON."""
-
     actor: ActorContext
     capability_adapter: IntegrationCapabilityAdapter
     execution: GovernedExecutionContext
@@ -183,32 +154,16 @@ class PreparedCompanyAssetAdmission:
 
 
 class CompanyAssetGovernedAdmissionProvider(Protocol):
-    """Resolve current actor plus fully admitted Governed Execution server-side."""
-
-    def available(self, access: AccessContext) -> bool:
-        ...
-
-    def actor_for(self, access: AccessContext) -> ActorContext:
-        ...
-
+    def available(self, access: AccessContext) -> bool: ...
+    def actor_for(self, access: AccessContext) -> ActorContext: ...
     def prepare(
-        self,
-        *,
-        access: AccessContext,
-        candidate: DocumentVersionCandidate,
+        self, *, access: AccessContext, candidate: DocumentVersionCandidate,
         staged: ExactCompanyStagedMaterial,
-    ) -> PreparedCompanyAssetAdmission:
-        ...
+    ) -> PreparedCompanyAssetAdmission: ...
 
 
 class P1003CompanyAssetAdmissionExecutor:
-    """In-process reference composition over the exact P10.03 admission semantic.
-
-    The bounded state is intentionally the same in-memory reference state as
-    P10.03. This class therefore makes no durable-store/transaction claim. A
-    provider must re-resolve the current actor and return an already admitted
-    RFC-0005 execution; this executor never manufactures gate ALLOW decisions.
-    """
+    """Reference executor that delegates the canonical change to the P10.03 guard."""
 
     def __init__(self, provider: CompanyAssetGovernedAdmissionProvider) -> None:
         self.provider = provider
@@ -219,8 +174,7 @@ class P1003CompanyAssetAdmissionExecutor:
 
     def _views(self, access: AccessContext) -> tuple[AdmittedCompanyAssetVersion, ...]:
         matching = tuple(
-            item
-            for item in self.state.committed
+            item for item in self.state.committed
             if item.admitted_document.canonical_record.organization.organization_id == access.organization
         )
         by_subject: dict[Identity, list[Any]] = {}
@@ -229,8 +183,7 @@ class P1003CompanyAssetAdmissionExecutor:
             by_subject.setdefault(record.subject_id, []).append(record)
         heads: set[Identity] = set()
         for records in by_subject.values():
-            lineage = CanonicalLineage(tuple(records))
-            heads.add(lineage.head.version_id)
+            heads.add(CanonicalLineage(tuple(records)).head.version_id)
 
         result: list[AdmittedCompanyAssetVersion] = []
         for item in matching:
@@ -240,26 +193,22 @@ class P1003CompanyAssetAdmissionExecutor:
             version_id = payload.get("source_version_id")
             if not isinstance(material_id, str) or not isinstance(version_id, str):
                 raise CompanyAssetLibraryError("admitted Company asset lacks exact staged source identity")
-            designation = item.designation
-            event = item.event
             provenance = tuple(
-                _identity_text(value)
-                for value in tuple(dict.fromkeys((*designation.provenance_refs, *event.provenance_refs)))
+                _identity_text(ref)
+                for ref in dict.fromkeys((*item.designation.provenance_refs, *item.event.provenance_refs))
             )
-            result.append(
-                AdmittedCompanyAssetVersion(
-                    material_id=material_id,
-                    version_id=version_id,
-                    document_subject=_identity_text(record.subject_id),
-                    document_version=_identity_text(record.version_id),
-                    designation_subject=_identity_text(designation.subject_id),
-                    designation_version=_identity_text(designation.version_id),
-                    event_version=_identity_text(event.version_id),
-                    admitted_at=designation.created_at.isoformat().replace("+00:00", "Z"),
-                    provenance_refs=provenance,
-                    current=record.version_id in heads,
-                )
-            )
+            result.append(AdmittedCompanyAssetVersion(
+                material_id=material_id,
+                version_id=version_id,
+                document_subject=_identity_text(record.subject_id),
+                document_version=_identity_text(record.version_id),
+                designation_subject=_identity_text(item.designation.subject_id),
+                designation_version=_identity_text(item.designation.version_id),
+                event_version=_identity_text(item.event.version_id),
+                admitted_at=item.designation.created_at.isoformat().replace("+00:00", "Z"),
+                provenance_refs=provenance,
+                current=record.version_id in heads,
+            ))
         return tuple(result)
 
     def admitted_versions(self, access: AccessContext) -> tuple[AdmittedCompanyAssetVersion, ...]:
@@ -268,11 +217,9 @@ class P1003CompanyAssetAdmissionExecutor:
         return self._views(access)
 
     def _require_linear_successor(self, access: AccessContext, staged: ExactCompanyStagedMaterial) -> None:
-        material_versions = tuple(
-            item for item in self._views(access) if item.material_id == staged.material_id
-        )
-        current = tuple(item for item in material_versions if item.current)
-        if not material_versions:
+        versions = tuple(v for v in self._views(access) if v.material_id == staged.material_id)
+        current = tuple(v for v in versions if v.current)
+        if not versions:
             if staged.predecessor_version_id is not None:
                 raise CompanyAssetAdmissionUnavailable(
                     "first canonical admission for a material must start from its initial staged version"
@@ -286,33 +233,23 @@ class P1003CompanyAssetAdmissionExecutor:
             )
 
     def admit(
-        self,
-        *,
-        access: AccessContext,
-        store: CompanyMaterialsStore,
-        material_id: str,
-        version_id: str,
-        policy: CompanyAssetReviewPolicy,
+        self, *, access: AccessContext, store: CompanyMaterialsStore,
+        material_id: str, version_id: str, policy: CompanyAssetReviewPolicy,
     ) -> AdmittedCompanyAssetVersion:
         if not self.available(access):
             raise CompanyAssetAdmissionUnavailable("current governed admission evidence is unavailable")
         staged = resolve_exact_staged_material(
-            store=store,
-            access=access,
-            material_id=material_id,
-            version_id=version_id,
+            store=store, access=access, material_id=material_id, version_id=version_id
         )
         self._require_linear_successor(access, staged)
         actor = self.provider.actor_for(access)
         candidate = build_staged_document_candidate(
-            staged=staged,
-            access=access,
-            actor=actor,
-            candidate_created_at=datetime.now(timezone.utc),
+            staged=staged, access=access, actor=actor, candidate_created_at=datetime.now(timezone.utc)
         )
         prepared = self.provider.prepare(access=access, candidate=candidate, staged=staged)
         if prepared.actor != actor:
             raise CompanyAssetAdmissionUnavailable("governed actor changed during command revalidation")
+
         source_subject, source_version, artifact_id = exact_staged_source_identities(staged=staged, actor=actor)
         handling = OrganizationalAssetHandlingPolicy(
             classification=staged.classification,
@@ -326,13 +263,8 @@ class P1003CompanyAssetAdmissionExecutor:
         designation_subject = Identity("organizational-asset-subject", f"company-asset-{material_id}", scope)
         designation_version = Identity("organizational-asset-version", f"company-asset-{version_id}", scope)
         designation_predecessor = (
-            Identity(
-                "organizational-asset-version",
-                f"company-asset-{staged.predecessor_version_id}",
-                scope,
-            )
-            if staged.predecessor_version_id is not None
-            else None
+            Identity("organizational-asset-version", f"company-asset-{staged.predecessor_version_id}", scope)
+            if staged.predecessor_version_id is not None else None
         )
         request = OrganizationalAssetAdmissionRequest(
             candidate=candidate,
@@ -360,7 +292,7 @@ class P1003CompanyAssetAdmissionExecutor:
             occurred_at=prepared.occurred_at,
             recorded_at=prepared.recorded_at,
         )
-        result = admit_organizational_asset(
+        result = admit_governed_organizational_asset(
             state=self.state,
             capability_adapter=prepared.capability_adapter,
             execution=prepared.execution,
@@ -368,8 +300,7 @@ class P1003CompanyAssetAdmissionExecutor:
         )
         self.state = result.state
         exact = tuple(
-            item
-            for item in self._views(access)
+            item for item in self._views(access)
             if item.material_id == material_id and item.version_id == version_id
         )
         if len(exact) != 1:
@@ -378,13 +309,9 @@ class P1003CompanyAssetAdmissionExecutor:
 
 
 class CompanyAssetLibrary:
-    """Owner-facing projection and non-authoritative review transitions."""
+    """Owner-facing projection plus non-authoritative review transitions."""
 
-    def __init__(
-        self,
-        materials: CompanyMaterialsStore,
-        admission: CompanyAssetAdmissionExecutor | None = None,
-    ) -> None:
+    def __init__(self, materials: CompanyMaterialsStore, admission: CompanyAssetAdmissionExecutor | None = None) -> None:
         self.materials = materials
         self.admission = admission or UnavailableCompanyAssetAdmissionExecutor()
 
@@ -393,8 +320,7 @@ class CompanyAssetLibrary:
 
     def _review_state(self, access: AccessContext, material_id: str, version_id: str) -> dict[str, Any]:
         self.materials._version(access, material_id, version_id)
-        manifest = self._manifest(access, material_id)
-        states = manifest.get("p10_04_review_states", {})
+        states = self._manifest(access, material_id).get("p10_04_review_states", {})
         if not isinstance(states, dict):
             raise CompanyAssetLibraryError("staged review metadata is invalid")
         value = states.get(version_id)
@@ -405,27 +331,19 @@ class CompanyAssetLibrary:
         return dict(value)
 
     def _write_review_state(
-        self,
-        access: AccessContext,
-        material_id: str,
-        version_id: str,
-        *,
-        state: str,
-        policy: CompanyAssetReviewPolicy | None,
-        reason: str | None,
+        self, access: AccessContext, material_id: str, version_id: str, *,
+        state: str, policy: CompanyAssetReviewPolicy | None, reason: str | None,
     ) -> dict[str, Any]:
         if state not in _REVIEW_STATES:
             raise CompanyAssetReviewError("unsupported review state")
         self.materials._version(access, material_id, version_id)
         manifest = self._manifest(access, material_id)
-        states = manifest.get("p10_04_review_states")
-        if states is None:
-            states = {}
+        states = manifest.get("p10_04_review_states") or {}
         if not isinstance(states, dict):
             raise CompanyAssetLibraryError("staged review metadata is invalid")
         value = {
             "state": state,
-            "policy": policy.to_payload() if policy is not None else None,
+            "policy": policy.to_payload() if policy else None,
             "reason": reason,
             "updated_at": _utc_now(),
             "actor": _staging_identity_text(access.actor),
@@ -436,104 +354,57 @@ class CompanyAssetLibrary:
         _atomic_json(self.materials._manifest_path(material_id), manifest)
         return value
 
-    def submit_review(
-        self,
-        access: AccessContext,
-        material_id: str,
-        version_id: str,
-        payload: object,
-    ) -> dict[str, Any]:
+    def submit_review(self, access: AccessContext, material_id: str, version_id: str, payload: object) -> dict[str, Any]:
         current = self._review_state(access, material_id, version_id)
         if current["state"] not in {"Draft", "Rejected"}:
             raise CompanyAssetReviewError("only Draft or Rejected staged versions can enter review")
-        policy = CompanyAssetReviewPolicy.from_payload(payload)
         return self._write_review_state(
-            access,
-            material_id,
-            version_id,
-            state="InReview",
-            policy=policy,
-            reason=None,
+            access, material_id, version_id, state="InReview",
+            policy=CompanyAssetReviewPolicy.from_payload(payload), reason=None,
         )
 
-    def reject(
-        self,
-        access: AccessContext,
-        material_id: str,
-        version_id: str,
-        payload: object,
-    ) -> dict[str, Any]:
+    def reject(self, access: AccessContext, material_id: str, version_id: str, payload: object) -> dict[str, Any]:
         current = self._review_state(access, material_id, version_id)
         if current["state"] != "InReview":
             raise CompanyAssetReviewError("only InReview staged versions can be rejected")
         if not isinstance(payload, dict) or set(payload) != {"reason"}:
             raise CompanyAssetReviewError("reject payload is invalid")
-        reason = _bounded_text(payload.get("reason"), field="reason", maximum=600)
         policy_payload = current.get("policy")
         policy = CompanyAssetReviewPolicy.from_payload(policy_payload) if isinstance(policy_payload, dict) else None
         return self._write_review_state(
-            access,
-            material_id,
-            version_id,
-            state="Rejected",
-            policy=policy,
-            reason=reason,
+            access, material_id, version_id, state="Rejected", policy=policy,
+            reason=_bounded_text(payload.get("reason"), field="reason", maximum=600),
         )
 
     def admit(self, access: AccessContext, material_id: str, version_id: str) -> AdmittedCompanyAssetVersion:
         current = self._review_state(access, material_id, version_id)
         if current["state"] != "InReview" or not isinstance(current.get("policy"), dict):
             raise CompanyAssetReviewError("exact staged version must be InReview with explicit handling policy")
-        policy = CompanyAssetReviewPolicy.from_payload(current["policy"])
         return self.admission.admit(
-            access=access,
-            store=self.materials,
-            material_id=material_id,
-            version_id=version_id,
-            policy=policy,
+            access=access, store=self.materials, material_id=material_id, version_id=version_id,
+            policy=CompanyAssetReviewPolicy.from_payload(current["policy"]),
         )
 
-    def _entry(
-        self,
-        *,
-        version: dict[str, Any],
-        review: dict[str, Any],
-        admitted: AdmittedCompanyAssetVersion | None,
-        lifecycle: str,
-    ) -> dict[str, Any]:
+    @staticmethod
+    def _entry(version: dict[str, Any], review: dict[str, Any], admitted: AdmittedCompanyAssetVersion | None, lifecycle: str) -> dict[str, Any]:
         return {
-            "material_id": version["material_id"],
-            "version_id": version["version_id"],
-            "title": version["filename"],
-            "project_id": version["project_id"],
-            "semantic_role": version["semantic_role"],
-            "media_type": version["media_type"],
-            "classification": version["classification"],
-            "purpose": version["purpose"],
-            "rights": version["rights"],
-            "retention_rule": version["retention_rule"],
-            "received_at": version["received_at"],
-            "uploader": version["uploader"],
-            "content_sha256": version["content_sha256"],
-            "size_bytes": version["size_bytes"],
+            "material_id": version["material_id"], "version_id": version["version_id"],
+            "title": version["filename"], "project_id": version["project_id"],
+            "semantic_role": version["semantic_role"], "media_type": version["media_type"],
+            "classification": version["classification"], "purpose": version["purpose"],
+            "rights": version["rights"], "retention_rule": version["retention_rule"],
+            "received_at": version["received_at"], "uploader": version["uploader"],
+            "content_sha256": version["content_sha256"], "size_bytes": version["size_bytes"],
             "predecessor_version_id": version.get("predecessor_version_id"),
-            "staging_state": "StagedNonCanonical",
-            "review": review,
-            "canonical": admitted.to_payload() if admitted is not None else None,
-            "lifecycle_view": lifecycle,
-            "technical_identity_available": True,
+            "staging_state": "StagedNonCanonical", "review": review,
+            "canonical": admitted.to_payload() if admitted else None,
+            "lifecycle_view": lifecycle, "technical_identity_available": True,
         }
 
     def project(self, access: AccessContext) -> dict[str, Any]:
         staged = self.materials.project(access)
-        admitted = self.admission.admitted_versions(access)
-        by_source = {(item.material_id, item.version_id): item for item in admitted}
-        views: dict[str, list[dict[str, Any]]] = {
-            "drafts": [],
-            "review": [],
-            "accepted": [],
-            "archive": [],
-        }
+        by_source = {(v.material_id, v.version_id): v for v in self.admission.admitted_versions(access)}
+        views: dict[str, list[dict[str, Any]]] = {"drafts": [], "review": [], "accepted": [], "archive": []}
         for material in staged["materials"]:
             for version in material["versions"]:
                 key = (str(version["material_id"]), str(version["version_id"]))
@@ -547,24 +418,16 @@ class CompanyAssetLibrary:
                     view = "archive"
                 else:
                     view = "drafts"
-                views[view].append(self._entry(version=version, review=review, admitted=canonical, lifecycle=view))
+                views[view].append(self._entry(version, review, canonical, view))
         for values in views.values():
             values.sort(key=lambda item: str(item["received_at"]), reverse=True)
         return {
             "schema": "arvectum.workspace.company-asset-library/1",
             "generated_at": _utc_now(),
-            "product_contract": {
-                "id": "p9-11-f11-arvectum-company-workspace",
-                "version": "0.2.0",
-                "lifecycle": "Provisional",
-            },
+            "product_contract": {"id": "p9-11-f11-arvectum-company-workspace", "version": "0.2.0", "lifecycle": "Provisional"},
             "views": views,
             "actions": {"governed_admission_available": self.admission.available(access)},
-            "scope": {
-                "organization_resolved_server_side": True,
-                "actor_resolved_server_side": True,
-                "cross_organization_access": False,
-            },
+            "scope": {"organization_resolved_server_side": True, "actor_resolved_server_side": True, "cross_organization_access": False},
             "governance": {
                 "workspace_is_authority_source": False,
                 "staging_is_canonical": False,
@@ -578,14 +441,12 @@ class CompanyAssetLibrary:
     def generate_docx(self, access: AccessContext, payload: object) -> dict[str, Any]:
         if not isinstance(payload, dict):
             raise CompanyMaterialsInputError("generation payload is invalid")
-        material_id = payload.get("material_id")
-        version_id = payload.get("version_id")
+        material_id, version_id = payload.get("material_id"), payload.get("version_id")
         if not isinstance(material_id, str) or not isinstance(version_id, str):
             raise CompanyMaterialsInputError("generation source identity is invalid")
         admitted = tuple(
-            item
-            for item in self.admission.admitted_versions(access)
-            if item.material_id == material_id and item.version_id == version_id
+            v for v in self.admission.admitted_versions(access)
+            if v.material_id == material_id and v.version_id == version_id
         )
         if len(admitted) != 1:
             raise CompanyMaterialUnavailable("generation requires an exact admitted Company Asset version")
@@ -599,36 +460,25 @@ class CompanyAssetLibrary:
         return result
 
     def export(self, access: AccessContext, *, limit: int = 100) -> dict[str, Any]:
-        if not isinstance(limit, int) or limit < 1 or limit > 100:
+        if not isinstance(limit, int) or not 1 <= limit <= 100:
             raise CompanyAssetReviewError("export limit must be between 1 and 100")
         projection = self.project(access)
         ordered = [
-            *projection["views"]["accepted"],
-            *projection["views"]["archive"],
-            *projection["views"]["review"],
-            *projection["views"]["drafts"],
+            *projection["views"]["accepted"], *projection["views"]["archive"],
+            *projection["views"]["review"], *projection["views"]["drafts"],
         ][:limit]
         return {
             "schema": "arvectum.workspace.company-asset-library-export/1",
             "generated_at": _utc_now(),
             "organization": _staging_identity_text(access.organization),
-            "items": ordered,
-            "bounded": True,
-            "limit": limit,
-            "canonical_authority": False,
+            "items": ordered, "bounded": True, "limit": limit, "canonical_authority": False,
         }
 
 
 __all__ = [
-    "AdmittedCompanyAssetVersion",
-    "CompanyAssetAdmissionExecutor",
-    "CompanyAssetAdmissionUnavailable",
-    "CompanyAssetGovernedAdmissionProvider",
-    "CompanyAssetLibrary",
-    "CompanyAssetLibraryError",
-    "CompanyAssetReviewError",
-    "CompanyAssetReviewPolicy",
-    "P1003CompanyAssetAdmissionExecutor",
-    "PreparedCompanyAssetAdmission",
-    "UnavailableCompanyAssetAdmissionExecutor",
+    "AdmittedCompanyAssetVersion", "CompanyAssetAdmissionExecutor",
+    "CompanyAssetAdmissionUnavailable", "CompanyAssetGovernedAdmissionProvider",
+    "CompanyAssetLibrary", "CompanyAssetLibraryError", "CompanyAssetReviewError",
+    "CompanyAssetReviewPolicy", "P1003CompanyAssetAdmissionExecutor",
+    "PreparedCompanyAssetAdmission", "UnavailableCompanyAssetAdmissionExecutor",
 ]
