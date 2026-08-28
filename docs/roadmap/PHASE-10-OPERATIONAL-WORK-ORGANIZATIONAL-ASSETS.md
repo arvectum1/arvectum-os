@@ -1,9 +1,9 @@
 # Arvectum OS Phase 10 — Operational Work & Organizational Assets
 
 Status: `Active`
-Version: `1.0.2`
+Version: `1.0.3`
 Created: `2026-08-27`
-Updated: `2026-08-27`
+Updated: `2026-08-28`
 Owner: `ООО «Арвектум»`
 Task classification: `platform` with `product_contract`, `product_specific` and `governance`
 Parent roadmap: [`ROADMAP.md`](ROADMAP.md)
@@ -16,18 +16,21 @@ Activation review: [`P10-00-post-M9-outcome-selection-and-phase-10-activation.md
 
 ## 0. Version note
 
-Version `1.0.2` records [`R33 — Asset / Product Contract / Authority Boundary Review`](../reviews/R33-asset-product-contract-authority-boundary-review.md) as `Complete / PASS after 6 iterations` and advances the Phase 10 critical path to `P10.03 — Domain-neutral organizational-asset admission execution path`.
+Version `1.0.3` records [`P10.03 — Domain-neutral organizational-asset admission execution path`](../reviews/P10-03-organizational-asset-admission-closure-review.md) as `Complete / PASS` and advances the Phase 10 critical path to `P10.04 — Company Asset Library UX + version/handling lifecycle`.
 
-R33 found no material conflict requiring Product Contract `0.2.1`, a new foundational RFC, a new ADR merely for the review, or any lifecycle promotion. It fixed mandatory P10.03 implementation constraints:
+P10.03 remains inside the boundary fixed by [`R33`](../reviews/R33-asset-product-contract-authority-boundary-review.md):
 
-- Company asset taxonomy and `company.*` product semantics remain product-owned and must not become Kernel/CAP-001 business semantics;
+- Company asset taxonomy and `company.*` product semantics remain product-owned and do not become Kernel/CAP-001 business semantics;
 - `StagedNonCanonical`, canonical Document/Asset state and generated `TransientOutput` remain distinct;
-- canonical admission remains RFC-0005 Governed Execution with separate Authorization, Organizational Authority, Data Governance, validation and Consequential Approval;
+- immutable Document Version admission plus a separate Organizational Asset designation occurs only through the exact Product Contract / Workflow / RFC-0005 Governed Execution context;
+- Actor Assurance, Authorization, Organizational Authority, Data Governance, Validation and Consequential Approval remain independent current gates;
 - because Decision Authority Policy remains `Proposed` and no exact delegation is approved, first-slice admission retains explicit owner Organizational Authority/approval;
-- external authority remains `External Reference` where declared;
+- Native and `External Reference` authority remain distinct, and external freshness/conflict/availability resolution is bound to the exact current Validation gate basis and reconstructable through immutable gate-decision provenance;
 - unresolved required purpose/classification/rights/retention/deletion state fails closed rather than being invented by implementation;
+- retry/idempotency/uncertainty are explicit and fail closed;
+- canonical RFC-0006 Event evidence is produced for successful admission;
 - browser/BFF/projection/AI remain non-authoritative;
-- P10.03 must reopen the ADR gate before material reliance on a new durable persistence/object-store/transaction/evidence-integrity/stable-serialization/separate-service mechanism.
+- no new database/object-store/durable transaction/idempotency ledger/stable serialization/public API/separate-service mechanism was selected, so the ADR gate did not reopen.
 
 Canonical P10.01 evidence: [`P10-01-asset-admission-real-work-authority-matrix`](../reviews/P10-01-asset-admission-real-work-authority-matrix.md) — `Complete / PASS`.
 
@@ -38,7 +41,7 @@ Canonical P10.02 evidence:
 - [`P10-02-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT-PROVISIONAL-v0.2.0`](../contracts/P10-02-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT-PROVISIONAL-v0.2.0.md) — lifecycle-current `Provisional 0.2.0`;
 - [`P10-02-product-contract-publication-closure`](../reviews/P10-02-product-contract-publication-closure.md) — `Complete / PASS`.
 
-R33 does not alter the approved Product Contract substance and does not establish P10.03 implementation PASS, Stable Product Contract status, Active Platform Capability status, customer Production or broader conformance/support commitments.
+P10.03 does not alter the approved Product Contract substance, promote it to `Stable`, promote CAP-001 to `Active`, establish M10-alpha, customer Production or broader conformance/support commitments.
 
 ## 1. Purpose
 
@@ -63,11 +66,11 @@ Phase 10 starts from these canonical facts:
 - Productive Workspace release at the M9 closure baseline is `p9.11.10`, internal application contract `11`;
 - F11 proved useful owner-local `StagedNonCanonical` Company material intake, exact version/digest/provenance retention and exact-version DOCX generation as `TransientOutput`;
 - F11 Product Contract `Provisional 0.1.0` remains immutable historical evidence; P10.02 evolved the same contract lineage to lifecycle-current `Provisional 0.2.0` for bounded canonical Company asset-admission and operational-entry semantics;
-- R33 has now passed the exact asset/Product Contract/authority boundary for P10.03 implementation, with mandatory constraints retained below;
+- R33 passed the exact asset/Product Contract/authority boundary, and P10.03 now implements and proves the bounded domain-neutral admission execution path inside that boundary;
 - generated-output promotion is contractually bounded by `0.2.0` but remains unavailable for real reliance until P10.05 implementation/review;
 - F08 false-task projection was repaired; the first naturally occurring genuine actionable task still remains the truthful real-world recheck of task-detail → governed-action comprehension;
 - CAP-001 through CAP-004 remain `Incubating / Provisional` unless separately governed;
-- no Product Contract is promoted to `Stable` and no capability to `Active` by R33 closure;
+- no Product Contract is promoted to `Stable` and no capability to `Active` by P10.03 closure;
 - Lane B integration design is internally complete through prepared INT-B7, but a real connector pilot remains blocked on an exact external endpoint/deployment/account.
 
 Phase 10 uses these facts as evidence rather than reopening completed M9 work.
@@ -109,7 +112,7 @@ It admits the minimum sufficient boundary for:
 - non-authoritative Actionable Work projection;
 - no-side-effect Workspace product-operation entry/routing.
 
-Actual downstream consequential product actions still require the owning product's exact effective Product Contract and product-owned governed workflow/operation. R33 confirms that P10.03 may implement only the domain-neutral asset-admission part of this boundary.
+Actual downstream consequential product actions still require the owning product's exact effective Product Contract and product-owned governed workflow/operation. P10.03 implements only the domain-neutral asset-admission part of this boundary.
 
 ### 3.4 No universal Task primitive by default
 
@@ -163,8 +166,8 @@ M10 does not require customer Production, public interfaces, multi-Organization 
 | `P10.01` | Asset/admission + real-work authority matrix | 🟩 Complete / PASS | exact subject classes, authority modes, owner decisions, retention/classification, action-request sources and consequentiality matrix fixed |
 | `P10.02` | Product Contract evolution for Company assets + operational work | 🟩 Complete / PASS — `Provisional 0.2.0` | effective minimum-sufficient Provisional boundary exists before governed reliance |
 | `R33` | Asset / Product Contract / Authority Boundary Review | 🟩 Complete / PASS — 6 iterations | no hidden authority, product leakage, competing truth or accidental stable/public surface; P10.03 constraints fixed |
-| **`P10.03`** | **Domain-neutral organizational-asset admission execution path** | **🟨 Current** | staged material can enter canonical asset history only through explicit Governed Execution |
-| `P10.04` | Company Asset Library UX + version/handling lifecycle | ⬜ | owner can review, admit, find, inspect, supersede/version and export/download admitted assets through Workspace |
+| **`P10.03`** | **Domain-neutral organizational-asset admission execution path** | **🟩 Complete / PASS** | exact staged/external-reference material can enter immutable canonical asset history only through explicit Governed Execution with reconstructable evidence |
+| **`P10.04`** | **Company Asset Library UX + version/handling lifecycle** | **🟨 Current** | owner can review, admit, find, inspect, supersede/version and export/download admitted assets through Workspace |
 | `P10.05` | Reviewed generated-output promotion boundary | ⬜ | generated `TransientOutput` can be reviewed and, only when admitted, promoted to a governed Company document/asset version |
 | `R34` | M10-alpha Asset Governance / Usability Review | ⬜ gate | real asset cycle safe, understandable and reconstructable |
 | `M10-alpha` | First Governed Company Asset Cycle | ⬜ | first real asset cycle owner PASS |
@@ -309,36 +312,38 @@ It reviewed all ten Phase 10 questions and found no unresolved material objectio
 9. browser/BFF/projection/AI remain non-authoritative and no stable/public API promise is created;
 10. a new materially constraining durable implementation mechanism reopens the ADR gate before reliance.
 
-R33 does not change Product Contract `0.2.0`, promote CAP-001, or prove P10.03 implementation.
+R33 itself did not prove P10.03 implementation; the subsequent P10.03 implementation/closure review does. R33 did not change Product Contract `0.2.0` or promote CAP-001.
 
 ## 10. P10.03 — domain-neutral organizational-asset admission path
 
-**Status: Current.**
+**Status: Complete / PASS.**
 
-Implement the smallest reusable platform mechanism required by the admitted Product Contract and the R33 gate.
+Closure review: [`P10-03-organizational-asset-admission-closure-review`](../reviews/P10-03-organizational-asset-admission-closure-review.md).
 
-Required behavior:
+Implemented bounded behavior:
 
-- accept an exact staged item/version reference;
-- resolve current Organization/Actor and applicable access;
-- pin exact content/digest/provenance and contract/workflow versions;
-- evaluate Authorization, Organizational Authority, Data Governance, validation and applicable Consequential Approval separately;
-- under current governance, preserve explicit owner Organizational Authority/approval unless a separately approved exact delegation applies;
-- create immutable canonical Document/Artifact version and explicit Governed Organizational Asset designation where approved;
-- preserve source/rights/classification/retention metadata proportionately and fail closed when required governance state cannot be resolved;
-- preserve `External Reference` authority/freshness/conflict semantics where applicable;
-- emit canonical Event/provenance evidence proportionate to the admission consequence;
-- be idempotent for the same admitted intent and represent blocked/failed/uncertain/reconciliation-required outcomes truthfully;
-- fail closed on stale/revoked/mismatched inputs;
-- never mutate an already admitted version or relabel the staged candidate into canonical history;
-- keep Company asset taxonomy/product rules outside shared platform semantics;
-- keep projections/browser/AI non-authoritative;
-- support explicit rejection/cancellation without creating a canonical asset version;
-- reopen the ADR gate before any materially new durable persistence/object-store/transaction/evidence-integrity/stable serialization/separate-service choice.
+- exact staged Subject/Version/Artifact identity and SHA-256 integrity are resolved and pinned before admission;
+- product-local staging remains `StagedNonCanonical` and is never relabelled into canonical history;
+- the exact candidate Document Version is a material input of the admitted Governed Execution;
+- exact Product Contract, Workflow and operation continuity is checked before effect;
+- Actor Assurance, Authorization, Organizational Authority, Data Governance, Validation and Consequential Approval are all required as independent current ALLOW decisions;
+- under current governance, Organizational Authority and Consequential Approval remain attributable to the explicit owner decision authority and exact governed basis references;
+- immutable Document Version admission is reused from CAP-001 and a separate immutable Organizational Asset designation is created rather than overloading Document lifecycle state;
+- Product Contract operation declarations explicitly include the separate designation WRITE boundary;
+- classification, purpose, rights, retention, deletion and permitted reuse are explicit admission inputs; unresolved or inconsistent handling fails closed;
+- Native staging cannot silently become `External Reference`; External Reference admission preserves the external authoritative system and authority contract;
+- external freshness/conflict/availability resolution basis must equal the exact current Validation gate basis, which is preserved by the immutable Validation gate decision and then linked by exact gate-decision Version from the admission designation/Event provenance;
+- canonical RFC-0006 admission Event evidence preserves execution, candidate, designation, source and gate-version lineage;
+- keyed idempotency prevents duplicate admission and key rebinding; uncertain prior outcome requires reconciliation before retry;
+- Company `project_id`, semantic role, taxonomy and `company.asset.*` operation names remain product-side, while the shared admission semantic owner remains domain-neutral;
+- no RFC-0007 Knowledge promotion is implied;
+- no new persistence/object-store/durable transaction/idempotency ledger/stable serialization/public API/separate-service mechanism is selected.
 
-P10.03 does not implement generated-output promotion or downstream product actions and creates no lifecycle/public/Production claim.
+P10.03 does not implement generated-output promotion, downstream product actions, owner-facing Asset Library UX or the real M10-alpha cycle. It creates no Product Contract/Platform Capability lifecycle, public interface, Production or conformance expansion claim.
 
 ## 11. P10.04 — Company Asset Library UX
+
+**Status: Current.**
 
 Owner-facing capabilities:
 
@@ -536,7 +541,7 @@ Phase 10 intentionally supports bounded concurrency.
 
 ### Lane A — Organizational Assets — primary early critical path
 
-`P10.01 ✓ → P10.02 ✓ → R33 ✓ → P10.03 CURRENT → P10.04 → P10.05 → R34 → M10-alpha`.
+`P10.01 ✓ → P10.02 ✓ → R33 ✓ → P10.03 ✓ → P10.04 CURRENT → P10.05 → R34 → M10-alpha`.
 
 ### Lane B — Real Operational Work
 
@@ -558,7 +563,7 @@ CI, recovery, observability, dependency/security, deterministic build and eviden
 
 ```text
                          ┌─ Lane A: Assets
-                         │   P10.01 ✓ → P10.02 ✓ → R33 ✓ → P10.03 CURRENT → P10.04 → P10.05 → R34 → M10-alpha
+                         │   P10.01 ✓ → P10.02 ✓ → R33 ✓ → P10.03 ✓ → P10.04 CURRENT → P10.05 → R34 → M10-alpha
                          │
 Phase 10 current main ───┼─ Lane B: Real work
                          │   P10.06 ──[genuine request + owning-product contract]──→ P10.07 → P10.08 → R35
@@ -591,6 +596,6 @@ Phase 10 does not by itself establish:
 
 ## 26. Current canonical action
 
-> **P10.03 — Domain-neutral organizational-asset admission execution path.**
+> **P10.04 — Company Asset Library UX + version/handling lifecycle.**
 
-Implement the smallest reusable platform admission mechanism within [`R33`](../reviews/R33-asset-product-contract-authority-boundary-review.md): exact staged input/version; immutable canonical Document/Asset version and explicit asset designation; separate current gate evaluation with explicit owner authority under current governance; exact Product Contract/workflow/input pins; external-authority fidelity; fail-closed rights/data-governance semantics; idempotent/reconstructable outcomes; no Company taxonomy in shared platform semantics; no public/stable/lifecycle overclaim; ADR re-trigger before any new materially constraining durable mechanism.
+Expose the admitted P10.03 asset semantics through the owner-facing Productive Workspace without creating a new authority surface. The ordinary owner path must support truthful staged-vs-canonical review, exact version/digest/source/handling inspection, initiation of the already-governed admission path, admitted asset discovery/opening, immutable version/supersession inspection and bounded authorized export/download without terminal/GitHub/internal identifiers. Workspace/UI/BFF remains non-authoritative; P10.04 must not invent rights, approval, Organizational Authority or a new stable/public interface.
