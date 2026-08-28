@@ -8,6 +8,13 @@ from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import FileResponse
 
 from .access import AccessContext, WorkspaceAccessError
+from .company_asset_library import (
+    CompanyAssetAdmissionExecutor,
+    CompanyAssetAdmissionUnavailable,
+    CompanyAssetLibrary,
+    CompanyAssetLibraryError,
+    CompanyAssetReviewError,
+)
 from .company_materials import (
     CompanyMaterialUnavailable,
     CompanyMaterialsError,
@@ -21,6 +28,8 @@ from .security import WorkspaceSession
 
 MAX_STAGE_REQUEST_BYTES = 12 * 1024 * 1024
 MAX_GENERATE_REQUEST_BYTES = 16 * 1024
+MAX_REVIEW_REQUEST_BYTES = 8 * 1024
+MAX_REJECT_REQUEST_BYTES = 4 * 1024
 
 
 def _bounded_json_body(limit: int, code: str):
@@ -51,16 +60,25 @@ def install_f11_routes(
     *,
     portfolio_provider: RuntimeCompanyPortfolioProvider | None = None,
     materials_store: CompanyMaterialsStore | None = None,
+    asset_admission: CompanyAssetAdmissionExecutor | None = None,
+    asset_library: CompanyAssetLibrary | None = None,
 ) -> FastAPI:
-    """Install bounded F11 routes inside the existing same-origin Workspace BFF."""
+    """Install bounded F11/P10.04 routes inside the same-origin Workspace BFF.
+
+    Canonical admission is intentionally injected as a server-side executor.  If
+    no current governed executor is installed the UI remains readable and
+    reviewable, but admission fails closed rather than manufacturing authority.
+    """
 
     settings = app.state.settings
     store = app.state.session_store
     resolver = app.state.access_resolver
     portfolio = portfolio_provider or VerifiedRuntimeCompanyPortfolioProvider(cache_root=Path(settings.runtime_root))
     materials = materials_store or CompanyMaterialsStore(Path(settings.runtime_root))
+    library = asset_library or CompanyAssetLibrary(materials, asset_admission)
     app.state.company_portfolio_provider = portfolio
     app.state.company_materials_store = materials
+    app.state.company_asset_library = library
 
     # Existing Workspace creates the SPA catch-all before this product boundary is
     # composed. Temporarily remove exactly that route so API routes remain reachable,
@@ -134,6 +152,97 @@ def install_f11_routes(
         except CompanyMaterialsError:
             raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="COMPANY_MATERIAL_STAGE_FAILED") from None
 
+    @app.get("/api/app/v1/company-assets")
+    async def company_asset_library(
+        current: tuple[WorkspaceSession, AccessContext] = Depends(authorize_current),
+    ) -> dict[str, Any]:
+        _, access = current
+        try:
+            return library.project(access)
+        except (CompanyAssetLibraryError, CompanyMaterialsError):
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="COMPANY_ASSET_LIBRARY_UNAVAILABLE") from None
+
+    @app.get("/api/app/v1/company-assets/export")
+    async def export_company_asset_library(
+        limit: int = 100,
+        current: tuple[WorkspaceSession, AccessContext] = Depends(authorize_current),
+    ) -> dict[str, Any]:
+        _, access = current
+        try:
+            return library.export(access, limit=limit)
+        except CompanyAssetReviewError:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="COMPANY_ASSET_EXPORT_REJECTED") from None
+        except (CompanyAssetLibraryError, CompanyMaterialsError):
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="COMPANY_ASSET_LIBRARY_UNAVAILABLE") from None
+
+    @app.post("/api/app/v1/company-assets/{material_id}/versions/{version_id}/review")
+    async def submit_company_asset_review(
+        material_id: str,
+        version_id: str,
+        payload: object = Depends(_bounded_json_body(MAX_REVIEW_REQUEST_BYTES, "COMPANY_ASSET_REVIEW_REJECTED")),
+        current: tuple[WorkspaceSession, AccessContext] = Depends(csrf_current),
+    ) -> dict[str, Any]:
+        _, access = current
+        try:
+            review = library.submit_review(access, material_id, version_id, payload)
+            return {
+                "schema": "arvectum.workspace.company-asset-review-result/1",
+                "review": review,
+                "canonical_state_changed": False,
+            }
+        except CompanyAssetReviewError:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="COMPANY_ASSET_REVIEW_REJECTED") from None
+        except CompanyMaterialUnavailable:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="COMPANY_ASSET_VERSION_UNAVAILABLE") from None
+        except (CompanyAssetLibraryError, CompanyMaterialsError):
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="COMPANY_ASSET_LIBRARY_UNAVAILABLE") from None
+
+    @app.post("/api/app/v1/company-assets/{material_id}/versions/{version_id}/reject")
+    async def reject_company_asset_version(
+        material_id: str,
+        version_id: str,
+        payload: object = Depends(_bounded_json_body(MAX_REJECT_REQUEST_BYTES, "COMPANY_ASSET_REJECT_REJECTED")),
+        current: tuple[WorkspaceSession, AccessContext] = Depends(csrf_current),
+    ) -> dict[str, Any]:
+        _, access = current
+        try:
+            review = library.reject(access, material_id, version_id, payload)
+            return {
+                "schema": "arvectum.workspace.company-asset-reject-result/1",
+                "review": review,
+                "canonical_state_changed": False,
+            }
+        except CompanyAssetReviewError:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="COMPANY_ASSET_REJECT_REJECTED") from None
+        except CompanyMaterialUnavailable:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="COMPANY_ASSET_VERSION_UNAVAILABLE") from None
+        except (CompanyAssetLibraryError, CompanyMaterialsError):
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="COMPANY_ASSET_LIBRARY_UNAVAILABLE") from None
+
+    @app.post("/api/app/v1/company-assets/{material_id}/versions/{version_id}/admit")
+    async def admit_company_asset_version(
+        material_id: str,
+        version_id: str,
+        current: tuple[WorkspaceSession, AccessContext] = Depends(csrf_current),
+    ) -> dict[str, Any]:
+        _, access = current
+        try:
+            admitted = library.admit(access, material_id, version_id)
+            return {
+                "schema": "arvectum.workspace.company-asset-admission-result/1",
+                "admitted": admitted.to_payload(),
+                "canonical_state_changed": True,
+                "through_governed_execution": True,
+            }
+        except CompanyAssetReviewError:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="COMPANY_ASSET_NOT_READY_FOR_ADMISSION") from None
+        except CompanyAssetAdmissionUnavailable:
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="COMPANY_ASSET_ADMISSION_UNAVAILABLE") from None
+        except CompanyMaterialUnavailable:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="COMPANY_ASSET_VERSION_UNAVAILABLE") from None
+        except (CompanyAssetLibraryError, CompanyMaterialsError):
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="COMPANY_ASSET_ADMISSION_FAILED") from None
+
     @app.post("/api/app/v1/company-materials/generate")
     async def generate_company_document(
         payload: object = Depends(_bounded_json_body(MAX_GENERATE_REQUEST_BYTES, "COMPANY_GENERATION_INPUT_REJECTED")),
@@ -141,12 +250,12 @@ def install_f11_routes(
     ) -> dict[str, Any]:
         _, access = current
         try:
-            return materials.generate_docx(access, payload)
+            return library.generate_docx(access, payload)
         except CompanyMaterialsInputError:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="COMPANY_GENERATION_INPUT_REJECTED") from None
         except CompanyMaterialUnavailable:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="COMPANY_MATERIAL_VERSION_UNAVAILABLE") from None
-        except CompanyMaterialsError:
+        except (CompanyAssetLibraryError, CompanyMaterialsError):
             raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="COMPANY_GENERATION_FAILED") from None
 
     @app.get("/api/app/v1/company-materials/outputs/{output_id}/download")
