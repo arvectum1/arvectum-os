@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 import unittest
 
 from arvectum_os_ref.canonical import AuthorityMode, CanonicalRecord, ExternalAuthorityContract
 from arvectum_os_ref.document_artifact_governance import ArtifactContent, DocumentVersionCandidate
 from arvectum_os_ref.governed_execution import GovernedGateKind
-from arvectum_os_ref.identity import Identity
 from arvectum_os_ref.organizational_asset_admission import (
     AssetAdmissionSourceKind,
     ExactAdmissionSourceError,
@@ -23,17 +22,12 @@ from p10_03_company_asset_ref.contract import (
     EXTERNAL_ASSET_DOCUMENT_SCOPE,
     OP_ADMIT_EXTERNAL_REFERENCE,
 )
-from test_p10_03_organizational_asset_admission import (
-    P1003OrganizationalAssetAdmissionTests,
-)
-
-
-UTC = timezone.utc
+import test_p10_03_organizational_asset_admission as p1003_base
 
 
 class P1003ExternalResolutionProvenanceTests(unittest.TestCase):
     def setUp(self) -> None:
-        helper = P1003OrganizationalAssetAdmissionTests(
+        helper = p1003_base.P1003OrganizationalAssetAdmissionTests(
             methodName="test_contract_projection_is_exact_p10_02_cap001_only_boundary"
         )
         helper.setUp()
@@ -142,7 +136,7 @@ class P1003ExternalResolutionProvenanceTests(unittest.TestCase):
         self.assertEqual(validation.basis_ref, resolution_basis)
         self.assertIn(resolution_basis, validation.record.provenance_refs)
         self.assertIn(validation.record.version_id, result.admission.designation.provenance_refs)
-        self.assertIn(validation.record.version_id, result.admission.event.provenance_refs)
+        self.assertIn(validation.record.version_id, result.admission.event.record.provenance_refs)
         self.assertIs(
             result.admission.admitted_document.canonical_record.authority_mode,
             AuthorityMode.EXTERNAL_REFERENCE,
