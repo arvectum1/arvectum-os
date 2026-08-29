@@ -1,14 +1,16 @@
 """Product-local P10.05 bridge from Company TransientOutput to promotion input.
 
 The bridge understands Company generation/staging metadata and therefore stays
-outside the shared platform semantic owner.  It resolves one exact transient
+outside the shared platform semantic owner. It resolves one exact transient
 output, re-hashes its bytes, proves the exact generating input was already an
 admitted Company Asset version, inherits that source handling without widening
 it, and constructs an immutable CAP-001 promotion candidate.
 
 It grants no Authorization, Organizational Authority, Data Governance decision,
 Validation or Consequential Approval and never changes the transient manifest's
-``TransientOutput`` state.
+``TransientOutput`` state. Historic F11/P10.04 output manifests did not retain a
+versioned generation configuration or generation-input digest; P10.05 therefore
+records those fields as unavailable rather than inventing evidence.
 """
 
 from __future__ import annotations
@@ -48,16 +50,18 @@ class ExactCompanyGeneratedOutput:
     source_material_id: str
     source_version_id: str
     source_sha256: str
-    generation_profile: str
-    generation_input_digest: str
+    generation_profile: str | None
+    generation_input_digest: str | None
     source_admission: CommittedOrganizationalAssetAdmission
     handling: OrganizationalAssetHandlingPolicy
 
     def __post_init__(self) -> None:
         if len(self.output_sha256) != 64 or len(self.source_sha256) != 64:
             raise ValueError("generated output must preserve exact SHA-256 digests")
-        if not self.generation_profile or len(self.generation_input_digest) != 64:
-            raise ValueError("generated output must preserve bounded generation evidence")
+        if self.generation_profile is not None and not self.generation_profile.strip():
+            raise ValueError("retained generation_profile must be non-empty")
+        if self.generation_input_digest is not None and len(self.generation_input_digest) != 64:
+            raise ValueError("retained generation_input_digest must be SHA-256")
 
 
 def _designation_handling(
@@ -126,15 +130,18 @@ def resolve_exact_generated_output(
         "source_material_id",
         "source_version_id",
         "source_sha256",
-        "generation_profile",
-        "generation_input_digest",
     )
     if any(not isinstance(manifest.get(key), str) or not str(manifest[key]).strip() for key in required_text):
-        raise CompanyMaterialUnavailable(
-            "transient output lacks exact P10.05 generation evidence; regenerate it before promotion"
-        )
-    if len(str(manifest["generation_input_digest"])) != 64:
-        raise CompanyMaterialUnavailable("transient output generation input digest is invalid")
+        raise CompanyMaterialUnavailable("transient output generation/source evidence is incomplete")
+
+    profile_value = manifest.get("generation_profile")
+    generation_profile = str(profile_value) if isinstance(profile_value, str) and profile_value.strip() else None
+    input_digest_value = manifest.get("generation_input_digest")
+    generation_input_digest = (
+        str(input_digest_value)
+        if isinstance(input_digest_value, str) and len(input_digest_value) == 64
+        else None
+    )
 
     source_material_id = str(manifest["source_material_id"])
     source_version_id = str(manifest["source_version_id"])
@@ -167,8 +174,8 @@ def resolve_exact_generated_output(
         source_material_id=source_material_id,
         source_version_id=source_version_id,
         source_sha256=str(manifest["source_sha256"]),
-        generation_profile=str(manifest["generation_profile"]),
-        generation_input_digest=str(manifest["generation_input_digest"]),
+        generation_profile=generation_profile,
+        generation_input_digest=generation_input_digest,
         source_admission=source,
         handling=_designation_handling(source),
     )
@@ -243,7 +250,7 @@ def build_generated_output_document_candidate(
         rendition_role="original",
         handling=handling,
         source_artifact_ids=(source_artifact.artifact_id,),
-        transformation=output.generation_profile,
+        transformation=output.generation_profile or "company-docx-generation",
         storage_locator="owner-local-company-materials/transient",
     )
     provenance = tuple(
@@ -275,8 +282,8 @@ def build_generated_output_document_candidate(
         integrity_metadata=(
             ("representation", "p10.05-exact-reviewed-transient-output"),
             ("source_output_sha256", output.output_sha256),
-            ("generation_profile", output.generation_profile),
-            ("generation_input_digest", output.generation_input_digest),
+            ("generation_profile", output.generation_profile or "not-retained"),
+            ("generation_input_digest", output.generation_input_digest or "not-retained"),
             ("source_state", "TransientOutput"),
         ),
         payload=(
