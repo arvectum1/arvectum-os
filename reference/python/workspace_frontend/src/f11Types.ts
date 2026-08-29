@@ -102,6 +102,96 @@ export type CompanyMaterialsProjection = {
   };
 };
 
+export type CompanyAssetReview = {
+  state: "Draft" | "InReview" | "Rejected";
+  policy: null | {
+    deletion_rule: string;
+    permitted_reuse: string[];
+  };
+  reason: string | null;
+  updated_at: string | null;
+  actor?: string;
+  canonical_authority?: false;
+};
+
+export type AdmittedCompanyAsset = {
+  material_id: string;
+  version_id: string;
+  document_subject: string;
+  document_version: string;
+  designation_subject: string;
+  designation_version: string;
+  event_version: string;
+  admitted_at: string;
+  provenance_refs: string[];
+  current: boolean;
+};
+
+export type CompanyAssetLibraryItem = {
+  material_id: string;
+  version_id: string;
+  title: string;
+  project_id: string;
+  semantic_role: string;
+  media_type: string;
+  classification: string;
+  purpose: string;
+  rights: string;
+  retention_rule: string;
+  received_at: string;
+  uploader: string;
+  content_sha256: string;
+  size_bytes: number;
+  predecessor_version_id: string | null;
+  staging_state: "StagedNonCanonical";
+  review: CompanyAssetReview;
+  canonical: AdmittedCompanyAsset | null;
+  lifecycle_view: "drafts" | "review" | "accepted" | "archive";
+  technical_identity_available: true;
+};
+
+export type CompanyAssetLibraryProjection = {
+  schema: "arvectum.workspace.company-asset-library/1";
+  generated_at: string;
+  product_contract: {
+    id: "p9-11-f11-arvectum-company-workspace";
+    version: "0.2.0";
+    lifecycle: "Provisional";
+  };
+  views: {
+    drafts: CompanyAssetLibraryItem[];
+    review: CompanyAssetLibraryItem[];
+    accepted: CompanyAssetLibraryItem[];
+    archive: CompanyAssetLibraryItem[];
+  };
+  actions: {
+    governed_admission_available: boolean;
+  };
+  scope: {
+    organization_resolved_server_side: true;
+    actor_resolved_server_side: true;
+    cross_organization_access: false;
+  };
+  governance: {
+    workspace_is_authority_source: false;
+    staging_is_canonical: false;
+    review_state_is_canonical: false;
+    canonical_admission_requires_governed_execution: true;
+    generated_output_default: "TransientOutput";
+    validated_knowledge_created: false;
+  };
+};
+
+export type CompanyAssetLibraryExport = {
+  schema: "arvectum.workspace.company-asset-library-export/1";
+  generated_at: string;
+  organization: string;
+  items: CompanyAssetLibraryItem[];
+  bounded: true;
+  limit: number;
+  canonical_authority: false;
+};
+
 export type GeneratedCompanyOutput = {
   schema: "arvectum.workspace.company-generated-output/1";
   output: {
@@ -125,5 +215,8 @@ export type GeneratedCompanyOutput = {
     generated_artifact_state: "TransientOutput";
     canonical_state_changed: false;
     exact_source_version_pinned: true;
+    source_admitted_company_asset?: true;
+    source_document_version?: string;
+    source_designation_version?: string;
   };
 };

@@ -7,6 +7,11 @@ from pathlib import Path
 
 from workspace_app.access import P704AccessResolver, provision_workspace_grant
 from workspace_app.assets import verify_frontend_assets
+from workspace_app.company_asset_governed_provider import (
+    P1004OwnerCompanyAssetAdmissionProvider,
+    provision_company_asset_admission_grant,
+)
+from workspace_app.company_asset_library import P1003CompanyAssetAdmissionExecutor
 from workspace_app.config import WorkspaceSettings
 from workspace_app.f11_routes import install_f11_routes
 from workspace_app.main import create_app
@@ -17,8 +22,15 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="P9.03 Arvectum OS Productive Workspace")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("check", help="verify current access and release-pinned built frontend")
-    provision = sub.add_parser("provision-local-grant", help="create the exact local Workspace shell operational grant")
+    provision = sub.add_parser(
+        "provision-local-grant", help="create the exact local Workspace shell operational grant"
+    )
     provision.add_argument("--confirm", action="store_true")
+    admission = sub.add_parser(
+        "provision-company-asset-admission-grant",
+        help="create only the exact local Company Asset admission authorization grant",
+    )
+    admission.add_argument("--confirm", action="store_true")
     sub.add_parser("serve", help="serve the bounded same-origin SPA+BFF on the configured profile")
     return parser
 
@@ -28,9 +40,15 @@ def _frontend_root() -> Path:
 
 
 def build_workspace_app(settings: WorkspaceSettings):
-    """Build one same-origin Workspace app and install bounded F11 product routes."""
+    """Build one same-origin Workspace app with bounded Company product routes.
 
-    return install_f11_routes(create_app(settings))
+    P10.04 installs the governed executor by default, but it remains fail-closed
+    until the exact admission authorization grant has been explicitly provisioned.
+    """
+
+    provider = P1004OwnerCompanyAssetAdmissionProvider(settings.runtime_root)
+    admission = P1003CompanyAssetAdmissionExecutor(provider)
+    return install_f11_routes(create_app(settings), asset_admission=admission)
 
 
 def main() -> None:
@@ -41,11 +59,39 @@ def main() -> None:
         if not args.confirm:
             raise SystemExit("--confirm is required; access is never auto-granted")
         grant_id = provision_workspace_grant(settings.runtime_root)
-        print(json.dumps({"status": "PASS", "grant_id": grant_id, "organizational_authority_provided": False}, sort_keys=True))
+        print(
+            json.dumps(
+                {
+                    "status": "PASS",
+                    "grant_id": grant_id,
+                    "organizational_authority_provided": False,
+                },
+                sort_keys=True,
+            )
+        )
+        return
+    if args.command == "provision-company-asset-admission-grant":
+        if not args.confirm:
+            raise SystemExit("--confirm is required; consequential-operation access is never auto-granted")
+        grant_id = provision_company_asset_admission_grant(settings.runtime_root)
+        print(
+            json.dumps(
+                {
+                    "status": "PASS",
+                    "grant_id": grant_id,
+                    "operation": "company.asset.admit-staged-version",
+                    "authorization_only": True,
+                    "organizational_authority_provided": False,
+                    "consequential_approval_provided": False,
+                },
+                sort_keys=True,
+            )
+        )
         return
     if args.command == "check":
         access = P704AccessResolver(settings.runtime_root).authorize()
         assets = verify_frontend_assets(_frontend_root(), release)
+        provider = P1004OwnerCompanyAssetAdmissionProvider(settings.runtime_root)
         print(
             json.dumps(
                 {
@@ -53,6 +99,7 @@ def main() -> None:
                     "organization_scope": access.organization.value,
                     "actor_attributable": True,
                     "operational_access_only": True,
+                    "company_asset_admission_authorized": provider.available(access),
                     "organizational_authority_provided": False,
                     "public_origin": settings.public_origin,
                 },

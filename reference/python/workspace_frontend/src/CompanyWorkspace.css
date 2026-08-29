@@ -1,3 +1,5 @@
+@import "./CompanyAssetLibrary.css";
+
 .company-page {
   display: grid;
   gap: 24px;

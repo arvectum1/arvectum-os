@@ -1,4 +1,7 @@
 import type {
+  AdmittedCompanyAsset,
+  CompanyAssetLibraryExport,
+  CompanyAssetLibraryProjection,
   CompanyMaterialsProjection,
   CompanyPortfolioProjection,
   GeneratedCompanyOutput,
@@ -43,12 +46,62 @@ function downloadFilename(disposition: string | null): string {
   return quoted ?? plain ?? "generated-arvectum-document.docx";
 }
 
+function assetPath(materialId: string, versionId: string, action: string): string {
+  return `/api/app/v1/company-assets/${encodeURIComponent(materialId)}/versions/${encodeURIComponent(versionId)}/${action}`;
+}
+
 export function loadCompanyPortfolio(forceRefresh = false): Promise<CompanyPortfolioProjection> {
   return request<CompanyPortfolioProjection>(forceRefresh ? "/api/app/v1/company/portfolio?refresh=true" : "/api/app/v1/company/portfolio");
 }
 
 export function loadCompanyMaterials(): Promise<CompanyMaterialsProjection> {
   return request<CompanyMaterialsProjection>("/api/app/v1/company-materials");
+}
+
+export function loadCompanyAssetLibrary(): Promise<CompanyAssetLibraryProjection> {
+  return request<CompanyAssetLibraryProjection>("/api/app/v1/company-assets");
+}
+
+export function exportCompanyAssetLibrary(limit = 100): Promise<CompanyAssetLibraryExport> {
+  return request<CompanyAssetLibraryExport>(`/api/app/v1/company-assets/export?limit=${limit}`);
+}
+
+export async function submitCompanyAssetReview(
+  materialId: string,
+  versionId: string,
+  input: { deletion_rule: string; permitted_reuse: string[] },
+  csrfToken: string,
+): Promise<void> {
+  await request(assetPath(materialId, versionId, "review"), {
+    method: "POST",
+    headers: { "X-Arvectum-CSRF": csrfToken },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function rejectCompanyAssetVersion(
+  materialId: string,
+  versionId: string,
+  reason: string,
+  csrfToken: string,
+): Promise<void> {
+  await request(assetPath(materialId, versionId, "reject"), {
+    method: "POST",
+    headers: { "X-Arvectum-CSRF": csrfToken },
+    body: JSON.stringify({ reason }),
+  });
+}
+
+export async function admitCompanyAssetVersion(
+  materialId: string,
+  versionId: string,
+  csrfToken: string,
+): Promise<AdmittedCompanyAsset> {
+  const response = await request<{ admitted: AdmittedCompanyAsset }>(assetPath(materialId, versionId, "admit"), {
+    method: "POST",
+    headers: { "X-Arvectum-CSRF": csrfToken },
+  });
+  return response.admitted;
 }
 
 export async function stageCompanyMaterial(
