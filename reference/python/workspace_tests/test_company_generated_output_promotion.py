@@ -16,14 +16,17 @@ from workspace_app.company_asset_governed_provider import (
     P1004OwnerCompanyAssetAdmissionProvider,
     provision_company_asset_admission_grant,
 )
-from workspace_app.company_asset_library import CompanyAssetLibrary, P1003CompanyAssetAdmissionExecutor
+from workspace_app.company_asset_library import (
+    CompanyAssetAdmissionUnavailable,
+    CompanyAssetLibrary,
+    P1003CompanyAssetAdmissionExecutor,
+)
 from workspace_app.company_generated_output_governed_provider import (
     COMPANY_GENERATED_OUTPUT_PROMOTION_RESOURCE,
     P1005OwnerCompanyGeneratedOutputPromotionProvider,
     provision_company_generated_output_promotion_grant,
 )
 from workspace_app.company_generated_outputs import (
-    CompanyGeneratedOutputPromotionUnavailable,
     CompanyGeneratedOutputs,
     P1005CompanyGeneratedOutputPromotionExecutor,
 )
@@ -263,7 +266,7 @@ class CompanyGeneratedOutputPromotionTests(unittest.TestCase):
         self.request_promotion()
         provision_company_generated_output_promotion_grant(self.root)
         self.asset_executor.state = type(self.asset_executor.state)()
-        with self.assertRaises(CompanyGeneratedOutputPromotionUnavailable):
+        with self.assertRaises(CompanyAssetAdmissionUnavailable):
             self.outputs.promote(self.access, self.output_id)
         self.assertEqual(len(self.promotion_executor.state.committed), 0)
 
