@@ -229,7 +229,9 @@ class P1003CompanyAssetAdmissionExecutor:
                 raise CompanyAssetLibraryError("admitted Company asset lacks exact staged source identity")
             provenance = tuple(
                 _identity_text(ref)
-                for ref in dict.fromkeys((*item.designation.provenance_refs, *item.event.provenance_refs))
+                for ref in dict.fromkeys(
+                    (*item.designation.provenance_refs, *item.event.record.provenance_refs)
+                )
             )
             result.append(
                 AdmittedCompanyAssetVersion(
