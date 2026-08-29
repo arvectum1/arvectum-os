@@ -16,6 +16,7 @@ from typing import Final
 
 from arvectum_os_ref.canonical import AuthorityMode, CanonicalRecord
 from arvectum_os_ref.execution import GovernedVersionPin
+from arvectum_os_ref.identity import Identity
 from arvectum_os_ref.organizational_asset_admission import (
     ORGANIZATIONAL_ASSET_DESIGNATION_AUTHORITY_SCOPE,
     ORGANIZATIONAL_ASSET_DESIGNATION_SEMANTIC_TYPE,
@@ -125,9 +126,6 @@ def build_p10_05_product_contract_projection(
     organization = actor.organization
     scope = organization.organization_id.value
     owner = actor.actual_principal.principal_id
-    product_id = CanonicalRecord.__annotations__ and None  # type-narrowing guard replaced immediately below
-    from arvectum_os_ref.identity import Identity
-
     product_id = Identity("product", PRODUCT_ID_VALUE, scope)
     canonical_pin = p10_02_canonical_version_pin(organization=organization)
 
