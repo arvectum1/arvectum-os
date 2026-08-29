@@ -10,6 +10,7 @@ import p7_04_persistent_access as p704
 from arvectum_os_ref.governed_execution import GovernedGateKind, GovernedGateOutcome
 from arvectum_os_ref.identity import Identity
 from p10_03_company_asset_ref.contract import OP_ADMIT_STAGED_VERSION
+from p9_03_workspace import build_workspace_app
 from workspace_app.access import P704AccessResolver, provision_workspace_grant
 from workspace_app.company_asset_admission import (
     build_staged_document_candidate,
@@ -27,6 +28,7 @@ from workspace_app.company_asset_library import (
     P1003CompanyAssetAdmissionExecutor,
 )
 from workspace_app.company_materials import CompanyMaterialsStore
+from workspace_app.config import WorkspaceSettings
 
 
 class CompanyAssetGovernedProviderTests(unittest.TestCase):
@@ -70,6 +72,30 @@ class CompanyAssetGovernedProviderTests(unittest.TestCase):
         if material_id is not None:
             payload["material_id"] = material_id
         return self.store.stage(self.access, payload)["material"]
+
+    def _settings(self) -> WorkspaceSettings:
+        return WorkspaceSettings(
+            runtime_root=self.root,
+            public_origin="http://127.0.0.1:8769",
+            bind_host="127.0.0.1",
+            bind_port=8769,
+            allowed_hosts=("127.0.0.1:8769",),
+            organization_label="ООО «Арвектум»",
+            actor_label="Owner operator",
+            session_idle_seconds=1800,
+            session_absolute_seconds=28800,
+            allow_loopback_http=True,
+        )
+
+    def test_productive_workspace_installs_governed_executor_without_auto_grant(self) -> None:
+        app = build_workspace_app(self._settings())
+        admission = app.state.company_asset_library.admission
+        self.assertIsInstance(admission, P1003CompanyAssetAdmissionExecutor)
+        self.assertIsInstance(admission.provider, P1004OwnerCompanyAssetAdmissionProvider)
+        self.assertFalse(admission.available(self.access))
+
+        provision_company_asset_admission_grant(self.root)
+        self.assertTrue(admission.available(self.access))
 
     def test_admission_grant_is_not_ambient_or_auto_provisioned(self) -> None:
         self.assertFalse(self.provider.available(self.access))
@@ -178,8 +204,13 @@ class CompanyAssetGovernedProviderTests(unittest.TestCase):
         self.assertEqual(len(self.executor.state.admitted_events), 1)
         self.assertEqual(len(self.executor.state.attempts), 1)
         projection = self.library.project(self.access)
-        self.assertEqual([item["version_id"] for item in projection["views"]["accepted"]], [version_id])
-        self.assertEqual(projection["views"]["accepted"][0]["staging_state"], "StagedNonCanonical")
+        self.assertEqual(
+            [item["version_id"] for item in projection["views"]["accepted"]],
+            [version_id],
+        )
+        self.assertEqual(
+            projection["views"]["accepted"][0]["staging_state"], "StagedNonCanonical"
+        )
         self.assertTrue(projection["views"]["accepted"][0]["canonical"]["current"])
 
 
