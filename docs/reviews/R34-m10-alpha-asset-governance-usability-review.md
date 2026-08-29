@@ -1,68 +1,70 @@
 # R34 — M10-alpha Asset Governance / Usability Review
 
-**Version:** 0.2.0  
-**Status:** Executed / BLOCKED — durable-state remediation + real owner-operated evidence required  
+**Version:** 0.3.0  
+**Status:** Executed / BLOCKED — durable-state implementation/recovery evidence + real owner-operated evidence required  
 **Date:** 2026-08-29  
 **Review target:** first real owner-operated Arvectum Company asset cycle  
-**Canonical baseline reviewed:** `main@717f9091572ade1c961d2b85e93c1ba0772c39fc`  
 **Gate verdict:** `NOT PASS`  
 **Milestone:** `M10-alpha` remains unclaimed
 
 ## 1. Review objective
 
-R34 is the mandatory M10-alpha governance/usability gate after P10.05. It must determine whether the first real owner-operated Arvectum Company asset cycle is both usable and governance-correct under actual organizational evidence, including restart/recovery/update compatibility.
+R34 is the mandatory M10-alpha governance/usability gate after P10.05. It determines whether the first real owner-operated Arvectum Company asset cycle is usable, governance-correct, durable and reconstructable under actual organizational evidence.
 
 A PASS may not be inferred from implementation completeness, automated tests, synthetic fixtures or prior closure reviews alone.
 
-## 2. Canonical inputs checked
+## 2. Canonical authority checked
 
-The review was re-executed against:
+R34 remains subordinate to:
 
 - Constitution `1.2.0` — `Ratified`;
 - RFC-0001 through RFC-0008 — `Accepted 1.0.0`;
 - ADR-0001 — `Accepted`;
+- ADR-0002 — `Company Workspace Durable Governed State`, `Accepted 2026-08-29`;
 - P10.02 Company Workspace Product Contract `0.2.0` — `Provisional`;
-- roadmap `2.97.5` and Phase 10 operational guide;
-- P10.03/P10.04/P10.05 implementation and closure evidence;
-- `reference/python/arvectum_os_ref/organizational_asset_admission.py`;
-- `reference/python/workspace_app/company_asset_library.py`;
-- `reference/python/workspace_app/company_asset_governed_provider.py`;
-- `reference/python/workspace_app/company_generated_outputs.py`;
-- `reference/python/workspace_app/company_materials.py`;
-- merged R34 v0.1.0 baseline at `main@717f9091572ade1c961d2b85e93c1ba0772c39fc`.
+- canonical roadmap and Phase 10 roadmap;
+- P10.03/P10.04/P10.05 implementation and closure evidence.
 
-No conflict with higher-authority canonical semantics was found. The deeper implementation review did identify a material implementation/architecture decision gap that the original R34 v0.1.0 had not yet classified explicitly.
+No conflict with higher-authority canonical semantics is identified.
 
-## 3. Gate admission / evidence state
+## 3. Current gate state
 
-Two independent blockers exist.
+Two independent blockers remain.
 
-### B1 — required real owner-operated evidence is absent
+### B1 — real owner-operated evidence is absent
 
-No canonical evidence packet demonstrates the first real owner-operated Company asset cycle across R34 dimensions. CI, regression tests, synthetic fixtures and P10.03–P10.05 closure evidence remain implementation context only.
+No canonical evidence packet yet demonstrates the required first real owner-operated Company asset cycle across the R34 review dimensions.
 
-### B2 — restart-durable governed Company asset state is not implemented
+CI, regression tests, synthetic fixtures and P10.03–P10.05 closure evidence remain implementation context only. They cannot substitute for the real owner-operated milestone evidence.
 
-P10.03/P10.04/P10.05 intentionally retain admission/promotion canonical state in bounded in-memory semantic state. Their closure records explicitly do not claim restart-durable canonical state, durable Governed Execution/Event storage, transparent continuity across restart or restore/update survival.
+### B2 — restart-durable governed state is not yet implemented/proven
 
-This becomes a gate blocker at R34 because Phase 10 and R34 require the real organizational-asset cycle to be durable/reconstructable and require backup/restore/update compatibility evidence.
+P10.03/P10.04/P10.05 intentionally closed with bounded in-memory admission/promotion state and made no restart-durable persistence claim.
 
-A successful single-process live click-through would therefore still be insufficient for R34 PASS.
+ADR-0002 is now `Accepted` and selects the bounded remediation architecture:
 
-The semantic owner also explicitly leaves selection of a database/object store/durable idempotency ledger/serialization contract behind the applicable ADR gate. R34 must not silently choose one through implementation.
+- product-local owner-local persistence under the existing Workspace runtime root;
+- immutable schema-versioned JSON records for committed and retry/uncertainty evidence;
+- existing content-addressed material/output stores retained for bytes;
+- reconstruction without replaying historical consequential effects;
+- no platform-wide database mandate, new Kernel primitive, public persistence API or automatic Platform Capability promotion.
 
-## 4. R34 scope matrix
+The architecture-decision prerequisite is therefore closed. The implementation and recovery evidence required by B2 are **not** yet complete.
 
-| Review area | Current evidence | Finding |
+A successful single-process click-through is still insufficient for R34 PASS.
+
+## 4. Current R34 scope matrix
+
+| Review area | Current evidence | Current finding |
 | --- | --- | --- |
 | Owner usability | P10.04 owner-facing UX; no real owner cycle | `BLOCKED / NOT EVALUATED LIVE` |
-| Exact version / provenance | bounded semantic + regression evidence | `BLOCKED pending real evidence and restart reconstruction` |
+| Exact version / provenance | bounded semantic + regression evidence | `BLOCKED pending durable reconstruction + real evidence` |
 | Authorization / Organizational Authority / Data Governance | RFC/Product Contract/implementation evidence | `BLOCKED pending real point-of-use evidence` |
 | Data handling / logging | structural controls exist | `BLOCKED pending real evidence` |
-| Partial failure / retry | in-memory semantic retry/idempotency model exists | `BLOCKED: durability across restart not established` |
-| Generated output | P10.05 transient/review/promotion semantics exist | `BLOCKED pending durable promotion state + real promotion` |
-| Recovery / update compatibility | explicit P10.04/P10.05 non-claim | `BLOCKER B2` |
-| Product/platform coupling | current code remains bounded/product-composed | no present violation; persistence choice requires explicit boundary decision |
+| Partial failure / retry | semantic retry/idempotency model exists | `BLOCKED pending durable restart/reconciliation evidence` |
+| Generated output | P10.05 transient/review/promotion semantics exist | `BLOCKED pending durable promotion state + real promotion evidence` |
+| Recovery / update compatibility | ADR-0002 accepted; implementation absent | `BLOCKER B2` |
+| Product/platform coupling | ADR-0002 explicitly product-local | no present architecture violation; implementation must preserve this boundary |
 
 ## 5. Findings
 
@@ -71,71 +73,65 @@ The semantic owner also explicitly leaves selection of a database/object store/d
 R34 is an owner-operated milestone gate. Synthetic execution cannot substitute for real organizational evidence.
 
 **Severity:** gate blocker.  
-**Disposition:** unresolved until B2 is remediated sufficiently to make the real cycle valid, then one real bounded owner-operated cycle is executed and captured.
+**Disposition:** unresolved until B2 implementation/recovery evidence passes and one real bounded owner-operated cycle is executed and reviewed.
 
-### F2 — durable/reconstructable state is a material R34 blocker
+### F2 — durable/reconstructable state remains a material implementation blocker
 
-`OrganizationalAssetAdmissionState` and `ReviewedGeneratedOutputPromotionState` are in-memory. Staging/review/transient bytes/manifests are filesystem-backed, but the consequential admission/promotion result and required retry/event reconstruction state do not survive process restart as current canonical runtime state.
+ADR-0002 now supplies the accepted architecture decision, but the production/reference runtime has not yet demonstrated that Company asset admission and reviewed-output promotion reconstruct exactly across restart/restore/update.
 
-That means current runtime cannot yet prove the R34 requirement that an admitted/promoted asset remains reconstructable through restart/backup/restore/update.
+R34 therefore remains blocked until implementation proves exact identities, versions, provenance, Event references, retry state and promotion state survive the declared recovery boundary.
 
 **Severity:** gate blocker.  
-**Disposition:** requires an explicit subordinate architecture decision and implementation/evidence before the live R34 cycle can close the gate.
+**Disposition:** implementation and evidence required.
 
 ### F3 — no RFC amendment is required
 
-Accepted RFCs intentionally remain technology-neutral and permit simple reversible storage while requiring reconstructability, portability, append-only Event meaning and safe retry/replay semantics.
+Accepted RFCs intentionally remain technology-neutral while requiring reconstructability, portability, safe retry/replay and append-only Event meaning. ADR-0002 is the correct subordinate decision level for the concrete Company-local persistence choice.
 
-The missing choice is concrete and subordinate, not a change to Kernel/RFC semantics. A new ADR is the minimally sufficient governance level.
+### F4 — ADR-0002 is accepted but bounded
 
-### F4 — ADR-0002 proposal is the bounded remediation direction
-
-`ADR-0002 — Company Workspace Durable Governed State` is prepared as `Proposed 0.1.0` on the R34 remediation branch. It chooses product-local owner-local immutable schema-versioned JSON records under the existing runtime root, with rebuildable projections, no new shared Platform Capability, no public/stable persistence API and no database mandate.
-
-The proposal has no normative force until exact owner approval and valid acceptance publication.
+ADR-0002 is binding only for the declared Company Workspace scope. It does not create a platform-wide database choice, public persistence API, Stable Product Contract, Active Platform Capability or production-readiness claim.
 
 ### F5 — generated output classification remains correct
 
-Generated output remains `TransientOutput` by default. Review alone does not canonicalize it. Promotion is a separate Governed Execution creating a new immutable governed version. R34 requires the durable implementation to preserve that separation across restart/recovery.
+Generated output remains `TransientOutput` by default. Review alone does not canonicalize it. Promotion is a separate Governed Execution creating a new immutable governed version. The durable implementation must preserve that separation across restart/recovery.
 
 ### F6 — historical recovery must not replay consequential effects
 
-Recovery may reconstruct admitted state from durable evidence but must not re-run historical canonical admission/promotion or external effects. Any new consequential effect still requires a current applicable Governed Execution and gates.
+Recovery may reconstruct admitted state from durable evidence but must not re-run historical canonical admission/promotion or external effects. Any new consequential effect still requires current applicable Governed Execution and gates.
 
-## 6. Functional cross-review
+## 6. Functional cross-review state
 
-This is functional review, not formal ADR approval or lifecycle promotion.
+The prior R34 review completed six functional iterations. ADR-0002 proposal separately completed five functional iterations with no unresolved material objection at proposal level.
 
-1. **Governance/authority:** B1 remains; B2 must not be solved by treating persistence as current authorization or owner approval. `PASS with blockers retained`.
-2. **Architecture/product boundary:** a product-local persistence adapter is sufficient; platform-wide DB/event-store selection would overreach. `PASS after ADR-0002 direction`.
-3. **Events/idempotency/recovery:** immutable per-operation durable evidence + reconstruction without side-effect replay is required. `PASS after ADR-0002 direction`.
-4. **Security/privacy:** governed metadata may persist; raw content remains in existing content-addressed stores; secrets/reusable credentials must not be copied into records/logs. `PASS`.
-5. **Portability/migration:** open schema-versioned representation is required; pickle/opaque process snapshots are unsuitable. `PASS`.
-6. **Usability/milestone integrity:** live owner validation cannot occur as closing evidence until durable-state blocker is removed; M10-alpha remains unclaimed. `PASS`.
+After owner approval and ADR acceptance, the remaining material objections are implementation/evidence blockers rather than unresolved architecture design objections:
 
-No seventh iteration is useful before owner disposition of the exact ADR proposal and implementation evidence.
+1. **Governance/authority:** accepted persistence must not become authorization or authority. `PASS at architecture level`; live evidence pending.
+2. **Architecture/product boundary:** ADR-0002 keeps storage product-local and bounded. `PASS at architecture level`.
+3. **Events/idempotency/recovery:** implementation must prove immutable durable evidence and reconstruction without replay. `BLOCKED pending implementation evidence`.
+4. **Security/privacy:** raw content/secrets must not be duplicated into governance records/logs. `BLOCKED pending implementation evidence`.
+5. **Portability/migration:** schema-versioned open representation is accepted. `PASS at architecture level`; migration/recovery tests pending.
+6. **Usability/milestone integrity:** real owner validation remains absent. `BLOCKED pending B1`.
 
-## 7. R34 remediation sequence
+No additional design-review iteration is useful before implementation evidence exists.
 
-The canonical safe sequence is:
+## 7. Required remediation sequence
+
+The current canonical sequence is:
 
 ```text
-ADR-0002 Proposed + reviewed
-        ↓ explicit exact owner approval
-ADR-0002 Accepted publication + index/roadmap sync
+ADR-0002 Accepted ✓
         ↓
 durable Company admission/promotion state implementation
         ↓
-restart + backup/restore + update + retry/reconciliation evidence
+restart + retry/reconciliation + backup/restore + update evidence
         ↓
 one real owner-operated Company asset cycle
         ↓
 R34 re-review
         ↓ PASS only if criteria satisfied
-M10-alpha claim
+M10-alpha
 ```
-
-Implementation may be prepared experimentally in parallel only while it remains bounded/reversible and is not used to claim canonical closure before the ADR is validly accepted.
 
 ## 8. Required implementation/recovery evidence
 
@@ -143,19 +139,20 @@ Before the live cycle can close R34, evidence must show at least:
 
 1. committed admission survives process restart with the same Document/Asset/Event identities;
 2. exact source digest/version and lineage remain resolvable;
-3. successful retry after lost response resolves the existing result without duplicate consequential effect;
+3. retry after a lost response resolves an existing successful result without duplicating the consequential effect;
 4. uncertain prior attempt remains fail-closed across restart until reconciliation;
-5. promotion survives restart while source output remains `TransientOutput`;
+5. reviewed promotion survives restart while the source output remains `TransientOutput`;
 6. pre-promotion source/admitted versions remain unchanged;
-7. corrupted/partial/unknown-schema durable records fail closed;
+7. corrupted, partial, conflicting or unknown-schema durable records fail closed;
 8. backup → restore reconstructs exact admitted/promoted state and referenced retained bytes;
 9. update/restart does not silently reinterpret stored schema versions;
-10. recovery/replay does not repeat consequential external effects;
-11. governed contents/secrets are not duplicated into logs.
+10. recovery/replay does not repeat consequential effects;
+11. governed contents, secrets and reusable credentials are not duplicated into logs or persistence metadata unnecessarily;
+12. persistence paths/schemas do not become hidden platform dependencies for other products.
 
 ## 9. Required real owner evidence packet
 
-After the durable-state gate is satisfied, one real bounded Company asset cycle must capture:
+After the durable-state evidence passes, one real bounded Company asset cycle must capture:
 
 1. owner/operator and Organization context without secrets;
 2. UTC timestamps plus environment/build/commit identity;
@@ -174,8 +171,7 @@ After the durable-state gate is satisfied, one real bounded Company asset cycle 
 
 R34 may become `Closed / PASS` only when:
 
-- ADR/persistence remediation required by B2 is validly governed and implemented;
-- durable/recovery evidence above passes;
+- ADR-0002 implementation and durable/recovery evidence pass;
 - the real owner-operated evidence packet is reviewed;
 - no unresolved P0/P1 exists in M10-alpha scope;
 - no unresolved structural concern exists around ownership, exact-version pinning, provenance, governed promotion, data handling, authority/gates, retry/reconciliation or recovery;
@@ -189,8 +185,9 @@ Only then may the roadmap claim `M10-alpha`.
 **R34:** `Executed / BLOCKED`  
 **Gate verdict:** `NOT PASS`  
 **Blocker B1:** real owner-operated Company asset-cycle evidence absent  
-**Blocker B2:** restart-durable governed admission/promotion state + recovery evidence absent  
-**Required architecture action:** ADR-0002 exact owner disposition before canonical implementation reliance  
+**Blocker B2:** ADR-0002 implementation + restart/recovery evidence absent  
+**ADR-0002:** `Accepted` — architecture decision prerequisite closed  
+**Next executable action:** implement and verify durable Company admission/promotion state under ADR-0002  
 **M10-alpha:** remains unclaimed  
 **RFC amendment required:** none  
 **Product Contract lifecycle transition performed:** none  
