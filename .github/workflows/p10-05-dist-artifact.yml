@@ -1,0 +1,40 @@
+name: P10.05 dist artifact
+
+on:
+  push:
+    branches:
+      - p10-05-reviewed-generated-output-promotion
+    paths:
+      - "reference/python/workspace_frontend/**"
+      - ".github/workflows/p10-05-dist-artifact.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: reference/python/workspace_frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: reference/python/workspace_frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run guard:web-storage
+      - run: npm run build
+      - name: Upload exact built dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: p10-05-workspace-dist
+          path: reference/python/workspace_frontend/dist
+          if-no-files-found: error
+          retention-days: 1
