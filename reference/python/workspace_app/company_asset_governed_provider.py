@@ -1,21 +1,22 @@
 """P10.04 productive owner-operated provider for staged Company Asset admission.
 
-The provider composes the already-governed P10.03 admission path.  It does not
+The provider composes the already-governed P10.03 admission path. It does not
 make Workspace access, a browser button, AI output, or Product Contract
-possession into authority.  Before one admission command it independently:
+possession into authority. Before one admission command it independently:
 
 * re-authenticates the current owner-operated P7.04 credential;
 * requires an exact least-privilege grant for ``company.asset.admit-staged-version``;
 * preserves current residual owner Organizational Authority from the canonical
   P10.01 matrix as a separate governed gate basis;
-* binds data-governance and validation bases to the exact staged version/digest;
+* binds data-governance and validation bases to the exact staged version,
+  reviewed handling policy and review evidence;
 * records the explicit owner admission command as a distinct Consequential
   Approval basis; and
 * constructs an exact Product Contract-pinned RFC-0005 execution with all six
   required gates ALLOW before P10.03 may mutate canonical state.
 
 The current reference runtime remains bounded/in-memory exactly as P10.03
-closed it.  This module selects no database, object store, durable ledger,
+closed it. This module selects no database, object store, durable ledger,
 transaction manager, public API or new authority mechanism.
 """
 from __future__ import annotations
@@ -64,6 +65,8 @@ from .company_asset_admission import ExactCompanyStagedMaterial
 from .company_asset_library import (
     CompanyAssetAdmissionUnavailable,
     CompanyAssetGovernedAdmissionProvider,
+    CompanyAssetReviewEvidence,
+    CompanyAssetReviewPolicy,
     PreparedCompanyAssetAdmission,
 )
 
@@ -107,7 +110,9 @@ class P1004OwnerCompanyAssetAdmissionProvider(CompanyAssetGovernedAdmissionProvi
 
     def _require_owner_operated_actor(self, access: AccessContext) -> None:
         if not isinstance(access, AccessContext) or access.principal_kind != "human":
-            raise CompanyAssetAdmissionUnavailable("Company Asset admission requires an attributable human owner")
+            raise CompanyAssetAdmissionUnavailable(
+                "Company Asset admission requires an attributable human owner"
+            )
         try:
             state = p704.load_access_store(self.runtime_root)
         except p704.P704Error as exc:
@@ -178,9 +183,15 @@ class P1004OwnerCompanyAssetAdmissionProvider(CompanyAssetGovernedAdmissionProvi
     ) -> WorkflowDefinition:
         record = candidate.canonical_record
         scope = actor.organization.organization_id.value
-        workflow_subject = Identity("workflow-subject", f"p10-04-company-asset-admission-{intent}", scope)
-        workflow_version = Identity("workflow-version", f"p10-04-company-asset-admission-{intent}-v1", scope)
-        authority_matrix = Identity("governance-source", "p10-01-owner-asset-admission-matrix", scope)
+        workflow_subject = Identity(
+            "workflow-subject", f"p10-04-company-asset-admission-{intent}", scope
+        )
+        workflow_version = Identity(
+            "workflow-version", f"p10-04-company-asset-admission-{intent}-v1", scope
+        )
+        authority_matrix = Identity(
+            "governance-source", "p10-01-owner-asset-admission-matrix", scope
+        )
         workflow_record = CanonicalRecord(
             subject_id=workflow_subject,
             version_id=workflow_version,
@@ -221,7 +232,16 @@ class P1004OwnerCompanyAssetAdmissionProvider(CompanyAssetGovernedAdmissionProvi
             ),
         )
 
-    def _basis_refs(self, *, access: AccessContext, staged: ExactCompanyStagedMaterial, intent: str, grant_id: str) -> dict[GovernedGateKind, Identity]:
+    def _basis_refs(
+        self,
+        *,
+        access: AccessContext,
+        staged: ExactCompanyStagedMaterial,
+        policy: CompanyAssetReviewPolicy,
+        review: CompanyAssetReviewEvidence,
+        intent: str,
+        grant_id: str,
+    ) -> dict[GovernedGateKind, Identity]:
         scope = access.organization.value
         handling = _digest(
             staged.classification,
@@ -229,9 +249,21 @@ class P1004OwnerCompanyAssetAdmissionProvider(CompanyAssetGovernedAdmissionProvi
             staged.rights,
             staged.retention_rule,
             staged.semantic_role,
+            policy.deletion_rule,
+            *policy.permitted_reuse,
+            review.policy_digest,
+        )
+        validation = _digest(
+            staged.version_id,
+            staged.content_sha256,
+            review.updated_at,
+            review.actor,
+            review.policy_digest,
         )
         return {
-            GovernedGateKind.ACTOR_ASSURANCE: Identity("credential-evidence", access.credential_id, scope),
+            GovernedGateKind.ACTOR_ASSURANCE: Identity(
+                "credential-evidence", access.credential_id, scope
+            ),
             GovernedGateKind.AUTHORIZATION: Identity("authorization-grant", grant_id, scope),
             GovernedGateKind.ORGANIZATIONAL_AUTHORITY: Identity(
                 "governance-basis", "p10-01-current-residual-owner-authority", scope
@@ -240,9 +272,7 @@ class P1004OwnerCompanyAssetAdmissionProvider(CompanyAssetGovernedAdmissionProvi
                 "company-asset-handling-basis", f"{staged.version_id}-{handling}", scope
             ),
             GovernedGateKind.VALIDATION: Identity(
-                "company-asset-validation-basis",
-                f"{staged.version_id}-{staged.content_sha256[:24]}",
-                scope,
+                "company-asset-validation-basis", f"{staged.version_id}-{validation}", scope
             ),
             GovernedGateKind.CONSEQUENTIAL_APPROVAL: Identity(
                 "owner-command-approval", f"company-asset-admit-{intent}", scope
@@ -255,23 +285,37 @@ class P1004OwnerCompanyAssetAdmissionProvider(CompanyAssetGovernedAdmissionProvi
         access: AccessContext,
         candidate,
         staged: ExactCompanyStagedMaterial,
+        policy: CompanyAssetReviewPolicy,
+        review: CompanyAssetReviewEvidence,
     ) -> PreparedCompanyAssetAdmission:
         decision = self._authorize(access)
         actor = self.actor_for(access)
         record = candidate.canonical_record
         if record.organization != actor.organization:
-            raise CompanyAssetAdmissionUnavailable("candidate Organization changed before governed admission")
+            raise CompanyAssetAdmissionUnavailable(
+                "candidate Organization changed before governed admission"
+            )
         if record.creation_actor != actor:
-            raise CompanyAssetAdmissionUnavailable("candidate Actor changed before governed admission")
+            raise CompanyAssetAdmissionUnavailable(
+                "candidate Actor changed before governed admission"
+            )
         if dict(record.integrity_metadata).get("source_sha256") != staged.content_sha256:
-            raise CompanyAssetAdmissionUnavailable("candidate digest no longer matches exact staged source")
+            raise CompanyAssetAdmissionUnavailable(
+                "candidate digest no longer matches exact staged source"
+            )
+        if review.actor != f"{access.actor.namespace}:{access.actor.value}@{access.actor.scope}":
+            raise CompanyAssetAdmissionUnavailable("review evidence Actor changed before admission")
 
-        command_at = _aware(record.created_at, label="owner admission command time").astimezone(timezone.utc)
+        command_at = _aware(record.created_at, label="owner admission command time").astimezone(
+            timezone.utc
+        )
         intent = _digest(
             access.actor.value,
             staged.material_id,
             staged.version_id,
             staged.content_sha256,
+            review.updated_at,
+            review.policy_digest,
             command_at.isoformat(),
             OP_ADMIT_STAGED_VERSION,
         )
@@ -304,20 +348,28 @@ class P1004OwnerCompanyAssetAdmissionProvider(CompanyAssetGovernedAdmissionProvi
         scope = actor.organization.organization_id.value
         created = adapters.facade.start_governed_execution(
             interaction=interaction,
-            execution_id=Identity("execution-subject", f"p10-04-asset-admission-{intent}", scope),
-            version_id=Identity("execution-version", f"p10-04-asset-admission-{intent}-v1", scope),
+            execution_id=Identity(
+                "execution-subject", f"p10-04-asset-admission-{intent}", scope
+            ),
+            version_id=Identity(
+                "execution-version", f"p10-04-asset-admission-{intent}-v1", scope
+            ),
             created_at=command_at + timedelta(seconds=1),
             governed_versions=governed_versions,
         )
         awaiting = await_required_gates(
             created,
-            version_id=Identity("execution-version", f"p10-04-asset-admission-{intent}-v2", scope),
+            version_id=Identity(
+                "execution-version", f"p10-04-asset-admission-{intent}-v2", scope
+            ),
             actor=actor,
             created_at=command_at + timedelta(seconds=2),
         )
         bases = self._basis_refs(
             access=access,
             staged=staged,
+            policy=policy,
+            review=review,
             intent=intent,
             grant_id=str(decision.grant_id),
         )
@@ -329,10 +381,14 @@ class P1004OwnerCompanyAssetAdmissionProvider(CompanyAssetGovernedAdmissionProvi
                 decision_actor=actor,
                 basis_ref=bases[kind],
                 decision_id=Identity(
-                    "gate-decision-subject", f"p10-04-{intent}-{kind.value.lower()}", scope
+                    "gate-decision-subject",
+                    f"p10-04-{intent}-{kind.value.lower()}",
+                    scope,
                 ),
                 version_id=Identity(
-                    "gate-decision-version", f"p10-04-{intent}-{kind.value.lower()}-v1", scope
+                    "gate-decision-version",
+                    f"p10-04-{intent}-{kind.value.lower()}-v1",
+                    scope,
                 ),
                 created_at=command_at + timedelta(seconds=3 + index),
             )
@@ -341,7 +397,9 @@ class P1004OwnerCompanyAssetAdmissionProvider(CompanyAssetGovernedAdmissionProvi
         ready = admit_ready_execution(
             awaiting,
             decisions=decisions,
-            version_id=Identity("execution-version", f"p10-04-asset-admission-{intent}-v3", scope),
+            version_id=Identity(
+                "execution-version", f"p10-04-asset-admission-{intent}-v3", scope
+            ),
             actor=actor,
             created_at=command_at + timedelta(seconds=10),
         )
@@ -368,7 +426,7 @@ class P1004OwnerCompanyAssetAdmissionProvider(CompanyAssetGovernedAdmissionProvi
 def provision_company_asset_admission_grant(runtime_root: Path) -> str:
     """Explicitly provision only the exact local staged-asset admission grant.
 
-    The grant is Authorization evidence only.  It deliberately supplies neither
+    The grant is Authorization evidence only. It deliberately supplies neither
     Organizational Authority nor Consequential Approval; both are re-evaluated
     for each exact owner admission command.
     """
@@ -376,7 +434,9 @@ def provision_company_asset_admission_grant(runtime_root: Path) -> str:
     root = runtime_root.expanduser()
     access = P704AccessResolver(root).authorize()
     if access.principal_kind != "human":
-        raise CompanyAssetAdmissionUnavailable("only the current human owner may receive the admission grant")
+        raise CompanyAssetAdmissionUnavailable(
+            "only the current human owner may receive the admission grant"
+        )
     grant_id = p704.grant_access(
         root,
         access.actor,
@@ -386,7 +446,9 @@ def provision_company_asset_admission_grant(runtime_root: Path) -> str:
     )
     provider = P1004OwnerCompanyAssetAdmissionProvider(root)
     if not provider.available(access):
-        raise CompanyAssetAdmissionUnavailable("provisioned admission grant failed current revalidation")
+        raise CompanyAssetAdmissionUnavailable(
+            "provisioned admission grant failed current revalidation"
+        )
     return grant_id
 
 
