@@ -1,4 +1,5 @@
 import { Activity } from "./Activity";
+import { CompanyGeneratedOutputs } from "./CompanyGeneratedOutputs";
 import { CompanyMaterials } from "./CompanyMaterials";
 import { CompanyProjects } from "./CompanyProjects";
 import { Copilot } from "./Copilot";
@@ -18,7 +19,15 @@ import type { NavigationItem, WorkspaceContext } from "./types";
 
 function groupForPath(path: string): string {
   if (path === "/" || path === "/today" || path === "/guide") return "today";
-  if (path === "/work" || path === "/my-work" || path === "/products" || path.startsWith("/products/") || path === "/projects" || path === "/company-materials") return "work";
+  if (
+    path === "/work"
+    || path === "/my-work"
+    || path === "/products"
+    || path.startsWith("/products/")
+    || path === "/projects"
+    || path === "/company-materials"
+    || path === "/company-generated-outputs"
+  ) return "work";
   if (path === "/information" || path === "/search" || path === "/records" || path === "/documents" || path === "/knowledge" || path.startsWith("/objects/")) return "information";
   if (path === "/copilot") return "copilot";
   return "system";
@@ -44,6 +53,7 @@ function Today() {
       <a href="/work" onClick={(event) => { event.preventDefault(); navigateTo("/work"); }}>{text("Открыть задачи", "Open tasks")}</a>
       <a href="/projects" onClick={(event) => { event.preventDefault(); navigateTo("/projects"); }}>{text("Проекты компании", "Company projects")}</a>
       <a href="/company-materials" onClick={(event) => { event.preventDefault(); navigateTo("/company-materials"); }}>{text("Материалы компании", "Company materials")}</a>
+      <a href="/company-generated-outputs" onClick={(event) => { event.preventDefault(); navigateTo("/company-generated-outputs"); }}>{text("Созданные документы", "Generated documents")}</a>
       <a href="/information" onClick={(event) => { event.preventDefault(); navigateTo("/information"); }}>{text("Найти документ", "Find a document")}</a>
       <a href="/copilot" onClick={(event) => { event.preventDefault(); navigateTo("/copilot"); }}>{text("Спросить Arvectum", "Ask Arvectum")}</a>
       <a href="/guide" onClick={(event) => { event.preventDefault(); navigateTo("/guide"); }}>{text("Открыть руководство", "Open guide")}</a>
@@ -61,7 +71,7 @@ export function Shell({ context, onLogout }: { context: WorkspaceContext; onLogo
   const productId = currentPath.startsWith("/products/") ? decodeURIComponent(currentPath.slice("/products/".length)) : null;
   const navLabel = (item: NavigationItem) => navigationLabels[item.id]?.[language] ?? item.label;
   const navigate = (item: NavigationItem) => (event: React.MouseEvent<HTMLAnchorElement>) => { event.preventDefault(); navigateTo(item.href); };
-  const specialWorkPath = currentPath === "/projects" || currentPath === "/company-materials";
+  const specialWorkPath = currentPath === "/projects" || currentPath === "/company-materials" || currentPath === "/company-generated-outputs";
   const primaryNavigation = context.navigation.flatMap((item) => {
     const items = [
       <li key={item.id}><a href={item.href} onClick={navigate(item)} aria-current={item.id === active.id && !specialWorkPath ? "page" : undefined}><span>{navLabel(item)}</span></a></li>,
@@ -70,6 +80,7 @@ export function Shell({ context, onLogout }: { context: WorkspaceContext; onLogo
       items.push(
         <li key="company-projects"><a href="/projects" aria-current={currentPath === "/projects" ? "page" : undefined} onClick={(event) => { event.preventDefault(); navigateTo("/projects"); }}><span>{text("Проекты", "Projects")}</span></a></li>,
         <li key="company-materials"><a href="/company-materials" aria-current={currentPath === "/company-materials" ? "page" : undefined} onClick={(event) => { event.preventDefault(); navigateTo("/company-materials"); }}><span>{text("Материалы компании", "Company materials")}</span></a></li>,
+        <li key="company-generated-outputs"><a href="/company-generated-outputs" aria-current={currentPath === "/company-generated-outputs" ? "page" : undefined} onClick={(event) => { event.preventDefault(); navigateTo("/company-generated-outputs"); }}><span>{text("Созданные документы", "Generated documents")}</span></a></li>,
       );
     }
     return items;
@@ -80,6 +91,7 @@ export function Shell({ context, onLogout }: { context: WorkspaceContext; onLogo
   else if (currentPath === "/products" || productId) content = <Products productId={productId} />;
   else if (currentPath === "/projects") content = <CompanyProjects />;
   else if (currentPath === "/company-materials") content = <CompanyMaterials csrfToken={context.session.csrf_token} />;
+  else if (currentPath === "/company-generated-outputs") content = <CompanyGeneratedOutputs csrfToken={context.session.csrf_token} />;
   else if (currentPath === "/my-work") content = <MyWork />;
   else if (currentPath === "/search" || currentPath === "/information") content = <Discovery />;
   else if (currentPath === "/records") content = <Discovery kind="record" />;
