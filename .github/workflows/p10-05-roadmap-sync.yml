@@ -1,0 +1,163 @@
+name: P10.05 roadmap sync
+
+on:
+  push:
+    branches:
+      - p10-05-reviewed-generated-output-promotion
+    paths:
+      - ".github/workflows/p10-05-roadmap-sync.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Synchronize P10.05 closure status
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(text: str, old: str, new: str, label: str) -> str:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected exactly one match, got {count}")
+              return text.replace(old, new, 1)
+
+          master_path = Path("docs/roadmap/ROADMAP.md")
+          master = master_path.read_text(encoding="utf-8")
+          master = replace_once(master, "Version: `2.97.4`", "Version: `2.97.5`", "master version")
+          master = replace_once(
+              master,
+              "Version `2.97.4` closes [`P10.04 — Company Asset Library UX + version/handling lifecycle`](../reviews/P10-04-company-asset-library-closure-review.md) as `Complete / PASS` for its exact bounded internal owner-facing/reference-runtime scope and advances the critical path to `P10.05 — Reviewed generated-output promotion boundary`.",
+              "Version `2.97.5` closes [`P10.05 — Reviewed generated-output promotion boundary`](../reviews/P10-05-reviewed-generated-output-promotion-closure-review.md) as `Complete / PASS` for its exact bounded internal owner-facing/reference-runtime scope and advances the critical path to `R34 — M10-alpha Asset Governance / Usability Review`.\n\nP10.05 implements the already-admitted P10.02 `Provisional 0.2.0` operation `company.generated-output.promote-reviewed`: review remains non-canonical; Reject/Keep transient/PromotionRequested remain distinct; the final command revalidates exact output/source/handling plus all six independent RFC-0005 gates; successful promotion creates a separate immutable governed Company Document/Artifact version, Organizational Asset designation and canonical Event while the source remains `TransientOutput`.\n\nP10.05 selects no new durable persistence mechanism and makes no M10-alpha, Stable Product Contract, Active Platform Capability, customer Production or broader conformance claim. R34 still requires real owner evidence rather than synthetic fixtures.",
+              "master version note",
+          )
+          master = replace_once(
+              master,
+              "The owner-approved Product Contract substance remains exact Draft blob `a92c1d1aac54d565d3d32ce746925620c9d1fd12`. P10.04 does not alter that contract, promote it to `Stable`, promote CAP-001 to `Active`, establish customer Production or broaden conformance/support commitments.",
+              "The owner-approved Product Contract substance remains exact Draft blob `a92c1d1aac54d565d3d32ce746925620c9d1fd12`. P10.05 does not alter that contract, promote it to `Stable`, promote CAP-001 to `Active`, establish customer Production or broaden conformance/support commitments.",
+              "master contract nonclaim",
+          )
+          master = replace_once(
+              master,
+              "- generated-output promotion is contractually bounded but remains unavailable for real reliance until P10.05 implementation/review;",
+              "- generated-output promotion is now implemented/reviewed for the exact P10.05 bounded owner-operated path, while generated output remains `TransientOutput` by default and R34/M10-alpha still require real owner evidence;",
+              "master promotion evidence",
+          )
+          master = replace_once(
+              master,
+              "- R33, P10.03 and P10.04 are `Complete / PASS` inside the R33/P10.02 constraints;",
+              "- R33, P10.03, P10.04 and P10.05 are `Complete / PASS` inside the R33/P10.02 constraints;",
+              "master baseline",
+          )
+          master = replace_once(
+              master,
+              "| **`P10.05`** | **Reviewed generated-output promotion boundary** | **🟨 Current** |\n| `R34` | M10-alpha Asset Governance / Usability Review | ⬜ gate |",
+              "| **`P10.05`** | **Reviewed generated-output promotion boundary** | **🟩 Complete / PASS** |\n| **`R34`** | **M10-alpha Asset Governance / Usability Review** | **🟨 Current** |",
+              "master work status",
+          )
+          master = replace_once(
+              master,
+              "P10.05 ← CURRENT\n   ↓\nR34",
+              "P10.05 ✓\n   ↓\nR34 ← CURRENT",
+              "master critical path",
+          )
+          master = replace_once(
+              master,
+              "P10.03/P10.04 remain inside the R33-reviewed `0.2.0` boundary; no Product Contract `0.2.1` was required.",
+              "P10.03/P10.04/P10.05 remain inside the R33-reviewed `0.2.0` boundary; no Product Contract `0.2.1` was required.",
+              "master pc boundary",
+          )
+          master = replace_once(
+              master,
+              "| **A — Organizational Assets** | P10.03–P10.05 → R34 → M10-alpha | 🟨 P10.05 current |",
+              "| **A — Organizational Assets** | P10.03–P10.05 → R34 → M10-alpha | 🟨 R34 current |",
+              "master lane",
+          )
+          master = replace_once(
+              master,
+              "> **P10.05 — Reviewed generated-output promotion boundary.**\n\nExtend the exact-version generation journey so a generated `TransientOutput` can be explicitly reviewed and either rejected/kept transient or requested for governed promotion. Any promotion must create a new governed Company Document/Asset version only through the applicable Product Contract and RFC-0005 Governed Execution path, preserve exact admitted input/output/provenance and handling evidence, and remain distinct from RFC-0007 validated Knowledge, legal approval, signing, external send or publication.",
+              "> **R34 — M10-alpha Asset Governance / Usability Review.**\n\nReview the first real owner-operated Company asset cycle using real evidence rather than synthetic fixtures. Verify usability, exact-version truthfulness, provenance, authority/gate correctness, retention/classification presentation, failure/retry behavior, generated-output classification, backup/restore/update compatibility and absence of hidden product/platform coupling. R34 PASS is required before `M10-alpha` may be claimed.",
+              "master current action",
+          )
+          master_path.write_text(master, encoding="utf-8")
+
+          phase_path = Path("docs/roadmap/PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md")
+          phase = phase_path.read_text(encoding="utf-8")
+          phase = replace_once(phase, "Version: `1.0.4`", "Version: `1.0.5`", "phase version")
+          phase = replace_once(
+              phase,
+              "Version `1.0.4` records [`P10.04 — Company Asset Library UX + version/handling lifecycle`](../reviews/P10-04-company-asset-library-closure-review.md) as `Complete / PASS` for its exact bounded internal owner-facing/reference-runtime scope and advances the Phase 10 critical path to `P10.05 — Reviewed generated-output promotion boundary`.",
+              "Version `1.0.5` records [`P10.05 — Reviewed generated-output promotion boundary`](../reviews/P10-05-reviewed-generated-output-promotion-closure-review.md) as `Complete / PASS` for its exact bounded internal owner-facing/reference-runtime scope and advances the Phase 10 critical path to `R34 — M10-alpha Asset Governance / Usability Review`.\n\nP10.05 keeps generated output `TransientOutput` by default, stores owner review/disposition as non-canonical state, and permits a separate promotion command only after exact current output/source/handling revalidation and six independent RFC-0005 gates. Success creates a separate immutable governed Company Document/Artifact version, Organizational Asset designation and canonical Event; the transient source is not relabelled. Product Contract remains `Provisional 0.2.0`; no new durable persistence mechanism or lifecycle promotion is selected; M10-alpha remains unclaimed pending real owner evidence and R34.",
+              "phase version note",
+          )
+          phase = replace_once(
+              phase,
+              "P10.04 does not alter the approved Product Contract substance, promote it to `Stable`, promote CAP-001 to `Active`, establish M10-alpha, customer Production or broader conformance/support commitments.",
+              "P10.05 does not alter the approved Product Contract substance, promote it to `Stable`, promote CAP-001 to `Active`, establish M10-alpha, customer Production or broader conformance/support commitments.",
+              "phase nonclaim",
+          )
+          phase = replace_once(
+              phase,
+              "- generated-output promotion is contractually bounded by `0.2.0` but remains unavailable for real reliance until P10.05 implementation/review;",
+              "- generated-output promotion is implemented/reviewed by P10.05 for the exact bounded owner-operated path, but generated output remains transient by default and real owner evidence is still required by R34/M10-alpha;",
+              "phase evidence",
+          )
+          phase = replace_once(
+              phase,
+              "- the later reviewed generated-output promotion boundary, with real reliance deferred until P10.05;",
+              "- the reviewed generated-output promotion boundary, with its bounded real reliance implemented/reviewed by P10.05;",
+              "phase pc boundary",
+          )
+          phase = replace_once(
+              phase,
+              "| **`P10.05`** | **Reviewed generated-output promotion boundary** | **🟨 Current** | generated `TransientOutput` can be reviewed and, only when admitted, promoted to a governed Company document/asset version |\n| `R34` | M10-alpha Asset Governance / Usability Review | ⬜ gate | real asset cycle safe, understandable and reconstructable |",
+              "| **`P10.05`** | **Reviewed generated-output promotion boundary** | **🟩 Complete / PASS** | generated `TransientOutput` can be reviewed and, only when admitted, promoted to a governed Company document/asset version |\n| **`R34`** | **M10-alpha Asset Governance / Usability Review** | **🟨 Current** | real asset cycle safe, understandable and reconstructable |",
+              "phase work status",
+          )
+          phase = replace_once(
+              phase,
+              "**Status: Current.**\n\nExtend the existing exact-version DOCX generation journey with a truthful review lifecycle:",
+              "**Status: Complete / PASS.**\n\nClosure review: [`P10-05-reviewed-generated-output-promotion-closure-review`](../reviews/P10-05-reviewed-generated-output-promotion-closure-review.md).\n\nThe existing exact-version DOCX generation journey now has a truthful reviewed-promotion lifecycle:",
+              "phase p10.05 section",
+          )
+          phase = replace_once(
+              phase,
+              "`P10.01 ✓ → P10.02 ✓ → R33 ✓ → P10.03 ✓ → P10.04 ✓ → P10.05 CURRENT → R34 → M10-alpha`.",
+              "`P10.01 ✓ → P10.02 ✓ → R33 ✓ → P10.03 ✓ → P10.04 ✓ → P10.05 ✓ → R34 CURRENT → M10-alpha`.",
+              "phase lane A",
+          )
+          phase = replace_once(
+              phase,
+              "                         │   P10.01 ✓ → P10.02 ✓ → R33 ✓ → P10.03 ✓ → P10.04 ✓ → P10.05 CURRENT → R34 → M10-alpha",
+              "                         │   P10.01 ✓ → P10.02 ✓ → R33 ✓ → P10.03 ✓ → P10.04 ✓ → P10.05 ✓ → R34 CURRENT → M10-alpha",
+              "phase concurrency",
+          )
+          phase = replace_once(
+              phase,
+              "> **P10.05 — Reviewed generated-output promotion boundary.**\n\nExtend the exact-version generation journey so a generated `TransientOutput` can be explicitly reviewed and either rejected/kept transient or requested for governed promotion. Any promotion must create a new governed Company Document/Asset version only through the applicable Product Contract and RFC-0005 Governed Execution path, preserve exact admitted input/output/provenance and handling evidence, and remain distinct from RFC-0007 validated Knowledge, legal approval, signing, external send or publication.",
+              "> **R34 — M10-alpha Asset Governance / Usability Review.**\n\nUse real owner evidence, not synthetic fixtures, to review the first Company asset cycle for usability, exact-version truthfulness, provenance, authority/gate correctness, retention/classification presentation, failure/retry behavior, generated-output classification, backup/restore/update compatibility and absence of hidden product/platform coupling. Only after R34 PASS and the real owner journey passes may `M10-alpha` be claimed.",
+              "phase current action",
+          )
+          phase_path.write_text(phase, encoding="utf-8")
+          PY
+      - name: Commit roadmap synchronization
+        shell: bash
+        run: |
+          git diff --check
+          git diff -- docs/roadmap/ROADMAP.md docs/roadmap/PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md
+          if git diff --quiet -- docs/roadmap/ROADMAP.md docs/roadmap/PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md; then
+            echo "No roadmap changes produced"
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/roadmap/ROADMAP.md docs/roadmap/PHASE-10-OPERATIONAL-WORK-ORGANIZATIONAL-ASSETS.md
+          git commit -m "docs(p10.05): close task and advance R34"
+          git push origin HEAD:p10-05-reviewed-generated-output-promotion
