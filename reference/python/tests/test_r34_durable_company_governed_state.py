@@ -39,7 +39,7 @@ UTC = timezone.utc
 class R34DurableCompanyGovernedStateTests(unittest.TestCase):
     def setUp(self) -> None:
         self.scope = "r34-durable-org"
-        self.organization_id = Identity("organization", "arvectum", "platform")
+        self.organization_id = Identity("organization", self.scope, "platform")
         self.organization = OrganizationScope(self.organization_id)
         self.owner_id = Identity("principal", "owner", self.scope)
         self.actor = ActorContext(Principal(self.owner_id), self.organization)
