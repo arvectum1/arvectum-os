@@ -12,9 +12,18 @@ from workspace_app.company_asset_governed_provider import (
     provision_company_asset_admission_grant,
 )
 from workspace_app.company_asset_library import P1003CompanyAssetAdmissionExecutor
+from workspace_app.company_generated_output_governed_provider import (
+    P1005OwnerCompanyGeneratedOutputPromotionProvider,
+    provision_company_generated_output_promotion_grant,
+)
+from workspace_app.company_generated_outputs import (
+    CompanyGeneratedOutputs,
+    P1005CompanyGeneratedOutputPromotionExecutor,
+)
 from workspace_app.config import WorkspaceSettings
 from workspace_app.f11_routes import install_f11_routes
 from workspace_app.main import create_app
+from workspace_app.p10_05_routes import install_p10_05_routes
 from workspace_app.release import load_release
 
 
@@ -31,6 +40,11 @@ def _parser() -> argparse.ArgumentParser:
         help="create only the exact local Company Asset admission authorization grant",
     )
     admission.add_argument("--confirm", action="store_true")
+    promotion = sub.add_parser(
+        "provision-company-generated-output-promotion-grant",
+        help="create only the exact local reviewed generated-output promotion authorization grant",
+    )
+    promotion.add_argument("--confirm", action="store_true")
     sub.add_parser("serve", help="serve the bounded same-origin SPA+BFF on the configured profile")
     return parser
 
@@ -42,13 +56,25 @@ def _frontend_root() -> Path:
 def build_workspace_app(settings: WorkspaceSettings):
     """Build one same-origin Workspace app with bounded Company product routes.
 
-    P10.04 installs the governed executor by default, but it remains fail-closed
-    until the exact admission authorization grant has been explicitly provisioned.
+    P10.04 asset admission and P10.05 reviewed-output promotion are installed by
+    default but each consequential operation remains fail-closed until its own
+    exact P7.04 Authorization grant has been explicitly provisioned. Neither
+    grant supplies Organizational Authority or Consequential Approval.
     """
 
-    provider = P1004OwnerCompanyAssetAdmissionProvider(settings.runtime_root)
-    admission = P1003CompanyAssetAdmissionExecutor(provider)
-    return install_f11_routes(create_app(settings), asset_admission=admission)
+    admission_provider = P1004OwnerCompanyAssetAdmissionProvider(settings.runtime_root)
+    admission = P1003CompanyAssetAdmissionExecutor(admission_provider)
+    app = install_f11_routes(create_app(settings), asset_admission=admission)
+
+    promotion_provider = P1005OwnerCompanyGeneratedOutputPromotionProvider(settings.runtime_root)
+    promotion = P1005CompanyGeneratedOutputPromotionExecutor(promotion_provider, admission)
+    outputs = CompanyGeneratedOutputs(
+        settings.runtime_root,
+        app.state.company_materials_store,
+        admission,
+        promotion,
+    )
+    return install_p10_05_routes(app, outputs=outputs)
 
 
 def main() -> None:
@@ -88,10 +114,29 @@ def main() -> None:
             )
         )
         return
+    if args.command == "provision-company-generated-output-promotion-grant":
+        if not args.confirm:
+            raise SystemExit("--confirm is required; consequential-operation access is never auto-granted")
+        grant_id = provision_company_generated_output_promotion_grant(settings.runtime_root)
+        print(
+            json.dumps(
+                {
+                    "status": "PASS",
+                    "grant_id": grant_id,
+                    "operation": "company.generated-output.promote-reviewed",
+                    "authorization_only": True,
+                    "organizational_authority_provided": False,
+                    "consequential_approval_provided": False,
+                },
+                sort_keys=True,
+            )
+        )
+        return
     if args.command == "check":
         access = P704AccessResolver(settings.runtime_root).authorize()
         assets = verify_frontend_assets(_frontend_root(), release)
-        provider = P1004OwnerCompanyAssetAdmissionProvider(settings.runtime_root)
+        admission_provider = P1004OwnerCompanyAssetAdmissionProvider(settings.runtime_root)
+        promotion_provider = P1005OwnerCompanyGeneratedOutputPromotionProvider(settings.runtime_root)
         print(
             json.dumps(
                 {
@@ -99,7 +144,8 @@ def main() -> None:
                     "organization_scope": access.organization.value,
                     "actor_attributable": True,
                     "operational_access_only": True,
-                    "company_asset_admission_authorized": provider.available(access),
+                    "company_asset_admission_authorized": admission_provider.available(access),
+                    "company_generated_output_promotion_authorized": promotion_provider.available(access),
                     "organizational_authority_provided": False,
                     "public_origin": settings.public_origin,
                 },

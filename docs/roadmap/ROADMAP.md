@@ -1,7 +1,7 @@
 # Arvectum OS Canonical Roadmap
 
 Status: `Active`
-Version: `2.97.4`
+Version: `2.97.5`
 Created: `2026-08-07`
 Updated: `2026-08-29`
 Owner: `ООО «Арвектум»`
@@ -17,7 +17,11 @@ Detailed completed-phase evidence remains in the corresponding phase roadmaps, r
 
 ## 2. Version note
 
-Version `2.97.4` closes [`P10.04 — Company Asset Library UX + version/handling lifecycle`](../reviews/P10-04-company-asset-library-closure-review.md) as `Complete / PASS` for its exact bounded internal owner-facing/reference-runtime scope and advances the critical path to `P10.05 — Reviewed generated-output promotion boundary`.
+Version `2.97.5` closes [`P10.05 — Reviewed generated-output promotion boundary`](../reviews/P10-05-reviewed-generated-output-promotion-closure-review.md) as `Complete / PASS` for its exact bounded internal owner-facing/reference-runtime scope and advances the critical path to `R34 — M10-alpha Asset Governance / Usability Review`.
+
+P10.05 implements the already-admitted P10.02 `Provisional 0.2.0` operation `company.generated-output.promote-reviewed`: review remains non-canonical; Reject/Keep transient/PromotionRequested remain distinct; the final command revalidates exact output/source/handling plus all six independent RFC-0005 gates; successful promotion creates a separate immutable governed Company Document/Artifact version, Organizational Asset designation and canonical Event while the source remains `TransientOutput`.
+
+P10.05 selects no new durable persistence mechanism and makes no M10-alpha, Stable Product Contract, Active Platform Capability, customer Production or broader conformance claim. R34 still requires real owner evidence rather than synthetic fixtures.
 
 P10.04 exposes the P10.03 governed Organizational Asset admission path through Productive Workspace without creating a new authority surface. Four truthful lifecycle views separate staged drafts/review from canonical accepted/superseded history; exact version/digest/handling is reviewed before admission; productive admission requires a separate exact P7.04 `company.asset.admit-staged-version` authorization grant and independently evaluated Actor Assurance, Organizational Authority, Data Governance, Validation and Consequential Approval; canonical mutation remains exclusively behind the P10.03 guarded entrypoint; immutable version/currentness/supersession and canonical Document/designation/Event provenance remain reconstructable in the bounded runtime; bounded export remains Organization-scoped; and Company DOCX generation requires an exact admitted source while the generated result remains `TransientOutput`.
 
@@ -27,14 +31,14 @@ P10.01 authority/admission and real-work source semantics remain recorded in [`P
 
 P10.02 remains lifecycle-current [`Provisional 0.2.0`](../contracts/P10-02-ARVECTUM-COMPANY-WORKSPACE-PRODUCT-CONTRACT-PROVISIONAL-v0.2.0.md), approved in [`DECISION-2026-08-27-P10-02-PROVISIONAL-APPROVAL`](../governance/decisions/DECISION-2026-08-27-P10-02-PROVISIONAL-APPROVAL.md) and closed by [`P10-02-product-contract-publication-closure`](../reviews/P10-02-product-contract-publication-closure.md) — `Complete / PASS`.
 
-The owner-approved Product Contract substance remains exact Draft blob `a92c1d1aac54d565d3d32ce746925620c9d1fd12`. P10.04 does not alter that contract, promote it to `Stable`, promote CAP-001 to `Active`, establish customer Production or broaden conformance/support commitments.
+The owner-approved Product Contract substance remains exact Draft blob `a92c1d1aac54d565d3d32ce746925620c9d1fd12`. P10.05 does not alter that contract, promote it to `Stable`, promote CAP-001 to `Active`, establish customer Production or broaden conformance/support commitments.
 
 Phase 10 remains grounded in real M9/F11 evidence:
 
 - Company materials can be received as `StagedNonCanonical` and P10.04 now presents the bounded governed admission lifecycle through Workspace;
 - P10.03 provides the bounded domain-neutral canonical admission path and P10.04 provides the bounded owner-facing composition, but M10-alpha still requires a real owner-operated Workspace asset cycle;
 - generated document output remains `TransientOutput` by default;
-- generated-output promotion is contractually bounded but remains unavailable for real reliance until P10.05 implementation/review;
+- generated-output promotion is now implemented/reviewed for the exact P10.05 bounded owner-operated path, while generated output remains `TransientOutput` by default and R34/M10-alpha still require real owner evidence;
 - M9 proved a usable owner-operated Workspace but did not prove the full real organizational-asset lifecycle or a naturally occurring genuine task → governed-action loop;
 - the first natural genuine action remains the truthful deferred F08 recheck and is carried into Phase 10 without synthetic evidence.
 
@@ -49,7 +53,7 @@ This roadmap update creates no Constitution/RFC amendment, new Kernel primitive,
 - Approved Engineering Quality and Refactoring Gates remain binding;
 - CAP-001 through CAP-004 remain `Incubating / Provisional`;
 - Arvectum Company ↔ Productive Workspace Product Contract is lifecycle-current `Provisional 0.2.0` for its exact declared scope;
-- R33, P10.03 and P10.04 are `Complete / PASS` inside the R33/P10.02 constraints;
+- R33, P10.03, P10.04 and P10.05 are `Complete / PASS` inside the R33/P10.02 constraints;
 - operating environment remains `Local / Persistent Internal / owner-operated` with scoped conformance;
 - current canonical repository for new checkouts/deployments is `arvectum1/arvectum-os`;
 - no public/stable SDK/API/wire/browser/connector surface, external/customer Production, SLA/support/certification or broader conformance claim exists.
@@ -105,8 +109,8 @@ M10 additionally requires at least one naturally occurring genuine product/compa
 | `R33` | Asset / Product Contract / Authority Boundary Review | 🟩 Complete / PASS — 6 iterations |
 | **`P10.03`** | **Domain-neutral organizational-asset admission execution path** | **🟩 Complete / PASS** |
 | **`P10.04`** | **Company Asset Library UX + version/handling lifecycle** | **🟩 Complete / PASS** |
-| **`P10.05`** | **Reviewed generated-output promotion boundary** | **🟨 Current** |
-| `R34` | M10-alpha Asset Governance / Usability Review | ⬜ gate |
+| **`P10.05`** | **Reviewed generated-output promotion boundary** | **🟩 Complete / PASS** |
+| **`R34`** | **M10-alpha Asset Governance / Usability Review** | **🟨 Current** |
 | `M10-alpha` | First Governed Company Asset Cycle | ⬜ |
 | `P10.06` | Real Action Request / Actionable Work boundary | ⬜ |
 | `P10.07` | First real governed operational action | ⬜ — waits for genuine request |
@@ -131,9 +135,9 @@ P10.03 ✓
    ↓
 P10.04 ✓
    ↓
-P10.05 ← CURRENT
+P10.05 ✓
    ↓
-R34
+R34 ← CURRENT
    ↓
 M10-alpha
    ↓
@@ -172,7 +176,7 @@ Concrete requests remain product/company-owned. Workspace may provide a domain-n
 
 The lifecycle-current Company Workspace Product Contract is `Provisional 0.2.0` for the exact owner-approved boundary. It admits Company asset canonical-admission semantics and bounded Actionable Work/product-entry semantics, but actual downstream consequential product effects still require the owning product's exact effective Product Contract and governed operation.
 
-P10.03/P10.04 remain inside the R33-reviewed `0.2.0` boundary; no Product Contract `0.2.1` was required.
+P10.03/P10.04/P10.05 remain inside the R33-reviewed `0.2.0` boundary; no Product Contract `0.2.1` was required.
 
 ### 7.4 AI
 
@@ -182,7 +186,7 @@ AI may retrieve, explain, summarize, compare, draft and propose. It cannot indep
 
 | Lane | Scope | Status |
 |---|---|---:|
-| **A — Organizational Assets** | P10.03–P10.05 → R34 → M10-alpha | 🟨 P10.05 current |
+| **A — Organizational Assets** | P10.03–P10.05 → R34 → M10-alpha | 🟨 R34 current |
 | **B — Real Operational Work** | P10.06–P10.08 → R35 | 🟦 design available; real execution waits genuine request + applicable contract |
 | **C — Product ↔ Workspace** | product-owned operational surfaces/entry points | 🟦 bounded on Product Contract/product-local evidence |
 | **D — External integrations** | existing INT-B7 real connector pilot | ⏸ blocked on exact real endpoint/deployment/account |
@@ -218,9 +222,9 @@ If no genuine action naturally exists, Phase 10 may reach M10-alpha and remain A
 
 **Critical path:**
 
-> **P10.05 — Reviewed generated-output promotion boundary.**
+> **R34 — M10-alpha Asset Governance / Usability Review.**
 
-Extend the exact-version generation journey so a generated `TransientOutput` can be explicitly reviewed and either rejected/kept transient or requested for governed promotion. Any promotion must create a new governed Company Document/Asset version only through the applicable Product Contract and RFC-0005 Governed Execution path, preserve exact admitted input/output/provenance and handling evidence, and remain distinct from RFC-0007 validated Knowledge, legal approval, signing, external send or publication.
+Review the first real owner-operated Company asset cycle using real evidence rather than synthetic fixtures. Verify usability, exact-version truthfulness, provenance, authority/gate correctness, retention/classification presentation, failure/retry behavior, generated-output classification, backup/restore/update compatibility and absence of hidden product/platform coupling. R34 PASS is required before `M10-alpha` may be claimed.
 
 **Parallel integrations:**
 
