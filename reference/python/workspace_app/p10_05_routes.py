@@ -8,6 +8,7 @@ from typing import Any
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 
 from .access import AccessContext, WorkspaceAccessError
+from .company_asset_library import CompanyAssetAdmissionUnavailable
 from .company_generated_outputs import (
     CompanyGeneratedOutputError,
     CompanyGeneratedOutputPromotionUnavailable,
@@ -98,7 +99,7 @@ def install_p10_05_routes(app: FastAPI, *, outputs: CompanyGeneratedOutputs) -> 
         _, access = current
         try:
             return outputs.project(access)
-        except (CompanyGeneratedOutputError, CompanyMaterialsError):
+        except (CompanyGeneratedOutputError, CompanyMaterialsError, CompanyAssetAdmissionUnavailable):
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="COMPANY_GENERATED_OUTPUTS_UNAVAILABLE",
@@ -127,7 +128,7 @@ def install_p10_05_routes(app: FastAPI, *, outputs: CompanyGeneratedOutputs) -> 
             ) from None
         except CompanyMaterialUnavailable:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="COMPANY_OUTPUT_UNAVAILABLE") from None
-        except (CompanyGeneratedOutputError, CompanyMaterialsError):
+        except (CompanyGeneratedOutputError, CompanyMaterialsError, CompanyAssetAdmissionUnavailable):
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="COMPANY_OUTPUT_REVIEW_UNAVAILABLE",
@@ -162,7 +163,7 @@ def install_p10_05_routes(app: FastAPI, *, outputs: CompanyGeneratedOutputs) -> 
             ) from None
         except CompanyMaterialUnavailable:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="COMPANY_OUTPUT_UNAVAILABLE") from None
-        except (CompanyGeneratedOutputError, CompanyMaterialsError):
+        except (CompanyGeneratedOutputError, CompanyMaterialsError, CompanyAssetAdmissionUnavailable):
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="COMPANY_OUTPUT_PROMOTION_FAILED",
