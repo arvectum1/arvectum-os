@@ -30,7 +30,10 @@ from arvectum_os_ref.runtime_consistency import (
 )
 from arvectum_os_ref.security import ActorContext, OrganizationScope, Principal
 from arvectum_os_ref.workflow import OperationSideEffectClass
-from workspace_app.company_governed_state_store import CompanyGovernedStateStore
+from workspace_app.company_governed_state_store import (
+    CompanyGovernedStateError,
+    CompanyGovernedStateStore,
+)
 
 
 UTC = timezone.utc
@@ -62,7 +65,10 @@ class R34DurableCompanyGovernedStateTests(unittest.TestCase):
             created_at=self.base,
             provenance_refs=(self.owner_id,),
             integrity_metadata=(("representation", "r34-d1-test"),),
-            payload=(("source_material_id", f"material-{suffix}"), ("source_version_id", f"version-{suffix}")),
+            payload=(
+                ("source_material_id", f"material-{suffix}"),
+                ("source_version_id", f"version-{suffix}"),
+            ),
             lifecycle_status="Admitted",
         )
         artifact = ArtifactContent(
@@ -154,7 +160,12 @@ class R34DurableCompanyGovernedStateTests(unittest.TestCase):
         )
 
     def _attempt(
-        self, suffix: str, retry_token: str, fingerprint: tuple[str, ...], designation: CanonicalRecord, event: CanonicalEvent
+        self,
+        suffix: str,
+        retry_token: str,
+        fingerprint: tuple[str, ...],
+        designation: CanonicalRecord,
+        event: CanonicalEvent,
     ) -> ConsequentialAttempt:
         return ConsequentialAttempt(
             execution_subject_id=self._id("execution-subject", f"exec-{suffix}"),
@@ -195,9 +206,23 @@ class R34DurableCompanyGovernedStateTests(unittest.TestCase):
             recovered = restarted.load_admission_state()
 
             self.assertEqual(recovered, state)
-            self.assertEqual(recovered.committed[0].designation.version_id, designation.version_id)
+            self.assertEqual(
+                recovered.committed[0].designation.version_id, designation.version_id
+            )
             self.assertEqual(recovered.committed[0].event.version_id, event.version_id)
             self.assertEqual(recovered.attempts[0].retry_token, retry_token)
+            self.assertIs(
+                recovered.committed[0].admitted_document.canonical_record.authority_mode,
+                AuthorityMode.NATIVE,
+            )
+            self.assertIs(
+                recovered.committed[0].admitted_document.artifacts[0].state,
+                ArtifactState.GOVERNED,
+            )
+            self.assertIs(recovered.attempts[0].outcome, ConsequentialOutcome.SUCCEEDED)
+            self.assertIs(
+                recovered.attempts[0].retry_semantics, RetrySemantics.KEYED_IDEMPOTENT
+            )
 
     def test_promotion_state_round_trips_and_keeps_exact_transient_source_lineage(self) -> None:
         with TemporaryDirectory() as raw:
@@ -235,6 +260,11 @@ class R34DurableCompanyGovernedStateTests(unittest.TestCase):
             self.assertEqual(recovered, state)
             self.assertEqual(recovered.committed[0].source, source)
             self.assertEqual(recovered.committed[0].event.version_id, event.version_id)
+            self.assertIs(
+                recovered.committed[0].admitted_document.canonical_record.authority_mode,
+                AuthorityMode.NATIVE,
+            )
+            self.assertIs(recovered.attempts[0].outcome, ConsequentialOutcome.SUCCEEDED)
 
     def test_intent_time_is_stable_across_restart(self) -> None:
         with TemporaryDirectory() as raw:
@@ -247,6 +277,43 @@ class R34DurableCompanyGovernedStateTests(unittest.TestCase):
                 kind="admission", key=key, proposed=self.base + timedelta(days=1)
             )
             self.assertEqual(repeated, command_at)
+
+    def test_unresolved_pre_effect_marker_survives_restart_and_blocks_blind_retry(self) -> None:
+        with TemporaryDirectory() as raw:
+            root = Path(raw)
+            key = (self.scope, "material-a", "version-a", "policy-a")
+            retry_token = "company-asset-admission:r34-durable-org:material-a:version-a:policy-a"
+
+            first = CompanyGovernedStateStore(root)
+            first_attempt = first.begin_effect(
+                kind="admission",
+                key=key,
+                retry_token=retry_token,
+                started_at=self.base,
+            )
+
+            restarted = CompanyGovernedStateStore(root)
+            with self.assertRaises(CompanyGovernedStateError):
+                restarted.begin_effect(
+                    kind="admission",
+                    key=key,
+                    retry_token=retry_token,
+                    started_at=self.base + timedelta(minutes=1),
+                )
+
+            restarted.resolve_effect(
+                kind="admission",
+                attempt_id=first_attempt,
+                outcome="no_effect",
+                resolved_at=self.base + timedelta(minutes=2),
+            )
+            next_attempt = restarted.begin_effect(
+                kind="admission",
+                key=key,
+                retry_token=retry_token,
+                started_at=self.base + timedelta(minutes=3),
+            )
+            self.assertNotEqual(next_attempt, first_attempt)
 
 
 if __name__ == "__main__":
