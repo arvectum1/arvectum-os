@@ -26,7 +26,7 @@ R34 remains subordinate to:
 - P10.03/P10.04/P10.05 implementation and closure evidence;
 - R34-D1 durable-state implementation merged to `main` at `5f65061095094d9b58a4b293b2a5a8f01d88ad10`;
 - R34-D2 Productive Workspace wiring/qualification merged in PR #34 at `152bacd55436ebc46b36bd61d4e43f89e6b45eb6`, with final pre-merge head `5e040f560f58fcdb90d21abfac1eb333ab3225a1`;
-- [`R34-B1 — Owner-Operated Company Asset Cycle Execution / Evidence Runbook`](R34-b1-owner-operated-company-asset-cycle-runbook.md) `0.1.0` — `Prepared / NOT EXECUTED`.
+- [`R34-B1 — Owner-Operated Company Asset Cycle Execution / Evidence Runbook`](R34-b1-owner-operated-company-asset-cycle-runbook.md) `0.1.1` — `Prepared / NOT EXECUTED`.
 
 No conflict with higher-authority canonical semantics is identified.
 
@@ -38,7 +38,7 @@ One gate blocker remains.
 
 No canonical evidence packet yet demonstrates the required first real owner-operated Company asset cycle across the R34 review dimensions.
 
-The bounded R34-B1 execution/evidence runbook is now prepared and maps the actual Productive Workspace owner path: real material selection/attestation → staged receipt → owner review → Governed Execution admission → accepted identity/provenance → same-runtime-root restart/reconstruction → genuine later retrieval/use → owner usability observations.
+The bounded R34-B1 execution/evidence runbook is now prepared and maps the actual Productive Workspace owner path: real Company-owned material selection/attestation → staged receipt → owner review → Governed Execution admission → accepted identity/provenance → same-runtime-root restart/reconstruction → genuine later retrieval/use → owner usability observations.
 
 The runbook is preparation, not milestone evidence. CI, regression tests, synthetic fixtures, a prepared procedure and P10.03–P10.05/R34-D1/R34-D2 engineering evidence cannot substitute for the real owner-operated milestone evidence.
 
@@ -113,9 +113,9 @@ The existing semantic owner remains responsible for retry-token/fingerprint conf
 
 ### F8 — B1 execution is now bounded without weakening the gate
 
-The R34-B1 runbook fixes the exact real-cycle procedure and evidence-minimization rules without creating evidence by declaration. It requires a real Company material, explicit owner rights/handling attestation, actual Productive Workspace UI execution, exact immutable identifiers/digests, same-runtime-root restart/reconstruction and genuine later retrieval/use.
+The R34-B1 runbook fixes the exact real-cycle procedure and evidence-minimization rules without creating evidence by declaration. It requires a real Company-owned material, explicit owner ownership/rights/handling attestation, actual Productive Workspace UI execution, exact immutable identifiers/digests, same-runtime-root restart/reconstruction and genuine later retrieval/use.
 
-It explicitly forbids committing credentials/unnecessary raw contents and forbids deliberate durable-state corruption merely to produce a live negative-path screenshot. If no safe real negative path occurs, the live packet must say so and may reference D2 for the engineering negative-path dimension rather than fabricate owner evidence.
+A third-party, licensed or otherwise merely authorized-for-use material may be valid in another governed scenario but cannot satisfy the current M10-alpha definition. The runbook also explicitly forbids committing credentials/unnecessary raw contents and forbids deliberate durable-state corruption merely to produce a live negative-path screenshot. If no safe real negative path occurs, the live packet must say so and may reference D2 for the engineering negative-path dimension rather than fabricate owner evidence.
 
 ## 6. R34-D2 qualification evidence
 
@@ -199,7 +199,7 @@ One real bounded Company asset cycle must capture at minimum:
 
 1. owner/operator and Organization context without secrets;
 2. UTC timestamps plus environment/build/commit identity;
-3. one real bounded Company-owned/authorized material and owner attestation without embedding unnecessary raw contents in governance markdown;
+3. one real bounded Company-owned material plus explicit owner ownership/handling attestation without embedding unnecessary raw contents in governance markdown;
 4. exact staged and admitted asset/version/checksum/provenance/ownership/Event references;
 5. owner-visible review/list/detail and exact-version retrieval/use;
 6. point-of-use Authorization, Organizational Authority and Data Governance evidence;
@@ -235,8 +235,8 @@ Only then may the roadmap claim `M10-alpha`.
 **ADR-0002:** `Accepted`  
 **R34-D1:** merged/verified at `5f65061095094d9b58a4b293b2a5a8f01d88ad10`  
 **R34-D2:** merged/verified via PR #34 at `152bacd55436ebc46b36bd61d4e43f89e6b45eb6`; final pre-merge head `5e040f560f58fcdb90d21abfac1eb333ab3225a1`  
-**R34-B1 runbook:** `0.1.0 Prepared / NOT EXECUTED`  
-**Next executable action:** owner selects one real qualifying Company material and executes the prepared R34-B1 runbook through Productive Workspace; capture the resulting evidence packet and re-run R34  
+**R34-B1 runbook:** `0.1.1 Prepared / NOT EXECUTED`  
+**Next executable action:** owner selects one real qualifying Company-owned material and executes the prepared R34-B1 runbook through Productive Workspace; capture the resulting evidence packet and re-run R34  
 **M10-alpha:** remains unclaimed  
 **P10.06:** not started; remains after M10-alpha on the canonical critical path  
 **RFC amendment required:** none  
