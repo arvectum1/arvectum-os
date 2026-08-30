@@ -1,6 +1,6 @@
 # R34-B1 — Owner-Operated Company Asset Cycle Execution / Evidence Runbook
 
-**Version:** 0.1.0  
+**Version:** 0.1.1  
 **Status:** Prepared / NOT EXECUTED  
 **Date:** 2026-08-30  
 **Owner:** ООО «Арвектум»  
@@ -46,21 +46,23 @@ Executing or publishing this runbook does not by itself:
 
 ## 4. Qualifying material
 
-The owner must select one **real** bounded material that is genuinely owned by ООО «Арвектум» or for which the owner can truthfully attest that ООО «Арвектум» has the required right to retain and use it for the declared Company purpose.
+The owner must select one **real bounded material genuinely owned by ООО «Арвектум»**. This ownership requirement comes directly from the canonical M10-alpha milestone definition.
+
+A third-party, licensed, externally owned or otherwise merely authorized-for-use material may be valid in another Product Contract/asset scenario, but it does **not** satisfy this M10-alpha cycle unless the canonical milestone definition is separately changed by proper governance.
 
 For the first cycle, prefer a low-risk Company document with no reusable credentials and no unnecessary personal, customer or third-party confidential data. The material must be useful enough that later retrieval/use through Workspace is genuine rather than ceremonial.
 
 Before staging, the owner records only the following attestation in the evidence packet:
 
 - material title/description sufficient to identify the business purpose without copying unnecessary content;
-- whether the material is Company-owned or used under an identified right/permission;
+- explicit confirmation that the material is owned by ООО «Арвектум» and a bounded ownership basis/reference where useful;
 - intended classification;
 - intended purpose;
 - rights/use statement;
 - retention rule;
 - confirmation that the chosen handling is appropriate for the first owner-operated cycle.
 
-The owner, not AI, is responsible for this attestation.
+The owner, not AI, is responsible for this ownership/handling attestation.
 
 ## 5. Evidence minimization
 
@@ -125,9 +127,9 @@ Do not record session cookies or secrets.
 
 ### Step 2 — Select and attest the real material
 
-The owner selects the qualifying material under section 4 and records the bounded ownership/rights/handling attestation.
+The owner selects the qualifying Company-owned material under section 4 and records the bounded ownership/rights/handling attestation.
 
-If the owner cannot make that attestation, stop. The material is not eligible for this first cycle.
+If the owner cannot truthfully attest Company ownership, stop. The material is not eligible for this M10-alpha cycle.
 
 ### Step 3 — Stage the material through Workspace
 
@@ -167,7 +169,7 @@ Expected state:
 - the item is visible in the review lifecycle view;
 - no authority is inferred from UI visibility.
 
-Record the review decision/evidence identifiers and owner observation.
+Record the review decision/evidence identifiers exposed by Workspace/system evidence and the owner observation; do not invent an identifier that the actual projection does not expose.
 
 ### Step 5 — Consequential admission through Governed Execution
 
@@ -283,9 +285,9 @@ Minimum evidence matrix:
 | Evidence | Required source / fields | Responsible actor |
 | --- | --- | --- |
 | Execution identity | UTC, repository commit, Workspace release/build, Organization, attributable operator, runtime profile | system + owner |
-| Material eligibility | bounded title/description, Company ownership/right attestation, classification, purpose, rights, retention | owner |
+| Material eligibility | bounded title/description, explicit Company ownership attestation, classification, purpose, rights, retention | owner |
 | Staged receipt | material ID, staged version ID, SHA-256, handling fields, timestamp | Workspace/system |
-| Owner review | exact version, review decision/evidence, deletion rule, permitted reuse | owner + Workspace |
+| Owner review | exact version, review decision/evidence exposed by actual projection, deletion rule, permitted reuse | owner + Workspace |
 | Governed admission | operation, exact admitted version, Document version, designation, Event, provenance, timestamp | Governed Execution/system |
 | Accepted UX | exact identifiers visible/retrievable in Accepted view | Workspace + owner |
 | Restart | stop/start timestamps, same runtime profile, successful reconstruction | system + owner |
@@ -298,7 +300,7 @@ Minimum evidence matrix:
 
 Stop the qualifying run and leave B1 open if any of the following occurs:
 
-- material ownership/right/handling cannot be truthfully attested;
+- Company ownership or required handling cannot be truthfully attested;
 - owner access or Company asset admission authorization is unavailable;
 - staged version/digest cannot be identified exactly;
 - review is missing, ambiguous or applies to a different version;
@@ -334,4 +336,4 @@ R34 may become `Closed / PASS` only if all canonical exit criteria are satisfied
 **M10-alpha:** unclaimed  
 **Product Contract:** remains `Provisional 0.2.0`  
 **Platform Capability promotion:** none  
-**Next action:** owner selects one real qualifying Company material and executes this runbook through Productive Workspace; the resulting real evidence packet is then subjected to R34 re-review.
+**Next action:** owner selects one real qualifying Company-owned material and executes this runbook through Productive Workspace; the resulting real evidence packet is then subjected to R34 re-review.
