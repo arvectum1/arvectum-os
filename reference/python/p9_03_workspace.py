@@ -11,15 +11,12 @@ from workspace_app.company_asset_governed_provider import (
     P1004OwnerCompanyAssetAdmissionProvider,
     provision_company_asset_admission_grant,
 )
-from workspace_app.company_asset_library import P1003CompanyAssetAdmissionExecutor
+from workspace_app.company_durable_executors import build_durable_company_governed_executors
 from workspace_app.company_generated_output_governed_provider import (
     P1005OwnerCompanyGeneratedOutputPromotionProvider,
     provision_company_generated_output_promotion_grant,
 )
-from workspace_app.company_generated_outputs import (
-    CompanyGeneratedOutputs,
-    P1005CompanyGeneratedOutputPromotionExecutor,
-)
+from workspace_app.company_generated_outputs import CompanyGeneratedOutputs
 from workspace_app.config import WorkspaceSettings
 from workspace_app.f11_routes import install_f11_routes
 from workspace_app.main import create_app
@@ -57,17 +54,18 @@ def build_workspace_app(settings: WorkspaceSettings):
     """Build one same-origin Workspace app with bounded Company product routes.
 
     P10.04 asset admission and P10.05 reviewed-output promotion are installed by
-    default but each consequential operation remains fail-closed until its own
-    exact P7.04 Authorization grant has been explicitly provisioned. Neither
-    grant supplies Organizational Authority or Consequential Approval.
+    default on the ADR-0002 product-local durable state pair. Each consequential
+    operation remains fail-closed until its own exact P7.04 Authorization grant
+    has been explicitly provisioned. Neither persistence nor either grant
+    supplies Organizational Authority or Consequential Approval.
+
+    This is only the existing Company asset/output route composition required by
+    R34. It does not implement or pre-empt the broader P10.08 operational
+    entry-point composition step.
     """
 
-    admission_provider = P1004OwnerCompanyAssetAdmissionProvider(settings.runtime_root)
-    admission = P1003CompanyAssetAdmissionExecutor(admission_provider)
+    admission, promotion = build_durable_company_governed_executors(settings.runtime_root)
     app = install_f11_routes(create_app(settings), asset_admission=admission)
-
-    promotion_provider = P1005OwnerCompanyGeneratedOutputPromotionProvider(settings.runtime_root)
-    promotion = P1005CompanyGeneratedOutputPromotionExecutor(promotion_provider, admission)
     outputs = CompanyGeneratedOutputs(
         settings.runtime_root,
         app.state.company_materials_store,
